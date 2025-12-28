@@ -284,7 +284,7 @@
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="0,0,1,1"
                   Padding="{TemplateBinding Padding}">
-            <Grid ColumnDefinitions="*,Auto,Auto,6">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto,6">
             <!-- Header Text -->
             <TextBlock Grid.Column="0"
                        Text="{TemplateBinding HeaderText}"
@@ -321,9 +321,34 @@
                          Text="{TemplateBinding SortIndex}" />
             </Border>
 
+            <!-- Pin Button (visible on hover) -->
+            <Button x:Name="PART_PinButton"
+                    Grid.Column="2"
+                    Width="18" Height="18"
+                    Padding="0"
+                    Margin="2,0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    VerticalAlignment="Center"
+                    Opacity="0">
+              <Panel>
+                <!-- Pin icon (when not frozen) -->
+                <PathIcon x:Name="PinIcon"
+                          Width="12" Height="12"
+                          Data="M12,2 L10,4 L10,8 L6,12 L6,13 L7,13 L11,9 L11,9 L13,9 L13,7 L9,7 L9,5 L11,3 L14,6 L16,4 L14,2 Z"
+                          Foreground="Gray" />
+                <!-- Unpin icon (when frozen) -->
+                <PathIcon x:Name="UnpinIcon"
+                          Width="12" Height="12"
+                          Data="M12,2 L10,4 L10,8 L6,12 L6,13 L7,13 L11,9 L11,9 L13,9 L13,7 L9,7 L9,5 L11,3 L14,6 L16,4 L14,2 Z"
+                          Foreground="#1976D2"
+                          IsVisible="False" />
+              </Panel>
+            </Button>
+
             <!-- Filter Button -->
             <Button x:Name="PART_FilterButton"
-                    Grid.Column="2"
+                    Grid.Column="3"
                     Width="16" Height="16"
                     Padding="0"
                     Background="Transparent"
@@ -335,7 +360,7 @@
 
             <!-- Resize Grip -->
             <Border x:Name="PART_ResizeGrip"
-                    Grid.Column="3"
+                    Grid.Column="4"
                     Width="6"
                     Background="Transparent"
                     Cursor="SizeWestEast"
@@ -357,6 +382,24 @@
     <!-- Hover State -->
     <Style Selector="^:pointerover">
       <Setter Property="Background" Value="#E8E8E8" />
+    </Style>
+
+    <!-- Show pin button on hover -->
+    <Style Selector="^:pointerover /template/ Button#PART_PinButton">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- Always show pin button when frozen -->
+    <Style Selector="^[IsFrozen=True] /template/ Button#PART_PinButton">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- Show unpin icon when frozen -->
+    <Style Selector="^[IsFrozen=True] /template/ PathIcon#PinIcon">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^[IsFrozen=True] /template/ PathIcon#UnpinIcon">
+      <Setter Property="IsVisible" Value="True" />
     </Style>
   </ControlTheme>
 

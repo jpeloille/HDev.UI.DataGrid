@@ -457,6 +457,7 @@ public class JDataGrid : TemplatedControl
         AddHandler(JDataGridColumnHeader.SortRequestedEvent, OnColumnSortRequested);
         AddHandler(JDataGridColumnHeader.ResizeCompletedEvent, OnColumnResizeCompleted);
         AddHandler(JDataGridColumnHeader.ReorderCompletedEvent, OnColumnReorderCompleted);
+        AddHandler(JDataGridColumnHeader.FreezeRequestedEvent, OnColumnFreezeRequested);
 
         // Listen to filter cell events (bubbled from JDataGridFilterCell)
         AddHandler(JDataGridFilterCell.FilterChangedEvent, OnFilterChanged);
@@ -838,6 +839,15 @@ public class JDataGrid : TemplatedControl
         if (!AllowColumnReordering) return;
 
         Columns.MoveColumn(e.Column, e.NewIndex);
+        RefreshView();
+        e.Handled = true;
+    }
+
+    private void OnColumnFreezeRequested(object? sender, ColumnFreezeEventArgs e)
+    {
+        if (e.Column == null) return;
+
+        e.Column.IsFrozen = e.Freeze;
         RefreshView();
         e.Handled = true;
     }

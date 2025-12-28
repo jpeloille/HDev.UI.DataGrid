@@ -64,6 +64,9 @@ public class JDataGridColumnHeader : TemplatedControl
     public static readonly StyledProperty<bool> IsDragOverRightProperty =
         AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsDragOverRight), false);
 
+    public static readonly StyledProperty<bool> IsFrozenProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsFrozen), false);
+
     #endregion
 
     #region Routed Events
@@ -87,6 +90,10 @@ public class JDataGridColumnHeader : TemplatedControl
     public static readonly RoutedEvent<ColumnEventArgs> GroupRequestedEvent =
         RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
             nameof(GroupRequested), RoutingStrategies.Bubble);
+
+    public static readonly RoutedEvent<ColumnFreezeEventArgs> FreezeRequestedEvent =
+        RoutedEvent.Register<JDataGridColumnHeader, ColumnFreezeEventArgs>(
+            nameof(FreezeRequested), RoutingStrategies.Bubble);
 
     public event EventHandler<ColumnEventArgs>? SortRequested
     {
@@ -116,6 +123,12 @@ public class JDataGridColumnHeader : TemplatedControl
     {
         add => AddHandler(GroupRequestedEvent, value);
         remove => RemoveHandler(GroupRequestedEvent, value);
+    }
+
+    public event EventHandler<ColumnFreezeEventArgs>? FreezeRequested
+    {
+        add => AddHandler(FreezeRequestedEvent, value);
+        remove => RemoveHandler(FreezeRequestedEvent, value);
     }
 
     #endregion
@@ -188,6 +201,12 @@ public class JDataGridColumnHeader : TemplatedControl
         set => SetValue(IsDragOverRightProperty, value);
     }
 
+    public bool IsFrozen
+    {
+        get => GetValue(IsFrozenProperty);
+        set => SetValue(IsFrozenProperty, value);
+    }
+
     #endregion
 
     #region Constructor
@@ -222,6 +241,12 @@ public class JDataGridColumnHeader : TemplatedControl
             filterButton.Click += OnFilterButtonClick;
         }
 
+        var pinButton = e.NameScope.Find<Button>("PART_PinButton");
+        if (pinButton != null)
+        {
+            pinButton.Click += OnPinButtonClick;
+        }
+
         // Enable drag-drop for column reordering
         DragDrop.SetAllowDrop(this, true);
         AddHandler(DragDrop.DragEnterEvent, OnDragEnter);
@@ -244,6 +269,7 @@ public class JDataGridColumnHeader : TemplatedControl
             AllowSort = column.AllowSort;
             AllowResize = column.AllowResize;
             AllowReorder = column.AllowReorder;
+            IsFrozen = column.IsFrozen;
 
             column.PropertyChanged += OnColumnPropertyChanged;
         }
@@ -265,6 +291,10 @@ public class JDataGridColumnHeader : TemplatedControl
         else if (e.Property == GridColumn.SortIndexProperty)
         {
             SortIndex = column.SortIndex;
+        }
+        else if (e.Property == GridColumn.IsFrozenProperty)
+        {
+            IsFrozen = column.IsFrozen;
         }
     }
 
@@ -476,6 +506,15 @@ public class JDataGridColumnHeader : TemplatedControl
         }
     }
 
+    private void OnPinButtonClick(object? sender, RoutedEventArgs e)
+    {
+        if (Column != null)
+        {
+            var freeze = !IsFrozen;
+            RaiseEvent(new ColumnFreezeEventArgs(FreezeRequestedEvent, Column, freeze));
+        }
+    }
+
     private void AutoFitWidth()
     {
         // TODO: Calculate optimal width based on content
@@ -515,6 +554,19 @@ public class ColumnReorderEventArgs : RoutedEventArgs
         Column = column;
         OldIndex = oldIndex;
         NewIndex = newIndex;
+    }
+}
+
+public class ColumnFreezeEventArgs : RoutedEventArgs
+{
+    public GridColumn Column { get; }
+    public bool Freeze { get; }
+
+    public ColumnFreezeEventArgs(RoutedEvent routedEvent, GridColumn column, bool freeze)
+        : base(routedEvent)
+    {
+        Column = column;
+        Freeze = freeze;
     }
 }
 
