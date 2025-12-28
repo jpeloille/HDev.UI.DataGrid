@@ -389,16 +389,16 @@
       <Setter Property="Opacity" Value="1" />
     </Style>
 
-    <!-- Always show pin button when frozen -->
-    <Style Selector="^[IsFrozen=True] /template/ Button#PART_PinButton">
+    <!-- Always show pin button when position is locked -->
+    <Style Selector="^[IsPositionLocked=True] /template/ Button#PART_PinButton">
       <Setter Property="Opacity" Value="1" />
     </Style>
 
-    <!-- Show unpin icon when frozen -->
-    <Style Selector="^[IsFrozen=True] /template/ PathIcon#PinIcon">
+    <!-- Show unpin icon when position is locked -->
+    <Style Selector="^[IsPositionLocked=True] /template/ PathIcon#PinIcon">
       <Setter Property="IsVisible" Value="False" />
     </Style>
-    <Style Selector="^[IsFrozen=True] /template/ PathIcon#UnpinIcon">
+    <Style Selector="^[IsPositionLocked=True] /template/ PathIcon#UnpinIcon">
       <Setter Property="IsVisible" Value="True" />
     </Style>
   </ControlTheme>

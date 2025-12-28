@@ -847,8 +847,7 @@ public class JDataGrid : TemplatedControl
     {
         if (e.Column == null) return;
 
-        e.Column.IsFrozen = e.Freeze;
-        RefreshView();
+        e.Column.IsPositionLocked = e.Freeze;
         e.Handled = true;
     }
 

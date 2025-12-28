@@ -54,6 +54,9 @@ public class GridColumn : AvaloniaObject
     public static readonly StyledProperty<bool> IsFrozenProperty =
         AvaloniaProperty.Register<GridColumn, bool>(nameof(IsFrozen), false);
 
+    public static readonly StyledProperty<bool> IsPositionLockedProperty =
+        AvaloniaProperty.Register<GridColumn, bool>(nameof(IsPositionLocked), false);
+
     public static readonly StyledProperty<TextAlignment> TextAlignmentProperty =
         AvaloniaProperty.Register<GridColumn, TextAlignment>(nameof(TextAlignment), TextAlignment.Left);
 
@@ -179,6 +182,15 @@ public class GridColumn : AvaloniaObject
     {
         get => (bool)GetValue(IsFrozenProperty)!;
         set => SetValue(IsFrozenProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets whether the column position is locked (cannot be reordered).
+    /// </summary>
+    public bool IsPositionLocked
+    {
+        get => (bool)GetValue(IsPositionLockedProperty)!;
+        set => SetValue(IsPositionLockedProperty, value);
     }
 
     public TextAlignment TextAlignment

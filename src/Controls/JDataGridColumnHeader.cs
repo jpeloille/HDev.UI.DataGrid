@@ -67,6 +67,9 @@ public class JDataGridColumnHeader : TemplatedControl
     public static readonly StyledProperty<bool> IsFrozenProperty =
         AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsFrozen), false);
 
+    public static readonly StyledProperty<bool> IsPositionLockedProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsPositionLocked), false);
+
     #endregion
 
     #region Routed Events
@@ -207,6 +210,12 @@ public class JDataGridColumnHeader : TemplatedControl
         set => SetValue(IsFrozenProperty, value);
     }
 
+    public bool IsPositionLocked
+    {
+        get => GetValue(IsPositionLockedProperty);
+        set => SetValue(IsPositionLockedProperty, value);
+    }
+
     #endregion
 
     #region Constructor
@@ -270,6 +279,7 @@ public class JDataGridColumnHeader : TemplatedControl
             AllowResize = column.AllowResize;
             AllowReorder = column.AllowReorder;
             IsFrozen = column.IsFrozen;
+            IsPositionLocked = column.IsPositionLocked;
 
             column.PropertyChanged += OnColumnPropertyChanged;
         }
@@ -295,6 +305,10 @@ public class JDataGridColumnHeader : TemplatedControl
         else if (e.Property == GridColumn.IsFrozenProperty)
         {
             IsFrozen = column.IsFrozen;
+        }
+        else if (e.Property == GridColumn.IsPositionLockedProperty)
+        {
+            IsPositionLocked = column.IsPositionLocked;
         }
     }
 
@@ -343,7 +357,8 @@ public class JDataGridColumnHeader : TemplatedControl
     {
         base.OnPointerMoved(e);
 
-        if (!_isPointerPressed || _isDragging || _isResizing || Column == null)
+        // Don't allow dragging if column is locked or reordering is disabled
+        if (!_isPointerPressed || _isDragging || _isResizing || Column == null || IsPositionLocked || !AllowReorder)
             return;
 
         var point = e.GetCurrentPoint(this);
@@ -371,12 +386,13 @@ public class JDataGridColumnHeader : TemplatedControl
 
     private void OnDragEnter(object? sender, DragEventArgs e)
     {
-        if (!AllowReorder || Column == null) return;
+        // Don't allow dropping on locked columns
+        if (!AllowReorder || Column == null || IsPositionLocked) return;
 
         if (e.Data.Contains("GridColumn"))
         {
             var draggedColumn = e.Data.Get("GridColumn") as GridColumn;
-            if (draggedColumn != null && draggedColumn != Column)
+            if (draggedColumn != null && draggedColumn != Column && !draggedColumn.IsPositionLocked)
             {
                 UpdateDropIndicator(e);
                 e.DragEffects = DragDropEffects.Move;
@@ -387,12 +403,13 @@ public class JDataGridColumnHeader : TemplatedControl
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        if (!AllowReorder || Column == null) return;
+        // Don't allow dropping on locked columns
+        if (!AllowReorder || Column == null || IsPositionLocked) return;
 
         if (e.Data.Contains("GridColumn"))
         {
             var draggedColumn = e.Data.Get("GridColumn") as GridColumn;
-            if (draggedColumn != null && draggedColumn != Column)
+            if (draggedColumn != null && draggedColumn != Column && !draggedColumn.IsPositionLocked)
             {
                 UpdateDropIndicator(e);
                 e.DragEffects = DragDropEffects.Move;
@@ -412,9 +429,10 @@ public class JDataGridColumnHeader : TemplatedControl
         IsDragOverLeft = false;
         IsDragOverRight = false;
 
-        if (!AllowReorder || Column == null) return;
+        // Don't allow dropping on locked columns
+        if (!AllowReorder || Column == null || IsPositionLocked) return;
 
-        if (e.Data.Get("GridColumn") is GridColumn draggedColumn && draggedColumn != Column)
+        if (e.Data.Get("GridColumn") is GridColumn draggedColumn && draggedColumn != Column && !draggedColumn.IsPositionLocked)
         {
             var position = e.GetPosition(this);
             var dropOnLeft = position.X < Bounds.Width / 2;
@@ -510,8 +528,8 @@ public class JDataGridColumnHeader : TemplatedControl
     {
         if (Column != null)
         {
-            var freeze = !IsFrozen;
-            RaiseEvent(new ColumnFreezeEventArgs(FreezeRequestedEvent, Column, freeze));
+            var lockPosition = !IsPositionLocked;
+            RaiseEvent(new ColumnFreezeEventArgs(FreezeRequestedEvent, Column, lockPosition));
         }
     }
 
