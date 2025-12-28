@@ -51,7 +51,7 @@
             <Border Grid.Row="1"
                     Background="{StaticResource DataGridHeaderBackgroundBrush}"
                     IsVisible="{TemplateBinding ShowHeader}">
-              <Grid ColumnDefinitions="Auto,Auto,*">
+              <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
                 <!-- Row Indicator Space -->
                 <Border Grid.Column="0"
                         Width="4"
@@ -70,9 +70,35 @@
                              FontWeight="SemiBold" />
                 </Border>
 
-                <!-- Column Headers -->
-                <ScrollViewer x:Name="PART_HeaderScrollViewer"
+                <!-- Frozen Column Headers -->
+                <ItemsControl x:Name="PART_FrozenHeaderPresenter"
                               Grid.Column="2"
+                              Height="{TemplateBinding HeaderHeight}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <controls:JDataGridColumnHeader Column="{Binding}"
+                                                      HeaderText="{Binding Header}"
+                                                      Width="{Binding Width.Value}"
+                                                      SortDirection="{Binding SortDirection}"
+                                                      AllowResize="{Binding AllowResize}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Frozen Column Separator -->
+                <Border x:Name="PART_FrozenHeaderSeparator"
+                        Grid.Column="3"
+                        Width="2"
+                        Background="{StaticResource DataGridFrozenColumnSeparator}" />
+
+                <!-- Scrollable Column Headers -->
+                <ScrollViewer x:Name="PART_HeaderScrollViewer"
+                              Grid.Column="4"
                               HorizontalScrollBarVisibility="Hidden"
                               VerticalScrollBarVisibility="Disabled">
                   <ItemsControl x:Name="PART_HeaderPresenter"
@@ -102,7 +128,7 @@
                     BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
                     BorderThickness="0,0,0,1"
                     IsVisible="{TemplateBinding ShowFilterRow}">
-              <Grid ColumnDefinitions="Auto,Auto,*">
+              <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
                 <!-- Row Indicator Space -->
                 <Border Grid.Column="0"
                         Width="4"
@@ -113,13 +139,34 @@
                         Width="40"
                         IsVisible="{TemplateBinding ShowRowNumbers}" />
 
-                <!-- Filter Controls -->
+                <!-- Frozen Filter Controls -->
+                <ItemsControl x:Name="PART_FrozenFilterPresenter"
+                              Grid.Column="2">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <controls:JDataGridFilterCell Column="{Binding}"
+                                                    Width="{Binding Width.Value}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Frozen Column Separator -->
+                <Border x:Name="PART_FrozenFilterSeparator"
+                        Grid.Column="3"
+                        Width="2"
+                        Background="{StaticResource DataGridFrozenColumnSeparator}" />
+
+                <!-- Scrollable Filter Controls -->
                 <ScrollViewer x:Name="PART_FilterScrollViewer"
-                              Grid.Column="2"
+                              Grid.Column="4"
                               HorizontalScrollBarVisibility="Hidden"
                               VerticalScrollBarVisibility="Disabled">
-                  <ItemsControl x:Name="PART_FilterRowPresenter"
-                                ItemsSource="{TemplateBinding Columns}">
+                  <ItemsControl x:Name="PART_FilterRowPresenter">
                     <ItemsControl.ItemsPanel>
                       <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal" />
@@ -220,11 +267,24 @@
 
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Background="{TemplateBinding Background}"
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="0,0,1,1"
-                Padding="{TemplateBinding Padding}">
-          <Grid ColumnDefinitions="*,Auto,Auto,6">
+        <Panel>
+          <!-- Drop Indicators -->
+          <Border x:Name="PART_DropIndicatorLeft"
+                  Width="3"
+                  Background="#1976D2"
+                  HorizontalAlignment="Left"
+                  IsVisible="{TemplateBinding IsDragOverLeft}" />
+          <Border x:Name="PART_DropIndicatorRight"
+                  Width="3"
+                  Background="#1976D2"
+                  HorizontalAlignment="Right"
+                  IsVisible="{TemplateBinding IsDragOverRight}" />
+
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="0,0,1,1"
+                  Padding="{TemplateBinding Padding}">
+            <Grid ColumnDefinitions="*,Auto,Auto,6">
             <!-- Header Text -->
             <TextBlock Grid.Column="0"
                        Text="{TemplateBinding HeaderText}"
@@ -282,6 +342,7 @@
                     IsVisible="{TemplateBinding AllowResize}" />
           </Grid>
         </Border>
+        </Panel>
       </ControlTemplate>
     </Setter>
 
@@ -310,7 +371,7 @@
                 Background="{TemplateBinding Background}"
                 BorderBrush="{StaticResource DataGridGridLinesBrush}"
                 BorderThickness="0,0,0,1">
-          <Grid ColumnDefinitions="Auto,Auto,*">
+          <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
             <!-- Row Indicator -->
             <Border x:Name="PART_RowIndicator"
                     Grid.Column="0"
@@ -332,10 +393,32 @@
                          FontSize="11" />
             </Border>
 
-            <!-- Cells -->
+            <!-- Frozen Cells -->
+            <ItemsControl x:Name="PART_FrozenCellsPresenter"
+                          Grid.Column="2">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <controls:JDataGridCell Column="{Binding}"
+                                          RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:JDataGridRow}}"
+                                          Width="{Binding Width.Value}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Frozen Separator -->
+            <Border x:Name="PART_FrozenSeparator"
+                    Grid.Column="3"
+                    Width="2"
+                    Background="{StaticResource DataGridFrozenColumnSeparator}" />
+
+            <!-- Scrollable Cells -->
             <ItemsControl x:Name="PART_CellsPresenter"
-                          Grid.Column="2"
-                          ItemsSource="{TemplateBinding Columns}">
+                          Grid.Column="4">
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                   <StackPanel Orientation="Horizontal" />

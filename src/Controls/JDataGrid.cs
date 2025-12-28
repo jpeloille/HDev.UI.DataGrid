@@ -31,9 +31,12 @@ public class JDataGrid : TemplatedControl
     private ScrollViewer? _filterScrollViewer;
     private ItemsControl? _rowsPresenter;
     private ItemsControl? _headerPresenter;
+    private ItemsControl? _frozenHeaderPresenter;
     private ItemsControl? _filterRowPresenter;
+    private ItemsControl? _frozenFilterPresenter;
     private JDataGridGroupPanel? _groupPanel;
-    private Border? _frozenColumnsPanel;
+    private Border? _frozenHeaderSeparator;
+    private Border? _frozenFilterSeparator;
     private object? _editingItem;
     private GridColumn? _editingColumn;
 
@@ -438,9 +441,12 @@ public class JDataGrid : TemplatedControl
         _filterScrollViewer = e.NameScope.Find<ScrollViewer>("PART_FilterScrollViewer");
         _rowsPresenter = e.NameScope.Find<ItemsControl>("PART_RowsPresenter");
         _headerPresenter = e.NameScope.Find<ItemsControl>("PART_HeaderPresenter");
+        _frozenHeaderPresenter = e.NameScope.Find<ItemsControl>("PART_FrozenHeaderPresenter");
         _filterRowPresenter = e.NameScope.Find<ItemsControl>("PART_FilterRowPresenter");
+        _frozenFilterPresenter = e.NameScope.Find<ItemsControl>("PART_FrozenFilterPresenter");
         _groupPanel = e.NameScope.Find<JDataGridGroupPanel>("PART_GroupPanel");
-        _frozenColumnsPanel = e.NameScope.Find<Border>("PART_FrozenColumnsPanel");
+        _frozenHeaderSeparator = e.NameScope.Find<Border>("PART_FrozenHeaderSeparator");
+        _frozenFilterSeparator = e.NameScope.Find<Border>("PART_FrozenFilterSeparator");
 
         if (_scrollViewer != null)
         {
@@ -450,6 +456,7 @@ public class JDataGrid : TemplatedControl
         // Listen to column header events (bubbled from JDataGridColumnHeader)
         AddHandler(JDataGridColumnHeader.SortRequestedEvent, OnColumnSortRequested);
         AddHandler(JDataGridColumnHeader.ResizeCompletedEvent, OnColumnResizeCompleted);
+        AddHandler(JDataGridColumnHeader.ReorderCompletedEvent, OnColumnReorderCompleted);
 
         // Listen to filter cell events (bubbled from JDataGridFilterCell)
         AddHandler(JDataGridFilterCell.FilterChangedEvent, OnFilterChanged);
@@ -826,6 +833,15 @@ public class JDataGrid : TemplatedControl
         e.Handled = true;
     }
 
+    private void OnColumnReorderCompleted(object? sender, ColumnReorderEventArgs e)
+    {
+        if (!AllowColumnReordering) return;
+
+        Columns.MoveColumn(e.Column, e.NewIndex);
+        RefreshView();
+        e.Handled = true;
+    }
+
     private void OnFilterChanged(object? sender, FilterChangedEventArgs e)
     {
         if (!AllowFiltering || e.Column == null) return;
@@ -895,10 +911,47 @@ public class JDataGrid : TemplatedControl
             _rowsPresenter.ItemsSource = _dataSource.View;
         }
 
-        // Bind columns to header presenter
+        // Get frozen and scrollable columns
+        var frozenColumns = Columns.GetFrozenColumns().ToList();
+        var scrollableColumns = Columns.GetScrollableColumns().ToList();
+        var hasFrozenColumns = frozenColumns.Count > 0;
+
+        // Bind frozen columns to frozen header presenter
+        if (_frozenHeaderPresenter != null)
+        {
+            _frozenHeaderPresenter.ItemsSource = frozenColumns;
+            _frozenHeaderPresenter.IsVisible = hasFrozenColumns;
+        }
+
+        // Show/hide frozen separator
+        if (_frozenHeaderSeparator != null)
+        {
+            _frozenHeaderSeparator.IsVisible = hasFrozenColumns;
+        }
+
+        // Bind scrollable columns to header presenter
         if (_headerPresenter != null)
         {
-            _headerPresenter.ItemsSource = Columns.Where(c => c.IsVisible);
+            _headerPresenter.ItemsSource = scrollableColumns;
+        }
+
+        // Bind frozen columns to frozen filter presenter
+        if (_frozenFilterPresenter != null)
+        {
+            _frozenFilterPresenter.ItemsSource = frozenColumns;
+            _frozenFilterPresenter.IsVisible = hasFrozenColumns;
+        }
+
+        // Show/hide frozen filter separator
+        if (_frozenFilterSeparator != null)
+        {
+            _frozenFilterSeparator.IsVisible = hasFrozenColumns;
+        }
+
+        // Bind scrollable columns to filter presenter
+        if (_filterRowPresenter != null)
+        {
+            _filterRowPresenter.ItemsSource = scrollableColumns;
         }
     }
 

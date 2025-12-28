@@ -16,6 +16,8 @@ public class JDataGridRow : TemplatedControl
     #region Private Fields
 
     private ItemsControl? _cellsPresenter;
+    private ItemsControl? _frozenCellsPresenter;
+    private Border? _frozenSeparator;
     private Border? _rowIndicator;
     private TextBlock? _rowNumber;
     private bool _isPointerOver;
@@ -194,6 +196,8 @@ public class JDataGridRow : TemplatedControl
         base.OnApplyTemplate(e);
 
         _cellsPresenter = e.NameScope.Find<ItemsControl>("PART_CellsPresenter");
+        _frozenCellsPresenter = e.NameScope.Find<ItemsControl>("PART_FrozenCellsPresenter");
+        _frozenSeparator = e.NameScope.Find<Border>("PART_FrozenSeparator");
         _rowIndicator = e.NameScope.Find<Border>("PART_RowIndicator");
         _rowNumber = e.NameScope.Find<TextBlock>("PART_RowNumber");
 
@@ -241,10 +245,28 @@ public class JDataGridRow : TemplatedControl
 
     private void UpdateCells()
     {
-        if (_cellsPresenter == null || Columns == null || DataContext == null)
+        if (Columns == null)
             return;
 
-        // Cells are generated via ItemsSource binding in the template
+        var frozenColumns = Columns.GetFrozenColumns().ToList();
+        var scrollableColumns = Columns.GetScrollableColumns().ToList();
+        var hasFrozenColumns = frozenColumns.Count > 0;
+
+        if (_frozenCellsPresenter != null)
+        {
+            _frozenCellsPresenter.ItemsSource = frozenColumns;
+            _frozenCellsPresenter.IsVisible = hasFrozenColumns;
+        }
+
+        if (_frozenSeparator != null)
+        {
+            _frozenSeparator.IsVisible = hasFrozenColumns;
+        }
+
+        if (_cellsPresenter != null)
+        {
+            _cellsPresenter.ItemsSource = scrollableColumns;
+        }
     }
 
     private void UpdateRowNumber()

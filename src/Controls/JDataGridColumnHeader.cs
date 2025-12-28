@@ -24,6 +24,8 @@ public class JDataGridColumnHeader : TemplatedControl
     private bool _isPointerPressed;
     private Point _dragStartPoint;
     private const double DragThreshold = 5.0;
+    private Border? _dropIndicatorLeft;
+    private Border? _dropIndicatorRight;
 
     #endregion
 
@@ -55,6 +57,12 @@ public class JDataGridColumnHeader : TemplatedControl
 
     public static readonly StyledProperty<bool> IsFilteredProperty =
         AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsFiltered), false);
+
+    public static readonly StyledProperty<bool> IsDragOverLeftProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsDragOverLeft), false);
+
+    public static readonly StyledProperty<bool> IsDragOverRightProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsDragOverRight), false);
 
     #endregion
 
@@ -168,6 +176,18 @@ public class JDataGridColumnHeader : TemplatedControl
         set => SetValue(IsFilteredProperty, value);
     }
 
+    public bool IsDragOverLeft
+    {
+        get => GetValue(IsDragOverLeftProperty);
+        set => SetValue(IsDragOverLeftProperty, value);
+    }
+
+    public bool IsDragOverRight
+    {
+        get => GetValue(IsDragOverRightProperty);
+        set => SetValue(IsDragOverRightProperty, value);
+    }
+
     #endregion
 
     #region Constructor
@@ -186,6 +206,8 @@ public class JDataGridColumnHeader : TemplatedControl
         base.OnApplyTemplate(e);
 
         _resizeGrip = e.NameScope.Find<Border>("PART_ResizeGrip");
+        _dropIndicatorLeft = e.NameScope.Find<Border>("PART_DropIndicatorLeft");
+        _dropIndicatorRight = e.NameScope.Find<Border>("PART_DropIndicatorRight");
 
         if (_resizeGrip != null)
         {
@@ -199,6 +221,13 @@ public class JDataGridColumnHeader : TemplatedControl
         {
             filterButton.Click += OnFilterButtonClick;
         }
+
+        // Enable drag-drop for column reordering
+        DragDrop.SetAllowDrop(this, true);
+        AddHandler(DragDrop.DragEnterEvent, OnDragEnter);
+        AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
+        AddHandler(DragDrop.DropEvent, OnDrop);
     }
 
     #endregion
@@ -308,6 +337,97 @@ public class JDataGridColumnHeader : TemplatedControl
         }
     }
 
+    #region Drag/Drop for Reordering
+
+    private void OnDragEnter(object? sender, DragEventArgs e)
+    {
+        if (!AllowReorder || Column == null) return;
+
+        if (e.Data.Contains("GridColumn"))
+        {
+            var draggedColumn = e.Data.Get("GridColumn") as GridColumn;
+            if (draggedColumn != null && draggedColumn != Column)
+            {
+                UpdateDropIndicator(e);
+                e.DragEffects = DragDropEffects.Move;
+                e.Handled = true;
+            }
+        }
+    }
+
+    private void OnDragOver(object? sender, DragEventArgs e)
+    {
+        if (!AllowReorder || Column == null) return;
+
+        if (e.Data.Contains("GridColumn"))
+        {
+            var draggedColumn = e.Data.Get("GridColumn") as GridColumn;
+            if (draggedColumn != null && draggedColumn != Column)
+            {
+                UpdateDropIndicator(e);
+                e.DragEffects = DragDropEffects.Move;
+                e.Handled = true;
+            }
+        }
+    }
+
+    private void OnDragLeave(object? sender, DragEventArgs e)
+    {
+        IsDragOverLeft = false;
+        IsDragOverRight = false;
+    }
+
+    private void OnDrop(object? sender, DragEventArgs e)
+    {
+        IsDragOverLeft = false;
+        IsDragOverRight = false;
+
+        if (!AllowReorder || Column == null) return;
+
+        if (e.Data.Get("GridColumn") is GridColumn draggedColumn && draggedColumn != Column)
+        {
+            var position = e.GetPosition(this);
+            var dropOnLeft = position.X < Bounds.Width / 2;
+
+            var oldIndex = draggedColumn.VisibleIndex;
+            var newIndex = Column.VisibleIndex;
+
+            // Adjust index based on drop position
+            if (!dropOnLeft && oldIndex < newIndex)
+            {
+                // Dropping on right side, keep same index
+            }
+            else if (dropOnLeft && oldIndex > newIndex)
+            {
+                // Dropping on left side, keep same index
+            }
+            else if (!dropOnLeft)
+            {
+                newIndex++;
+            }
+
+            if (oldIndex != newIndex)
+            {
+                RaiseEvent(new ColumnReorderEventArgs(ReorderCompletedEvent, draggedColumn, oldIndex, newIndex));
+            }
+
+            e.Handled = true;
+        }
+    }
+
+    private void UpdateDropIndicator(DragEventArgs e)
+    {
+        var position = e.GetPosition(this);
+        var dropOnLeft = position.X < Bounds.Width / 2;
+
+        IsDragOverLeft = dropOnLeft;
+        IsDragOverRight = !dropOnLeft;
+    }
+
+    #endregion
+
+    #region Resize Grip
+
     private void OnResizeGripPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!AllowResize || Column == null) return;
@@ -360,6 +480,8 @@ public class JDataGridColumnHeader : TemplatedControl
     {
         // TODO: Calculate optimal width based on content
     }
+
+    #endregion
 
     #endregion
 }

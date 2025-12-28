@@ -54,4 +54,30 @@ public class GridColumnCollection : AvaloniaList<GridColumn>
             visibleColumns[i].VisibleIndex = i;
         }
     }
+
+    /// <summary>
+    /// Moves a column to a new position.
+    /// </summary>
+    public void MoveColumn(GridColumn column, int newVisibleIndex)
+    {
+        if (!Contains(column)) return;
+
+        var visibleColumns = this.Where(c => c.IsVisible).OrderBy(c => c.VisibleIndex).ToList();
+        var currentIndex = visibleColumns.IndexOf(column);
+
+        if (currentIndex < 0 || currentIndex == newVisibleIndex) return;
+
+        visibleColumns.RemoveAt(currentIndex);
+
+        if (newVisibleIndex > visibleColumns.Count)
+            newVisibleIndex = visibleColumns.Count;
+
+        visibleColumns.Insert(newVisibleIndex, column);
+
+        // Update all visible indices
+        for (int i = 0; i < visibleColumns.Count; i++)
+        {
+            visibleColumns[i].VisibleIndex = i;
+        }
+    }
 }
