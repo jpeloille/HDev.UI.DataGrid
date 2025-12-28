@@ -1,0 +1,256 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DemoApp.ViewModels"
+        xmlns:jdg="using:Julien.Avalonia.DataGrid.Controls"
+        xmlns:models="using:Julien.Avalonia.DataGrid.Models"
+        x:Class="DemoApp.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="JDataGrid Demo - Avalonia UI"
+        Width="1400" Height="800"
+        WindowStartupLocation="CenterScreen">
+
+  <Design.DataContext>
+    <vm:MainViewModel />
+  </Design.DataContext>
+
+  <Grid RowDefinitions="Auto,*,Auto">
+    
+    <!-- Toolbar -->
+    <Border Grid.Row="0" 
+            Background="#F5F5F5" 
+            BorderBrush="#E0E0E0" 
+            BorderThickness="0,0,0,1"
+            Padding="8">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        
+        <!-- Data Operations -->
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="Data:" VerticalAlignment="Center" Margin="0,0,4,0" />
+          <Button Content="Refresh" Command="{Binding RefreshDataCommand}" />
+          <Button Content="Add" Command="{Binding AddEmployeeCommand}" />
+          <Button Content="Delete" Command="{Binding DeleteEmployeeCommand}" 
+                  IsEnabled="{Binding SelectedEmployee, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </StackPanel>
+
+        <Separator />
+        
+        <!-- Dataset Size -->
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="Load:" VerticalAlignment="Center" Margin="0,0,4,0" />
+          <Button Content="100" Command="{Binding LoadSmallDatasetCommand}" ToolTip.Tip="Load 100 rows" />
+          <Button Content="1K" Command="{Binding LoadMediumDatasetCommand}" ToolTip.Tip="Load 1,000 rows" />
+          <Button Content="10K" Command="{Binding LoadLargeDatasetCommand}" ToolTip.Tip="Load 10,000 rows" />
+          <Button Content="100K" Command="{Binding LoadVeryLargeDatasetCommand}" ToolTip.Tip="Load 100,000 rows" />
+        </StackPanel>
+
+        <Separator />
+        
+        <!-- View Options -->
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="View:" VerticalAlignment="Center" Margin="0,0,4,0" />
+          <ToggleButton Content="Filter Row" IsChecked="{Binding ShowFilterRow}" />
+          <ToggleButton Content="Group Panel" IsChecked="{Binding ShowGroupPanel}" />
+          <ToggleButton Content="Row Numbers" IsChecked="{Binding ShowRowNumbers}" />
+        </StackPanel>
+        
+      </StackPanel>
+    </Border>
+
+    <!-- Main Content -->
+    <Grid Grid.Row="1" ColumnDefinitions="*,300">
+      
+      <!-- DataGrid -->
+      <jdg:JDataGrid ItemsSource="{Binding Employees}"
+                     SelectedItem="{Binding SelectedEmployee}"
+                     ShowFilterRow="{Binding ShowFilterRow}"
+                     ShowGroupPanel="{Binding ShowGroupPanel}"
+                     ShowRowNumbers="{Binding ShowRowNumbers}"
+                     IsLoading="{Binding IsLoading}"
+                     AllowSorting="True"
+                     AllowFiltering="True"
+                     AllowGrouping="True"
+                     AllowEditing="True"
+                     AllowColumnResizing="True"
+                     AllowColumnReordering="True"
+                     AutoGenerateColumns="False"
+                     RowHeight="32"
+                     HeaderHeight="36"
+                     Margin="8">
+        
+        <jdg:JDataGrid.Columns>
+          <models:GridColumn FieldName="Id" 
+                             Header="ID" 
+                             Width="60" 
+                             IsReadOnly="True"
+                             TextAlignment="Right" />
+          
+          <models:GridColumn FieldName="FirstName" 
+                             Header="First Name" 
+                             Width="120" />
+          
+          <models:GridColumn FieldName="LastName" 
+                             Header="Last Name" 
+                             Width="120" />
+          
+          <models:GridColumn FieldName="Email" 
+                             Header="Email" 
+                             Width="200" />
+          
+          <models:GridColumn FieldName="Department" 
+                             Header="Department" 
+                             Width="120"
+                             AllowGroup="True" />
+          
+          <models:GridColumn FieldName="Position" 
+                             Header="Position" 
+                             Width="100" />
+          
+          <models:GridColumn FieldName="HireDate" 
+                             Header="Hire Date" 
+                             Width="100"
+                             ColumnType="DateTime"
+                             FormatString="d" />
+          
+          <models:GridColumn FieldName="Salary" 
+                             Header="Salary" 
+                             Width="100"
+                             ColumnType="Numeric"
+                             FormatString="C0"
+                             TextAlignment="Right" />
+          
+          <models:GridColumn FieldName="IsActive" 
+                             Header="Active" 
+                             Width="60"
+                             ColumnType="Boolean"
+                             TextAlignment="Center" />
+          
+          <models:GridColumn FieldName="PerformanceRating" 
+                             Header="Rating" 
+                             Width="70"
+                             ColumnType="Numeric"
+                             TextAlignment="Center" />
+          
+          <models:GridColumn FieldName="Country" 
+                             Header="Country" 
+                             Width="120"
+                             AllowGroup="True" />
+        </jdg:JDataGrid.Columns>
+        
+      </jdg:JDataGrid>
+
+      <!-- Details Panel -->
+      <Border Grid.Column="1"
+              Background="#FAFAFA"
+              BorderBrush="#E0E0E0"
+              BorderThickness="1,0,0,0"
+              Padding="16">
+        <ScrollViewer>
+          <StackPanel Spacing="12"
+                      IsVisible="{Binding SelectedEmployee, Converter={x:Static ObjectConverters.IsNotNull}}">
+            
+            <TextBlock Text="Employee Details" 
+                       FontSize="18" 
+                       FontWeight="Bold" 
+                       Margin="0,0,0,8" />
+            
+            <StackPanel Spacing="8">
+              <TextBlock>
+                <Run Text="ID: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.Id}" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Name: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.FullName}" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Email: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.Email}" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Department: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.Department}" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Position: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.Position}" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Hire Date: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.HireDate, StringFormat='{}{0:d}'}" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Salary: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.Salary, StringFormat='{}{0:C0}'}" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Active: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.IsActive}" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Rating: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.PerformanceRating}" />
+                <Run Text="/5" />
+              </TextBlock>
+              
+              <TextBlock>
+                <Run Text="Country: " FontWeight="SemiBold" />
+                <Run Text="{Binding SelectedEmployee.Country}" />
+              </TextBlock>
+            </StackPanel>
+            
+            <Separator Margin="0,8" />
+            
+            <!-- Edit Section -->
+            <TextBlock Text="Quick Edit" 
+                       FontSize="14" 
+                       FontWeight="SemiBold" 
+                       Margin="0,0,0,8" />
+            
+            <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto,Auto">
+              <TextBlock Grid.Row="0" Grid.Column="0" Text="First Name:" VerticalAlignment="Center" />
+              <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedEmployee.FirstName}" />
+              
+              <TextBlock Grid.Row="1" Grid.Column="0" Text="Last Name:" VerticalAlignment="Center" />
+              <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedEmployee.LastName}" />
+              
+              <TextBlock Grid.Row="2" Grid.Column="0" Text="Salary:" VerticalAlignment="Center" />
+              <NumericUpDown Grid.Row="2" Grid.Column="1" 
+                             Value="{Binding SelectedEmployee.Salary}"
+                             FormatString="C0"
+                             Minimum="0" />
+              
+              <TextBlock Grid.Row="3" Grid.Column="0" Text="Active:" VerticalAlignment="Center" />
+              <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding SelectedEmployee.IsActive}" />
+            </Grid>
+            
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+      
+    </Grid>
+
+    <!-- Status Bar -->
+    <Border Grid.Row="2"
+            Background="#F5F5F5"
+            BorderBrush="#E0E0E0"
+            BorderThickness="0,1,0,0"
+            Padding="12,6">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="1" 
+                   Text="JDataGrid Demo v1.0"
+                   Foreground="Gray"
+                   VerticalAlignment="Center" />
+      </Grid>
+    </Border>
+    
+  </Grid>
+</Window>

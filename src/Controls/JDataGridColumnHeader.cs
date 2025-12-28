@@ -1,0 +1,399 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Julien.Avalonia.DataGrid.Models;
+using System.ComponentModel;
+using System.Threading.Tasks;
+
+namespace Julien.Avalonia.DataGrid.Controls;
+
+/// <summary>
+/// Represents a column header with sorting, resizing, and reordering support.
+/// </summary>
+public class JDataGridColumnHeader : TemplatedControl
+{
+    #region Private Fields
+
+    private Border? _resizeGrip;
+    private bool _isResizing;
+    private Point _resizeStartPoint;
+    private double _originalWidth;
+    private bool _isDragging;
+    private bool _isPointerPressed;
+    private Point _dragStartPoint;
+    private const double DragThreshold = 5.0;
+
+    #endregion
+
+    #region Styled Properties
+
+    public static readonly StyledProperty<GridColumn?> ColumnProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, GridColumn?>(nameof(Column));
+
+    public static readonly StyledProperty<string> HeaderTextProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, string>(nameof(HeaderText), string.Empty);
+
+    public static readonly StyledProperty<ListSortDirection?> SortDirectionProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, ListSortDirection?>(nameof(SortDirection));
+
+    public static readonly StyledProperty<int> SortIndexProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, int>(nameof(SortIndex), -1);
+
+    public static readonly StyledProperty<bool> AllowSortProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(AllowSort), true);
+
+    public static readonly StyledProperty<bool> AllowResizeProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(AllowResize), true);
+
+    public static readonly StyledProperty<bool> AllowReorderProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(AllowReorder), true);
+
+    public static readonly StyledProperty<bool> ShowFilterButtonProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(ShowFilterButton), false);
+
+    public static readonly StyledProperty<bool> IsFilteredProperty =
+        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsFiltered), false);
+
+    #endregion
+
+    #region Routed Events
+
+    public static readonly RoutedEvent<ColumnEventArgs> SortRequestedEvent =
+        RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
+            nameof(SortRequested), RoutingStrategies.Bubble);
+
+    public static readonly RoutedEvent<ColumnResizeEventArgs> ResizeCompletedEvent =
+        RoutedEvent.Register<JDataGridColumnHeader, ColumnResizeEventArgs>(
+            nameof(ResizeCompleted), RoutingStrategies.Bubble);
+
+    public static readonly RoutedEvent<ColumnReorderEventArgs> ReorderCompletedEvent =
+        RoutedEvent.Register<JDataGridColumnHeader, ColumnReorderEventArgs>(
+            nameof(ReorderCompleted), RoutingStrategies.Bubble);
+
+    public static readonly RoutedEvent<ColumnEventArgs> FilterRequestedEvent =
+        RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
+            nameof(FilterRequested), RoutingStrategies.Bubble);
+
+    public static readonly RoutedEvent<ColumnEventArgs> GroupRequestedEvent =
+        RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
+            nameof(GroupRequested), RoutingStrategies.Bubble);
+
+    public event EventHandler<ColumnEventArgs>? SortRequested
+    {
+        add => AddHandler(SortRequestedEvent, value);
+        remove => RemoveHandler(SortRequestedEvent, value);
+    }
+
+    public event EventHandler<ColumnResizeEventArgs>? ResizeCompleted
+    {
+        add => AddHandler(ResizeCompletedEvent, value);
+        remove => RemoveHandler(ResizeCompletedEvent, value);
+    }
+
+    public event EventHandler<ColumnReorderEventArgs>? ReorderCompleted
+    {
+        add => AddHandler(ReorderCompletedEvent, value);
+        remove => RemoveHandler(ReorderCompletedEvent, value);
+    }
+
+    public event EventHandler<ColumnEventArgs>? FilterRequested
+    {
+        add => AddHandler(FilterRequestedEvent, value);
+        remove => RemoveHandler(FilterRequestedEvent, value);
+    }
+
+    public event EventHandler<ColumnEventArgs>? GroupRequested
+    {
+        add => AddHandler(GroupRequestedEvent, value);
+        remove => RemoveHandler(GroupRequestedEvent, value);
+    }
+
+    #endregion
+
+    #region Properties
+
+    public GridColumn? Column
+    {
+        get => GetValue(ColumnProperty);
+        set => SetValue(ColumnProperty, value);
+    }
+
+    public string HeaderText
+    {
+        get => GetValue(HeaderTextProperty);
+        set => SetValue(HeaderTextProperty, value);
+    }
+
+    public ListSortDirection? SortDirection
+    {
+        get => GetValue(SortDirectionProperty);
+        set => SetValue(SortDirectionProperty, value);
+    }
+
+    public int SortIndex
+    {
+        get => GetValue(SortIndexProperty);
+        set => SetValue(SortIndexProperty, value);
+    }
+
+    public bool AllowSort
+    {
+        get => GetValue(AllowSortProperty);
+        set => SetValue(AllowSortProperty, value);
+    }
+
+    public bool AllowResize
+    {
+        get => GetValue(AllowResizeProperty);
+        set => SetValue(AllowResizeProperty, value);
+    }
+
+    public bool AllowReorder
+    {
+        get => GetValue(AllowReorderProperty);
+        set => SetValue(AllowReorderProperty, value);
+    }
+
+    public bool ShowFilterButton
+    {
+        get => GetValue(ShowFilterButtonProperty);
+        set => SetValue(ShowFilterButtonProperty, value);
+    }
+
+    public bool IsFiltered
+    {
+        get => GetValue(IsFilteredProperty);
+        set => SetValue(IsFilteredProperty, value);
+    }
+
+    #endregion
+
+    #region Constructor
+
+    static JDataGridColumnHeader()
+    {
+        ColumnProperty.Changed.AddClassHandler<JDataGridColumnHeader>((header, e) => header.OnColumnChanged(e));
+    }
+
+    #endregion
+
+    #region Template
+
+    protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+    {
+        base.OnApplyTemplate(e);
+
+        _resizeGrip = e.NameScope.Find<Border>("PART_ResizeGrip");
+
+        if (_resizeGrip != null)
+        {
+            _resizeGrip.PointerPressed += OnResizeGripPointerPressed;
+            _resizeGrip.PointerMoved += OnResizeGripPointerMoved;
+            _resizeGrip.PointerReleased += OnResizeGripPointerReleased;
+        }
+
+        var filterButton = e.NameScope.Find<Button>("PART_FilterButton");
+        if (filterButton != null)
+        {
+            filterButton.Click += OnFilterButtonClick;
+        }
+    }
+
+    #endregion
+
+    #region Event Handlers
+
+    private void OnColumnChanged(AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.NewValue is GridColumn column)
+        {
+            HeaderText = column.Header;
+            SortDirection = column.SortDirection;
+            SortIndex = column.SortIndex;
+            AllowSort = column.AllowSort;
+            AllowResize = column.AllowResize;
+            AllowReorder = column.AllowReorder;
+
+            column.PropertyChanged += OnColumnPropertyChanged;
+        }
+
+        if (e.OldValue is GridColumn oldColumn)
+        {
+            oldColumn.PropertyChanged -= OnColumnPropertyChanged;
+        }
+    }
+
+    private void OnColumnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (sender is not GridColumn column) return;
+
+        if (e.Property == GridColumn.SortDirectionProperty)
+        {
+            SortDirection = column.SortDirection;
+        }
+        else if (e.Property == GridColumn.SortIndexProperty)
+        {
+            SortIndex = column.SortIndex;
+        }
+    }
+
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+
+        if (e.Source == _resizeGrip) return;
+
+        var point = e.GetCurrentPoint(this);
+
+        if (point.Properties.IsLeftButtonPressed)
+        {
+            _dragStartPoint = point.Position;
+            _isPointerPressed = true;
+
+            if (e.ClickCount == 2 && AllowResize)
+            {
+                AutoFitWidth();
+                e.Handled = true;
+                _isPointerPressed = false;
+            }
+        }
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+
+        var wasDragging = _isDragging;
+        _isDragging = false;
+        _isPointerPressed = false;
+
+        if (wasDragging)
+        {
+            return;
+        }
+
+        if (!_isResizing && AllowSort && Column != null)
+        {
+            RaiseEvent(new ColumnEventArgs(SortRequestedEvent, Column));
+        }
+    }
+
+    protected override async void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+
+        if (!_isPointerPressed || _isDragging || _isResizing || Column == null)
+            return;
+
+        var point = e.GetCurrentPoint(this);
+        var distance = Math.Sqrt(
+            Math.Pow(point.Position.X - _dragStartPoint.X, 2) +
+            Math.Pow(point.Position.Y - _dragStartPoint.Y, 2));
+
+        if (distance >= DragThreshold)
+        {
+            _isDragging = true;
+            _isPointerPressed = false;
+
+            // Start drag operation
+            var data = new DataObject();
+            data.Set("GridColumn", Column);
+
+#pragma warning disable CS0618 // DoDragDrop is obsolete but DoDragDropAsync is not available in public API
+            await DragDrop.DoDragDrop(e, data, DragDropEffects.Move);
+#pragma warning restore CS0618
+            _isDragging = false;
+        }
+    }
+
+    private void OnResizeGripPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!AllowResize || Column == null) return;
+
+        var point = e.GetCurrentPoint(this);
+        if (point.Properties.IsLeftButtonPressed)
+        {
+            _isResizing = true;
+            _resizeStartPoint = point.Position;
+            _originalWidth = Column.ActualWidth > 0 ? Column.ActualWidth : Bounds.Width;
+            e.Pointer.Capture(_resizeGrip);
+            e.Handled = true;
+        }
+    }
+
+    private void OnResizeGripPointerMoved(object? sender, PointerEventArgs e)
+    {
+        if (!_isResizing || Column == null) return;
+
+        var point = e.GetCurrentPoint(this);
+        var delta = point.Position.X - _resizeStartPoint.X;
+        var newWidth = Math.Max(Column.MinWidth, Math.Min(Column.MaxWidth, _originalWidth + delta));
+
+        Column.ActualWidth = newWidth;
+        Column.Width = new GridLength(newWidth);
+
+        e.Handled = true;
+    }
+
+    private void OnResizeGripPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (!_isResizing || Column == null) return;
+
+        _isResizing = false;
+        e.Pointer.Capture(null);
+
+        RaiseEvent(new ColumnResizeEventArgs(ResizeCompletedEvent, Column, _originalWidth, Column.ActualWidth));
+        e.Handled = true;
+    }
+
+    private void OnFilterButtonClick(object? sender, RoutedEventArgs e)
+    {
+        if (Column != null)
+        {
+            RaiseEvent(new ColumnEventArgs(FilterRequestedEvent, Column));
+        }
+    }
+
+    private void AutoFitWidth()
+    {
+        // TODO: Calculate optimal width based on content
+    }
+
+    #endregion
+}
+
+#region Event Args
+
+public class ColumnResizeEventArgs : RoutedEventArgs
+{
+    public GridColumn Column { get; }
+    public double OldWidth { get; }
+    public double NewWidth { get; }
+
+    public ColumnResizeEventArgs(RoutedEvent routedEvent, GridColumn column, double oldWidth, double newWidth)
+        : base(routedEvent)
+    {
+        Column = column;
+        OldWidth = oldWidth;
+        NewWidth = newWidth;
+    }
+}
+
+public class ColumnReorderEventArgs : RoutedEventArgs
+{
+    public GridColumn Column { get; }
+    public int OldIndex { get; }
+    public int NewIndex { get; }
+
+    public ColumnReorderEventArgs(RoutedEvent routedEvent, GridColumn column, int oldIndex, int newIndex)
+        : base(routedEvent)
+    {
+        Column = column;
+        OldIndex = oldIndex;
+        NewIndex = newIndex;
+    }
+}
+
+#endregion

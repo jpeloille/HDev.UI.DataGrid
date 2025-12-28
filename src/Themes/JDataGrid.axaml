@@ -1,0 +1,599 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Julien.Avalonia.DataGrid.Controls;assembly=Julien.Avalonia.DataGrid">
+
+  <!-- ===== Colors ===== -->
+  <Color x:Key="DataGridHeaderBackground">#F5F5F5</Color>
+  <Color x:Key="DataGridHeaderBorder">#E0E0E0</Color>
+  <Color x:Key="DataGridRowAlternate">#FAFAFA</Color>
+  <Color x:Key="DataGridRowSelected">#E3F2FD</Color>
+  <Color x:Key="DataGridRowHover">#F5F5F5</Color>
+  <Color x:Key="DataGridGridLines">#E0E0E0</Color>
+  <Color x:Key="DataGridCellSelected">#BBDEFB</Color>
+  <Color x:Key="DataGridGroupBackground">#EEEEEE</Color>
+  <Color x:Key="DataGridFrozenColumnSeparator">#BDBDBD</Color>
+
+  <!-- ===== Brushes ===== -->
+  <SolidColorBrush x:Key="DataGridHeaderBackgroundBrush" Color="{StaticResource DataGridHeaderBackground}" />
+  <SolidColorBrush x:Key="DataGridHeaderBorderBrush" Color="{StaticResource DataGridHeaderBorder}" />
+  <SolidColorBrush x:Key="DataGridRowAlternateBrush" Color="{StaticResource DataGridRowAlternate}" />
+  <SolidColorBrush x:Key="DataGridRowSelectedBrush" Color="{StaticResource DataGridRowSelected}" />
+  <SolidColorBrush x:Key="DataGridRowHoverBrush" Color="{StaticResource DataGridRowHover}" />
+  <SolidColorBrush x:Key="DataGridGridLinesBrush" Color="{StaticResource DataGridGridLines}" />
+  <SolidColorBrush x:Key="DataGridCellSelectedBrush" Color="{StaticResource DataGridCellSelected}" />
+  <SolidColorBrush x:Key="DataGridGroupBackgroundBrush" Color="{StaticResource DataGridGroupBackground}" />
+
+  <!-- ===== JDataGrid Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:JDataGrid}" TargetType="controls:JDataGrid">
+    <Setter Property="Background" Value="White" />
+    <Setter Property="BorderBrush" Value="{StaticResource DataGridHeaderBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="AlternateRowBackground" Value="{StaticResource DataGridRowAlternateBrush}" />
+    <Setter Property="SelectedRowBackground" Value="{StaticResource DataGridRowSelectedBrush}" />
+    <Setter Property="HoverRowBackground" Value="{StaticResource DataGridRowHoverBrush}" />
+    <Setter Property="GridLinesColor" Value="{StaticResource DataGridGridLinesBrush}" />
+    <Setter Property="Focusable" Value="True" />
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="4">
+          <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+            
+            <!-- Group Panel (drag columns here to group) -->
+            <controls:JDataGridGroupPanel x:Name="PART_GroupPanel"
+                                          Grid.Row="0"
+                                          IsVisible="{TemplateBinding ShowGroupPanel}" />
+
+            <!-- Column Headers -->
+            <Border Grid.Row="1"
+                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
+                    IsVisible="{TemplateBinding ShowHeader}">
+              <Grid ColumnDefinitions="Auto,Auto,*">
+                <!-- Row Indicator Space -->
+                <Border Grid.Column="0"
+                        Width="4"
+                        IsVisible="{TemplateBinding ShowRowIndicator}" />
+
+                <!-- Row Number Header -->
+                <Border Grid.Column="1"
+                        Width="40"
+                        Background="{StaticResource DataGridHeaderBackgroundBrush}"
+                        BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                        BorderThickness="0,0,1,1"
+                        IsVisible="{TemplateBinding ShowRowNumbers}">
+                  <TextBlock Text="#"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             FontWeight="SemiBold" />
+                </Border>
+
+                <!-- Column Headers -->
+                <ScrollViewer x:Name="PART_HeaderScrollViewer"
+                              Grid.Column="2"
+                              HorizontalScrollBarVisibility="Hidden"
+                              VerticalScrollBarVisibility="Disabled">
+                  <ItemsControl x:Name="PART_HeaderPresenter"
+                                Height="{TemplateBinding HeaderHeight}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <controls:JDataGridColumnHeader Column="{Binding}"
+                                                        HeaderText="{Binding Header}"
+                                                        Width="{Binding Width.Value}"
+                                                        SortDirection="{Binding SortDirection}"
+                                                        AllowResize="{Binding AllowResize}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Grid>
+            </Border>
+
+            <!-- Filter Row -->
+            <Border Grid.Row="2"
+                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
+                    BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                    BorderThickness="0,0,0,1"
+                    IsVisible="{TemplateBinding ShowFilterRow}">
+              <Grid ColumnDefinitions="Auto,Auto,*">
+                <!-- Row Indicator Space -->
+                <Border Grid.Column="0"
+                        Width="4"
+                        IsVisible="{TemplateBinding ShowRowIndicator}" />
+
+                <!-- Row Number Space -->
+                <Border Grid.Column="1"
+                        Width="40"
+                        IsVisible="{TemplateBinding ShowRowNumbers}" />
+
+                <!-- Filter Controls -->
+                <ScrollViewer x:Name="PART_FilterScrollViewer"
+                              Grid.Column="2"
+                              HorizontalScrollBarVisibility="Hidden"
+                              VerticalScrollBarVisibility="Disabled">
+                  <ItemsControl x:Name="PART_FilterRowPresenter"
+                                ItemsSource="{TemplateBinding Columns}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <controls:JDataGridFilterCell Column="{Binding}"
+                                                      Width="{Binding Width.Value}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Grid>
+            </Border>
+
+            <!-- Data Rows -->
+            <Grid Grid.Row="3">
+              <!-- Loading Overlay -->
+              <Border x:Name="PART_LoadingOverlay"
+                      Background="#80FFFFFF"
+                      IsVisible="{TemplateBinding IsLoading}"
+                      ZIndex="100">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                  <ProgressBar IsIndeterminate="True"
+                               Width="200" />
+                  <TextBlock Text="{TemplateBinding LoadingText}"
+                             Margin="0,8,0,0"
+                             HorizontalAlignment="Center" />
+                </StackPanel>
+              </Border>
+
+              <!-- Empty Content -->
+              <TextBlock x:Name="PART_EmptyContent"
+                         Text="{TemplateBinding EmptyContent}"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Foreground="Gray"
+                         FontStyle="Italic"
+                         IsVisible="False" />
+
+              <!-- Frozen Columns Panel -->
+              <Border x:Name="PART_FrozenColumnsPanel"
+                      HorizontalAlignment="Left"
+                      ZIndex="10">
+                <!-- Frozen columns rendered here -->
+              </Border>
+
+              <!-- Scrollable Content -->
+              <ScrollViewer x:Name="PART_ScrollViewer"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="PART_RowsPresenter">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <controls:JDataGridRow DataContext="{Binding}"
+                                             Columns="{Binding Columns, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
+                                             RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
+                                             ShowRowNumber="{Binding ShowRowNumbers, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
+                                             ShowRowIndicator="{Binding ShowRowIndicator, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}" />
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </Grid>
+
+            <!-- Status Bar / Summary -->
+            <Border Grid.Row="4"
+                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
+                    BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="8,4">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="PART_StatusText"
+                           Foreground="Gray"
+                           FontSize="12" />
+              </StackPanel>
+            </Border>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ===== JDataGridColumnHeader Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:JDataGridColumnHeader}" TargetType="controls:JDataGridColumnHeader">
+    <Setter Property="Background" Value="{StaticResource DataGridHeaderBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource DataGridHeaderBorderBrush}" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="MinWidth" Value="50" />
+    <Setter Property="Cursor" Value="Hand" />
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="0,0,1,1"
+                Padding="{TemplateBinding Padding}">
+          <Grid ColumnDefinitions="*,Auto,Auto,6">
+            <!-- Header Text -->
+            <TextBlock Grid.Column="0"
+                       Text="{TemplateBinding HeaderText}"
+                       VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis" />
+
+            <!-- Sort Indicator -->
+            <Panel Grid.Column="1"
+                   Margin="4,0"
+                   VerticalAlignment="Center"
+                   IsVisible="{TemplateBinding SortDirection, Converter={x:Static ObjectConverters.IsNotNull}}">
+              <PathIcon x:Name="SortAscIcon"
+                        Width="10" Height="10"
+                        Data="M0,6 L5,0 L10,6 Z"
+                        IsVisible="False" />
+              <PathIcon x:Name="SortDescIcon"
+                        Width="10" Height="10"
+                        Data="M0,0 L5,6 L10,0 Z"
+                        IsVisible="False" />
+            </Panel>
+
+            <!-- Sort Index (for multi-column sort) -->
+            <Border Grid.Column="1"
+                    Background="#1976D2"
+                    CornerRadius="8"
+                    Padding="4,1"
+                    Margin="2,0"
+                    VerticalAlignment="Center"
+                    IsVisible="False"
+                    x:Name="SortIndexBadge">
+              <TextBlock x:Name="SortIndexText"
+                         Foreground="White"
+                         FontSize="10"
+                         Text="{TemplateBinding SortIndex}" />
+            </Border>
+
+            <!-- Filter Button -->
+            <Button x:Name="PART_FilterButton"
+                    Grid.Column="2"
+                    Width="16" Height="16"
+                    Padding="0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    IsVisible="{TemplateBinding ShowFilterButton}">
+              <PathIcon Width="12" Height="12"
+                        Data="M0,0 L12,0 L7,5 L7,10 L5,12 L5,5 Z" />
+            </Button>
+
+            <!-- Resize Grip -->
+            <Border x:Name="PART_ResizeGrip"
+                    Grid.Column="3"
+                    Width="6"
+                    Background="Transparent"
+                    Cursor="SizeWestEast"
+                    IsVisible="{TemplateBinding AllowResize}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Sort Direction Styles -->
+    <Style Selector="^[SortDirection=Ascending] /template/ PathIcon#SortAscIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^[SortDirection=Descending] /template/ PathIcon#SortDescIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Hover State -->
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="#E8E8E8" />
+    </Style>
+  </ControlTheme>
+
+  <!-- ===== JDataGridRow Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:JDataGridRow}" TargetType="controls:JDataGridRow">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Height" Value="{Binding RowHeight, RelativeSource={RelativeSource Self}}" />
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="RowBorder"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{StaticResource DataGridGridLinesBrush}"
+                BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="Auto,Auto,*">
+            <!-- Row Indicator -->
+            <Border x:Name="PART_RowIndicator"
+                    Grid.Column="0"
+                    Width="4"
+                    Background="Transparent"
+                    IsVisible="{TemplateBinding ShowRowIndicator}" />
+
+            <!-- Row Number -->
+            <Border Grid.Column="1"
+                    Width="40"
+                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
+                    BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                    BorderThickness="0,0,1,0"
+                    IsVisible="{TemplateBinding ShowRowNumber}">
+              <TextBlock x:Name="PART_RowNumber"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Foreground="Gray"
+                         FontSize="11" />
+            </Border>
+
+            <!-- Cells -->
+            <ItemsControl x:Name="PART_CellsPresenter"
+                          Grid.Column="2"
+                          ItemsSource="{TemplateBinding Columns}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <controls:JDataGridCell Column="{Binding}"
+                                          RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:JDataGridRow}}"
+                                          Width="{Binding Width.Value}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Alternate Row -->
+    <Style Selector="^:alternate">
+      <Setter Property="Background" Value="{StaticResource DataGridRowAlternateBrush}" />
+    </Style>
+
+    <!-- Hover State -->
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="{StaticResource DataGridRowHoverBrush}" />
+    </Style>
+
+    <!-- Selected State -->
+    <Style Selector="^:selected">
+      <Setter Property="Background" Value="{StaticResource DataGridRowSelectedBrush}" />
+    </Style>
+
+    <!-- Current Row Indicator -->
+    <Style Selector="^:current /template/ Border#PART_RowIndicator">
+      <Setter Property="Background" Value="#1976D2" />
+    </Style>
+
+    <!-- Editing State -->
+    <Style Selector="^:editing">
+      <Setter Property="Background" Value="#FFF3E0" />
+    </Style>
+  </ControlTheme>
+
+  <!-- ===== JDataGridCell Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:JDataGridCell}" TargetType="controls:JDataGridCell">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="8,4" />
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{StaticResource DataGridGridLinesBrush}"
+                BorderThickness="0,0,1,0"
+                Padding="{TemplateBinding Padding}">
+          <Panel>
+            <!-- Display Content -->
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              Content="{TemplateBinding DisplayText}"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center" />
+
+            <!-- Edit Content -->
+            <ContentPresenter x:Name="PART_EditPresenter"
+                              IsVisible="False"
+                              VerticalAlignment="Center" />
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Selected State -->
+    <Style Selector="^:selected">
+      <Setter Property="Background" Value="{StaticResource DataGridCellSelectedBrush}" />
+    </Style>
+
+    <!-- Editing State -->
+    <Style Selector="^:editing /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:editing /template/ ContentPresenter#PART_EditPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- ReadOnly State -->
+    <Style Selector="^:readonly">
+      <Setter Property="Foreground" Value="Gray" />
+    </Style>
+  </ControlTheme>
+
+  <!-- ===== JDataGridFilterCell Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:JDataGridFilterCell}" TargetType="controls:JDataGridFilterCell">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Padding="2"
+                BorderBrush="{StaticResource DataGridGridLinesBrush}"
+                BorderThickness="0,0,1,0">
+          <TextBox x:Name="PART_FilterTextBox"
+                   Watermark="Filter..."
+                   FontSize="11"
+                   Padding="4,2"
+                   VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- ===== JDataGridGroupPanel Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:JDataGridGroupPanel}" TargetType="controls:JDataGridGroupPanel">
+    <Setter Property="Background" Value="{StaticResource DataGridGroupBackgroundBrush}" />
+    <Setter Property="MinHeight" Value="36" />
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="PART_DropZone"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="8"
+                MinHeight="{TemplateBinding MinHeight}">
+          <Panel>
+            <!-- Placeholder Text (visible when no columns grouped) -->
+            <TextBlock x:Name="PlaceholderText"
+                       Text="{TemplateBinding PlaceholderText}"
+                       Foreground="Gray"
+                       FontStyle="Italic"
+                       VerticalAlignment="Center"
+                       IsVisible="True" />
+
+            <!-- Grouped Columns -->
+            <ItemsControl x:Name="PART_GroupedColumnsPresenter"
+                          ItemsSource="{TemplateBinding GroupedColumns}"
+                          VerticalAlignment="Center">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="8" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Border Background="#E0E0E0"
+                          BorderBrush="#BDBDBD"
+                          BorderThickness="1"
+                          CornerRadius="4"
+                          Padding="8,4">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="{Binding Header}"
+                                 VerticalAlignment="Center" />
+                      <Button Width="16" Height="16"
+                              Padding="0"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              VerticalAlignment="Center"
+                              Command="{Binding $parent[controls:JDataGridGroupPanel].RemoveGroupCommand}"
+                              CommandParameter="{Binding}">
+                        <PathIcon Width="10" Height="10"
+                                  Data="M0,0 L8,8 M8,0 L0,8"
+                                  Foreground="Gray" />
+                      </Button>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Drag Over State -->
+    <Style Selector="^[IsDragOver=True] /template/ Border#PART_DropZone">
+      <Setter Property="Background" Value="#E3F2FD" />
+      <Setter Property="BorderBrush" Value="#1976D2" />
+      <Setter Property="BorderThickness" Value="2" />
+    </Style>
+
+    <!-- Hide placeholder when columns are grouped -->
+    <Style Selector="^:has-items /template/ TextBlock#PlaceholderText">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+  </ControlTheme>
+
+  <!-- ===== JDataGridGroupRow Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:JDataGridGroupRow}" TargetType="controls:JDataGridGroupRow">
+    <Setter Property="Background" Value="{StaticResource DataGridGroupBackgroundBrush}" />
+    <Setter Property="Height" Value="{Binding RowHeight, RelativeSource={RelativeSource Self}}" />
+    <Setter Property="Cursor" Value="Hand" />
+
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                BorderThickness="0,0,0,1">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+            <!-- Indent -->
+            <Border Grid.Column="0"
+                    Width="{Binding TotalIndent, RelativeSource={RelativeSource TemplatedParent}}" />
+
+            <!-- Expand/Collapse Button -->
+            <ToggleButton x:Name="PART_ExpandButton"
+                          Grid.Column="1"
+                          Width="24" Height="24"
+                          Margin="4,0"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          IsChecked="{TemplateBinding IsExpanded}">
+              <Panel>
+                <PathIcon x:Name="ExpandedIcon"
+                          Width="10" Height="10"
+                          Data="M0,0 L6,5 L0,10 Z"
+                          RenderTransform="rotate(90deg)"
+                          IsVisible="False" />
+                <PathIcon x:Name="CollapsedIcon"
+                          Width="10" Height="10"
+                          Data="M0,0 L6,5 L0,10 Z"
+                          IsVisible="False" />
+              </Panel>
+            </ToggleButton>
+
+            <!-- Group Text -->
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Spacing="8">
+              <TextBlock Text="{TemplateBinding DisplayText}"
+                         FontWeight="SemiBold" />
+            </StackPanel>
+
+            <!-- Item Count -->
+            <Border Grid.Column="3"
+                    Background="#9E9E9E"
+                    CornerRadius="10"
+                    Padding="8,2"
+                    Margin="8,0"
+                    VerticalAlignment="Center">
+              <TextBlock Text="{TemplateBinding ItemCount}"
+                         Foreground="White"
+                         FontSize="11" />
+            </Border>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Expanded State -->
+    <Style Selector="^:expanded /template/ PathIcon#ExpandedIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Collapsed State -->
+    <Style Selector="^:collapsed /template/ PathIcon#CollapsedIcon">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <!-- Hover State -->
+    <Style Selector="^:pointerover">
+      <Setter Property="Background" Value="#E0E0E0" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
