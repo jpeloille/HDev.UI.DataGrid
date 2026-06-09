@@ -1,7 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:Julien.Avalonia.DataGrid.Controls;assembly=Julien.Avalonia.DataGrid"
-                    xmlns:models="clr-namespace:Julien.Avalonia.DataGrid.Models;assembly=Julien.Avalonia.DataGrid">
+                    xmlns:controls="clr-namespace:Julien.Avalonia.DataGrid.Controls;assembly=Julien.Avalonia.DataGrid">
 
   <!-- ===== Colors ===== -->
   <Color x:Key="DataGridHeaderBackground">#F5F5F5</Color>
@@ -228,20 +227,28 @@
                     </ItemsPanelTemplate>
                   </ItemsControl.ItemsPanel>
                   <!-- Group-header rows and data rows are interleaved in a single
-                       virtualized list; the template is selected per item type. -->
-                  <ItemsControl.DataTemplates>
-                    <DataTemplate DataType="models:GridGroup">
-                      <controls:JDataGridGroupRow Group="{Binding}"
-                                                  RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}" />
-                    </DataTemplate>
-                    <DataTemplate>
-                      <controls:JDataGridRow DataContext="{Binding}"
-                                             Columns="{Binding Columns, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
-                                             RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
-                                             ShowRowNumber="{Binding ShowRowNumbers, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
-                                             ShowRowIndicator="{Binding ShowRowIndicator, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}" />
-                    </DataTemplate>
-                  </ItemsControl.DataTemplates>
+                       virtualized list; ItemTemplate selects per item type. Using
+                       ItemTemplate (not DataTemplates) keeps the selection scoped
+                       to this control's items and out of descendant cells. -->
+                  <ItemsControl.ItemTemplate>
+                    <controls:GridRowTemplateSelector>
+                      <controls:GridRowTemplateSelector.GroupTemplate>
+                        <DataTemplate>
+                          <controls:JDataGridGroupRow Group="{Binding}"
+                                                      RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}" />
+                        </DataTemplate>
+                      </controls:GridRowTemplateSelector.GroupTemplate>
+                      <controls:GridRowTemplateSelector.RowTemplate>
+                        <DataTemplate>
+                          <controls:JDataGridRow DataContext="{Binding}"
+                                                 Columns="{Binding Columns, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
+                                                 RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
+                                                 ShowRowNumber="{Binding ShowRowNumbers, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
+                                                 ShowRowIndicator="{Binding ShowRowIndicator, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}" />
+                        </DataTemplate>
+                      </controls:GridRowTemplateSelector.RowTemplate>
+                    </controls:GridRowTemplateSelector>
+                  </ItemsControl.ItemTemplate>
                 </ItemsControl>
               </ScrollViewer>
             </Grid>
