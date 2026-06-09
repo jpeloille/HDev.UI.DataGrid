@@ -467,7 +467,14 @@ public class JDataGridCell : TemplatedControl
     {
         var datePicker = new DatePicker
         {
-            SelectedDate = Value as DateTimeOffset? ?? DateTimeOffset.Now
+            // Value is typically a DateTime; `as DateTimeOffset?` would always be
+            // null and open the picker at today instead of the cell's date.
+            SelectedDate = Value switch
+            {
+                DateTimeOffset dto => dto,
+                DateTime dt => new DateTimeOffset(dt),
+                _ => null
+            }
         };
 
         datePicker.SelectedDateChanged += (s, e) =>
