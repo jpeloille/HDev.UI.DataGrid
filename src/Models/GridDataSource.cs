@@ -51,6 +51,15 @@ public class GridDataSource : INotifyPropertyChanged
     public IReadOnlyList<object> View => _sortedFilteredItems?.AsReadOnly() ?? Array.Empty<object>().AsReadOnly();
 
     /// <summary>
+    /// The flattened list of rows for display: data items when ungrouped, or an
+    /// interleaved sequence of <see cref="GridGroup"/> headers and their data
+    /// items (honoring expand/collapse) when grouped. This is what the grid binds
+    /// its virtualized rows presenter to.
+    /// </summary>
+    public IReadOnlyList<object> VisualRows => _visualRows;
+    private IReadOnlyList<object> _visualRows = Array.Empty<object>();
+
+    /// <summary>
     /// Groups when grouping is applied.
     /// </summary>
     public ObservableCollection<GridGroup> Groups { get; } = new();
@@ -261,6 +270,7 @@ public class GridDataSource : INotifyPropertyChanged
             {
                 _sortedFilteredItems = new List<object>();
                 Groups.Clear();
+                _visualRows = Array.Empty<object>();
                 return;
             }
 
@@ -288,7 +298,10 @@ public class GridDataSource : INotifyPropertyChanged
                 Groups.Clear();
             }
 
+            BuildVisualRows();
+
             OnPropertyChanged(nameof(View));
+            OnPropertyChanged(nameof(VisualRows));
             OnPropertyChanged(nameof(FilteredCount));
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
@@ -416,6 +429,56 @@ public class GridDataSource : INotifyPropertyChanged
     private void OnSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         Refresh();
+    }
+
+    /// <summary>
+    /// Builds the flattened <see cref="VisualRows"/> sequence from the current
+    /// view and groups, honoring each group's expand/collapse state.
+    /// </summary>
+    private void BuildVisualRows()
+    {
+        if (_groupDescriptors.Count == 0)
+        {
+            _visualRows = _sortedFilteredItems is { } items
+                ? items as IReadOnlyList<object> ?? items.ToList()
+                : Array.Empty<object>();
+            return;
+        }
+
+        var rows = new List<object>();
+        foreach (var group in Groups)
+        {
+            AppendGroupRows(group, rows);
+        }
+        _visualRows = rows;
+    }
+
+    private static void AppendGroupRows(GridGroup group, List<object> rows)
+    {
+        rows.Add(group);
+        if (!group.IsExpanded) return;
+
+        if (group.SubGroups.Count > 0)
+        {
+            foreach (var subGroup in group.SubGroups)
+                AppendGroupRows(subGroup, rows);
+        }
+        else
+        {
+            foreach (var item in group.Items)
+                rows.Add(item);
+        }
+    }
+
+    /// <summary>
+    /// Rebuilds <see cref="VisualRows"/> in place (e.g. after a group is expanded
+    /// or collapsed) without re-running sort/filter/group, and notifies listeners.
+    /// </summary>
+    public void RebuildVisualRows()
+    {
+        BuildVisualRows();
+        OnPropertyChanged(nameof(VisualRows));
+        DataChanged?.Invoke(this, EventArgs.Empty);
     }
 
     #endregion

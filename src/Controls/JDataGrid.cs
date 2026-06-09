@@ -472,6 +472,9 @@ public class JDataGrid : TemplatedControl
         AddHandler(JDataGridGroupPanel.ColumnGroupedEvent, OnColumnGrouped);
         AddHandler(JDataGridGroupPanel.ColumnUngroupedEvent, OnColumnUngrouped);
 
+        // Rebuild the visual rows when a group header is expanded/collapsed.
+        AddHandler(JDataGridGroupRow.ExpandChangedEvent, OnGroupExpandChanged);
+
         RefreshView();
     }
 
@@ -695,6 +698,7 @@ public class JDataGrid : TemplatedControl
         {
             group.ExpandAll();
         }
+        _dataSource.RebuildVisualRows();
     }
 
     /// <summary>
@@ -706,6 +710,7 @@ public class JDataGrid : TemplatedControl
         {
             group.CollapseAll();
         }
+        _dataSource.RebuildVisualRows();
     }
 
     #endregion
@@ -933,6 +938,14 @@ public class JDataGrid : TemplatedControl
         e.Handled = true;
     }
 
+    private void OnGroupExpandChanged(object? sender, GroupEventArgs e)
+    {
+        // The group's IsExpanded was already updated by the group row; rebuild
+        // the flattened visual rows so collapsed items disappear / reappear.
+        _dataSource.RebuildVisualRows();
+        e.Handled = true;
+    }
+
     private void UpdateColumnSortIndicators()
     {
         for (int i = 0; i < Columns.Count; i++)
@@ -955,10 +968,10 @@ public class JDataGrid : TemplatedControl
 
     private void RefreshView()
     {
-        // Bind data to rows presenter
+        // Bind data to rows presenter (interleaved group headers + data rows).
         if (_rowsPresenter != null)
         {
-            _rowsPresenter.ItemsSource = _dataSource.View;
+            _rowsPresenter.ItemsSource = _dataSource.VisualRows;
         }
 
         // Get frozen and scrollable columns

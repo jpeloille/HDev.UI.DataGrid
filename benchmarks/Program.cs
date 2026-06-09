@@ -125,6 +125,61 @@ Console.WriteLine($"Cell reads (100k x6) accessor (uncached) : {perCompiled,8:F1
 Console.WriteLine($"Cell reads (100k x6) column-cached getter: {perColumn,8:F1} ms/pass  (x{perReflection / Math.Max(perColumn, 0.001):F1})");
 if (sink1 != sink2 || sink1 != sink3) Console.WriteLine("WARNING: results diverged!");
 
+// --- Visual-rows flattening correctness (task §1.4/§3.1) ---
+Console.WriteLine();
+Console.WriteLine("Visual-rows flattening checks:");
+int passed = 0, failed = 0;
+void Check(string name, bool ok)
+{
+    Console.WriteLine($"  [{(ok ? "PASS" : "FAIL")}] {name}");
+    if (ok) passed++; else failed++;
+}
+
+var sample = new List<Row>
+{
+    new() { Id = 1, Department = "A", IsActive = true },
+    new() { Id = 2, Department = "A", IsActive = false },
+    new() { Id = 3, Department = "A", IsActive = true },
+    new() { Id = 4, Department = "B", IsActive = true },
+    new() { Id = 5, Department = "B", IsActive = false },
+};
+
+// Ungrouped: visual rows == data rows.
+var g0 = new GridDataSource { Source = sample };
+Check("ungrouped -> 5 data rows, no GridGroup", g0.VisualRows.Count == 5 && !g0.VisualRows.OfType<GridGroup>().Any());
+
+// Single-level group by Department: [A, i, i, i, B, i, i] = 7 rows, 2 headers.
+var g1 = new GridDataSource { Source = sample };
+g1.AddGroup(nameof(Row.Department));
+Check("group by Dept -> 7 visual rows", g1.VisualRows.Count == 7);
+Check("group by Dept -> 2 group headers", g1.VisualRows.OfType<GridGroup>().Count() == 2);
+Check("first visual row is a GridGroup", g1.VisualRows[0] is GridGroup);
+
+// Collapse first group -> its 3 items vanish: [A(collapsed), B, i, i] = 4 rows.
+var firstGroup = (GridGroup)g1.VisualRows[0];
+firstGroup.IsExpanded = false;
+g1.RebuildVisualRows();
+Check("collapse group A -> 4 visual rows", g1.VisualRows.Count == 4);
+Check("collapsed group still present as header", g1.VisualRows.OfType<GridGroup>().Count() == 2);
+
+// Re-expand -> back to 7.
+firstGroup.IsExpanded = true;
+g1.RebuildVisualRows();
+Check("re-expand group A -> 7 visual rows", g1.VisualRows.Count == 7);
+
+// Two-level group by Department then IsActive.
+// A -> {true:2, false:1}, B -> {true:1, false:1}
+// rows: A, A/true, i, i, A/false, i, B, B/true, i, B/false, i
+// = 2 top headers + 4 sub headers + 5 items = 11
+var g2 = new GridDataSource { Source = sample };
+g2.AddGroup(nameof(Row.Department));
+g2.AddGroup(nameof(Row.IsActive));
+Check("two-level group -> 11 visual rows", g2.VisualRows.Count == 11);
+Check("two-level group -> 6 group headers", g2.VisualRows.OfType<GridGroup>().Count() == 6);
+
+Console.WriteLine($"  => {passed} passed, {failed} failed");
+Environment.ExitCode = failed == 0 ? 0 : 1;
+
 public class Row
 {
     public int Id { get; set; }
