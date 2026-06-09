@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Reflection;
 
 namespace Julien.Avalonia.DataGrid.Models;
 
@@ -308,10 +307,22 @@ public class GridDataSource : INotifyPropertyChanged
 
         foreach (var descriptor in _sortDescriptors)
         {
-            var property = GetPropertyInfo(items.FirstOrDefault(), descriptor.FieldName);
-            if (property == null) continue;
+            var first = items.FirstOrDefault();
+            var rootType = first?.GetType();
+            var rootGetter = rootType != null
+                ? Helpers.PropertyAccessor.GetGetter(rootType, descriptor.FieldName)
+                : null;
+            if (first != null && rootGetter == null)
+                continue;
 
-            Func<object, object?> keySelector = item => property.GetValue(item);
+            var fieldName = descriptor.FieldName;
+            // Fast path for homogeneous collections (the common case): use the
+            // pre-resolved getter directly; fall back to per-type resolution only
+            // when an element's runtime type differs (polymorphic collections).
+            Func<object, object?> keySelector = item =>
+                item.GetType() == rootType
+                    ? rootGetter!(item)
+                    : Helpers.PropertyAccessor.GetValue(item, fieldName);
 
             if (ordered == null)
             {
@@ -350,13 +361,15 @@ public class GridDataSource : INotifyPropertyChanged
             return new List<GridGroup>();
 
         var descriptor = _groupDescriptors[level];
-        var property = GetPropertyInfo(items.FirstOrDefault(), descriptor.FieldName);
-        
-        if (property == null)
+        var first = items.FirstOrDefault();
+
+        if (first != null && descriptor.GroupKeySelector == null &&
+            Helpers.PropertyAccessor.GetGetter(first.GetType(), descriptor.FieldName) == null)
             return new List<GridGroup>();
 
-        var grouped = items.GroupBy(item => 
-            descriptor.GroupKeySelector?.Invoke(item) ?? property.GetValue(item));
+        var grouped = items.GroupBy(item =>
+            descriptor.GroupKeySelector?.Invoke(item)
+            ?? Helpers.PropertyAccessor.GetValue(item, descriptor.FieldName));
 
         var sortedGroups = descriptor.SortDirection == ListSortDirection.Ascending
             ? grouped.OrderBy(g => g.Key)
@@ -398,11 +411,6 @@ public class GridDataSource : INotifyPropertyChanged
         }
 
         return result;
-    }
-
-    private PropertyInfo? GetPropertyInfo(object? item, string propertyName)
-    {
-        return item?.GetType().GetProperty(propertyName);
     }
 
     private void OnSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

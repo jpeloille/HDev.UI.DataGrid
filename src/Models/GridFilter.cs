@@ -19,10 +19,10 @@ public class GridFilter
     /// </summary>
     public bool Matches(object item)
     {
-        var property = item.GetType().GetProperty(FieldName);
-        if (property == null) return true;
+        var getter = Helpers.PropertyAccessor.GetGetter(item.GetType(), FieldName);
+        if (getter == null) return true;
 
-        var itemValue = property.GetValue(item);
+        var itemValue = getter(item);
         return EvaluateFilter(itemValue);
     }
 

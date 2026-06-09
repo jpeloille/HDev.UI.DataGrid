@@ -20,6 +20,7 @@ public class JDataGridCell : TemplatedControl
     private ContentPresenter? _contentPresenter;
     private ContentPresenter? _editPresenter;
     private Control? _editor;
+    private bool _isCancelling;
 
     #endregion
 
@@ -69,6 +70,10 @@ public class JDataGridCell : TemplatedControl
         RoutedEvent.Register<JDataGridCell, CellValueChangedEventArgs>(
             nameof(ValueChanged), RoutingStrategies.Bubble);
 
+    public static readonly RoutedEvent<CellEventArgs> EditEndedEvent =
+        RoutedEvent.Register<JDataGridCell, CellEventArgs>(
+            nameof(EditEnded), RoutingStrategies.Bubble);
+
     public event EventHandler<CellEventArgs>? CellClick
     {
         add => AddHandler(CellClickEvent, value);
@@ -91,6 +96,12 @@ public class JDataGridCell : TemplatedControl
     {
         add => AddHandler(ValueChangedEvent, value);
         remove => RemoveHandler(ValueChangedEvent, value);
+    }
+
+    public event EventHandler<CellEventArgs>? EditEnded
+    {
+        add => AddHandler(EditEndedEvent, value);
+        remove => RemoveHandler(EditEndedEvent, value);
     }
 
     #endregion
@@ -266,10 +277,29 @@ public class JDataGridCell : TemplatedControl
         }
     }
 
+    /// <summary>
+    /// Commits the current edit (writes the editor value back) and ends editing.
+    /// </summary>
+    public void CommitEditing()
+    {
+        if (IsEditing) IsEditing = false;
+    }
+
+    /// <summary>
+    /// Cancels the current edit without writing the editor value back.
+    /// </summary>
+    public void CancelEditing()
+    {
+        if (!IsEditing) return;
+        _isCancelling = true;
+        IsEditing = false;
+    }
+
     private void OnEditingChanged(bool isEditing)
     {
         if (isEditing)
         {
+            _isCancelling = false;
             StartEditing();
         }
         else
@@ -304,23 +334,23 @@ public class JDataGridCell : TemplatedControl
     {
         if (_editor != null)
         {
-            // Get the edited value
-            var newValue = GetEditorValue();
-
-            if (!Equals(newValue, Value))
+            if (!_isCancelling)
             {
-                var oldValue = Value;
-                
-                // Update the data source
-                if (Column != null && RowData != null)
+                // Get the edited value and write it back through the column
+                // (which performs type/culture-aware conversion).
+                var newValue = GetEditorValue();
+
+                if (Column != null && RowData != null && Column.SetCellValue(RowData, newValue))
                 {
-                    Column.SetCellValue(RowData, newValue);
+                    var oldValue = Value;
+                    Value = Column.GetCellValue(RowData);
+                    UpdateDisplayText();
+
+                    if (!Equals(oldValue, Value))
+                    {
+                        RaiseEvent(new CellValueChangedEventArgs(ValueChangedEvent, RowData, Column!, oldValue, Value));
+                    }
                 }
-
-                Value = newValue;
-                UpdateDisplayText();
-
-                RaiseEvent(new CellValueChangedEventArgs(ValueChangedEvent, RowData, Column!, oldValue, newValue));
             }
 
             _editor = null;
@@ -335,6 +365,13 @@ public class JDataGridCell : TemplatedControl
         if (_contentPresenter != null)
         {
             _contentPresenter.IsVisible = true;
+        }
+
+        _isCancelling = false;
+
+        if (Column != null && RowData != null)
+        {
+            RaiseEvent(new CellEventArgs(EditEndedEvent, RowData, Column));
         }
     }
 
@@ -377,9 +414,7 @@ public class JDataGridCell : TemplatedControl
             }
             else if (e.Key == Key.Escape)
             {
-                // Cancel edit - restore original value
-                textBox.Text = Value?.ToString() ?? string.Empty;
-                IsEditing = false;
+                CancelEditing();
                 e.Handled = true;
             }
         };
@@ -420,8 +455,7 @@ public class JDataGridCell : TemplatedControl
             }
             else if (e.Key == Key.Escape)
             {
-                numericUpDown.Value = Convert.ToDecimal(Value ?? 0);
-                IsEditing = false;
+                CancelEditing();
                 e.Handled = true;
             }
         };

@@ -6,6 +6,7 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using Julien.Avalonia.DataGrid.Models;
 using Models = Julien.Avalonia.DataGrid.Models;
 using SelectionMode = Julien.Avalonia.DataGrid.Models.SelectionMode;
@@ -39,6 +40,7 @@ public class JDataGrid : TemplatedControl
     private Border? _frozenFilterSeparator;
     private object? _editingItem;
     private GridColumn? _editingColumn;
+    private JDataGridCell? _editingCell;
 
     #endregion
 
@@ -462,6 +464,10 @@ public class JDataGrid : TemplatedControl
         // Listen to filter cell events (bubbled from JDataGridFilterCell)
         AddHandler(JDataGridFilterCell.FilterChangedEvent, OnFilterChanged);
 
+        // Listen to cell edit events (bubbled from JDataGridCell)
+        AddHandler(JDataGridCell.BeginEditEvent, OnCellBeginEditRequested);
+        AddHandler(JDataGridCell.EditEndedEvent, OnCellEditEnded);
+
         // Listen to group panel events
         AddHandler(JDataGridGroupPanel.ColumnGroupedEvent, OnColumnGrouped);
         AddHandler(JDataGridGroupPanel.ColumnUngroupedEvent, OnColumnUngrouped);
@@ -580,17 +586,32 @@ public class JDataGrid : TemplatedControl
     /// </summary>
     public void BeginEdit(object item, GridColumn column)
     {
-        if (!AllowEditing || column.IsReadOnly) return;
+        var cell = FindCell(item, column);
+        if (cell != null)
+        {
+            BeginEdit(cell);
+        }
+    }
 
-        var args = new CellEditEventArgs(CellEditStartingEvent, item, column);
+    private void BeginEdit(JDataGridCell cell)
+    {
+        if (!AllowEditing || cell.Column == null || cell.RowData == null || cell.IsReadOnly)
+            return;
+
+        var args = new CellEditEventArgs(CellEditStartingEvent, cell.RowData, cell.Column);
         RaiseEvent(args);
-
         if (args.Cancel) return;
 
-        _editingItem = item;
-        _editingColumn = column;
+        // Commit any other cell currently being edited.
+        if (_editingCell != null && _editingCell != cell)
+        {
+            _editingCell.CommitEditing();
+        }
 
-        // TODO: Swap cell template to edit template
+        _editingItem = cell.RowData;
+        _editingColumn = cell.Column;
+        _editingCell = cell;
+        cell.IsEditing = true;
     }
 
     /// <summary>
@@ -598,28 +619,48 @@ public class JDataGrid : TemplatedControl
     /// </summary>
     public void CommitEdit()
     {
-        if (_editingItem == null || _editingColumn == null) return;
+        _editingCell?.CommitEditing();
+    }
 
-        var args = new CellEditEventArgs(CellEditEndingEvent, _editingItem, _editingColumn);
-        RaiseEvent(args);
+    /// <summary>
+    /// Cancels the current edit, restoring the original value.
+    /// </summary>
+    public void CancelEdit()
+    {
+        _editingCell?.CancelEditing();
+    }
 
-        if (!args.Cancel)
+    private void OnCellBeginEditRequested(object? sender, CellEventArgs e)
+    {
+        if (e.Source is JDataGridCell cell)
         {
+            BeginEdit(cell);
+            e.Handled = true;
+        }
+    }
+
+    private void OnCellEditEnded(object? sender, CellEventArgs e)
+    {
+        if (_editingItem != null && _editingColumn != null)
+        {
+            var args = new CellEditEventArgs(CellEditEndingEvent, _editingItem, _editingColumn);
+            RaiseEvent(args);
             CellEditEndingCommand?.Execute(args);
         }
 
         _editingItem = null;
         _editingColumn = null;
+        _editingCell = null;
+        e.Handled = true;
     }
 
-    /// <summary>
-    /// Cancels the current edit.
-    /// </summary>
-    public void CancelEdit()
+    private JDataGridCell? FindCell(object item, GridColumn column)
     {
-        _editingItem = null;
-        _editingColumn = null;
-        // TODO: Restore original value
+        if (_rowsPresenter == null) return null;
+
+        return _rowsPresenter.GetVisualDescendants()
+            .OfType<JDataGridCell>()
+            .FirstOrDefault(c => Equals(c.RowData, item) && c.Column == column);
     }
 
     /// <summary>
@@ -1028,8 +1069,13 @@ public class JDataGrid : TemplatedControl
                 break;
 
             case Key.F2:
-                if (_selection.CurrentItem != null && _selection.CurrentColumn != null)
-                    BeginEdit(_selection.CurrentItem, _selection.CurrentColumn);
+                if (_selection.CurrentItem != null)
+                {
+                    var column = _selection.CurrentColumn
+                        ?? Columns.FirstOrDefault(c => c.IsVisible && !c.IsReadOnly);
+                    if (column != null)
+                        BeginEdit(_selection.CurrentItem, column);
+                }
                 e.Handled = true;
                 break;
         }

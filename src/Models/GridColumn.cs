@@ -307,15 +307,40 @@ public class GridColumn : AvaloniaObject
         return binding;
     }
 
+    // Cache the resolved getter for the last-seen row type so cell rendering
+    // (the hot path) reuses a compiled delegate instead of doing a cache lookup
+    // per access. Falls back to per-type resolution for polymorphic rows.
+    // _fieldNameCache mirrors FieldName as a plain field to avoid the Avalonia
+    // styled-property read cost on every cell access.
+    private string _fieldNameCache = string.Empty;
+    private Type? _getterType;
+    private Func<object, object?>? _getter;
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == FieldNameProperty)
+        {
+            _fieldNameCache = FieldName ?? string.Empty;
+            _getterType = null;
+            _getter = null;
+        }
+    }
+
     /// <summary>
     /// Gets the value from a data item for this column.
     /// </summary>
     public object? GetCellValue(object item)
     {
-        if (string.IsNullOrEmpty(FieldName)) return null;
+        if (_fieldNameCache.Length == 0) return null;
 
-        var property = item.GetType().GetProperty(FieldName);
-        return property?.GetValue(item);
+        var type = item.GetType();
+        if (type != _getterType)
+        {
+            _getter = Helpers.PropertyAccessor.GetGetter(type, _fieldNameCache);
+            _getterType = type;
+        }
+        return _getter?.Invoke(item);
     }
 
     /// <summary>
@@ -324,20 +349,7 @@ public class GridColumn : AvaloniaObject
     public bool SetCellValue(object item, object? value)
     {
         if (string.IsNullOrEmpty(FieldName) || IsReadOnly) return false;
-
-        var property = item.GetType().GetProperty(FieldName);
-        if (property == null || !property.CanWrite) return false;
-
-        try
-        {
-            var convertedValue = Convert.ChangeType(value, property.PropertyType);
-            property.SetValue(item, convertedValue);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        return Helpers.PropertyAccessor.TrySetValue(item, FieldName, value);
     }
 
     #endregion
