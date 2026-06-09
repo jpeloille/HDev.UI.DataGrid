@@ -79,6 +79,52 @@ try
 
     int dataRowsReexpanded = grid.GetVisualDescendants().OfType<JDataGridRow>().Count();
     Check($"re-expanded: data rows return (found {dataRowsReexpanded})", dataRowsReexpanded > 0);
+
+    // 5. Edit cycle: ungroup, edit the Name cell of Alice, commit, verify write-back.
+    grid.ClearGrouping();
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(window);
+
+    var alice = data[0];
+    var nameColumn = grid.Columns.GetByFieldName(nameof(Emp.Name));
+    Check("Name column resolved + editable", nameColumn is { IsReadOnly: false });
+
+    if (nameColumn != null)
+    {
+        grid.BeginEdit(alice, nameColumn);
+        Dispatcher.UIThread.RunJobs();
+        ForceLayout(window);
+
+        var cell = grid.GetVisualDescendants().OfType<JDataGridCell>()
+            .FirstOrDefault(c => Equals(c.RowData, alice) && c.Column == nameColumn);
+        Check("edit: target cell entered editing state", cell is { IsEditing: true });
+
+        var editor = cell?.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
+        Check("edit: text editor materialized", editor != null);
+
+        if (editor != null)
+        {
+            editor.Text = "Zoe";
+            grid.CommitEdit();
+            Dispatcher.UIThread.RunJobs();
+            Check($"edit commit: value written back (Name='{alice.Name}')", alice.Name == "Zoe");
+        }
+
+        // Cancel: start another edit, change the editor, cancel -> value unchanged.
+        grid.BeginEdit(alice, nameColumn);
+        Dispatcher.UIThread.RunJobs();
+        ForceLayout(window);
+        var cell2 = grid.GetVisualDescendants().OfType<JDataGridCell>()
+            .FirstOrDefault(c => Equals(c.RowData, alice) && c.Column == nameColumn);
+        var editor2 = cell2?.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
+        if (editor2 != null)
+        {
+            editor2.Text = "ShouldNotStick";
+            grid.CancelEdit();
+            Dispatcher.UIThread.RunJobs();
+            Check($"edit cancel: value preserved (Name='{alice.Name}')", alice.Name == "Zoe");
+        }
+    }
 }
 catch (Exception ex)
 {
