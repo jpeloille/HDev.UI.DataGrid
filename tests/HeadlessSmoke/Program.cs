@@ -125,6 +125,82 @@ try
             Check($"edit cancel: value preserved (Name='{alice.Name}')", alice.Name == "Zoe");
         }
     }
+
+    // 6. Row recycle: changing a row's DataContext must update the displayed cell
+    //    value by rebinding, reusing the same cell instances (no rebuild churn).
+    var recycleRow = new JDataGridRow { Columns = grid.Columns };
+    var recycleWindow = new Window { Width = 900, Height = 60, Content = recycleRow };
+    recycleWindow.Show();
+    recycleRow.DataContext = data[1]; // Bob
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(recycleWindow);
+    var cellBefore = recycleRow.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var textBefore = cellBefore?.DisplayText;
+
+    recycleRow.DataContext = data[2]; // Carol
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(recycleWindow);
+    var cellAfter = recycleRow.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var textAfter = cellAfter?.DisplayText;
+
+    Check($"recycle: cell value rebinds on DataContext change ('{textBefore}' -> '{textAfter}')",
+        textBefore != textAfter && !string.IsNullOrEmpty(textAfter));
+    Check("recycle: same cell instances reused (no rebuild)",
+        cellBefore != null && ReferenceEquals(cellBefore, cellAfter));
+    recycleWindow.Close();
+
+    // 7. RefreshCells reflects a structural column change on an already-realized
+    //    row (the safety net for reorder/freeze/visibility now that recycle no
+    //    longer rebuilds cells).
+    var structRow = new JDataGridRow { Columns = grid.Columns };
+    var structWindow = new Window { Width = 900, Height = 60, Content = structRow };
+    structWindow.Show();
+    structRow.DataContext = data[0];
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(structWindow);
+    int cellsBeforeHide = structRow.GetVisualDescendants().OfType<JDataGridCell>().Count();
+
+    grid.Columns[0].IsVisible = false;
+    grid.Columns.UpdateVisibleIndices();
+    structRow.RefreshCells();
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(structWindow);
+    int cellsAfterHide = structRow.GetVisualDescendants().OfType<JDataGridCell>().Count();
+    Check($"RefreshCells reflects hidden column ({cellsBeforeHide} -> {cellsAfterHide})", cellsAfterHide == cellsBeforeHide - 1);
+
+    grid.Columns[0].IsVisible = true;
+    grid.Columns.UpdateVisibleIndices();
+    structWindow.Close();
+
+    // --- Column-count scaling measurement (informs whether true column
+    //     virtualization is warranted; absolute headless ms are indicative). ---
+    Console.WriteLine();
+    Console.WriteLine("Column-count scaling (initial layout):");
+    var fields = new[] { nameof(Emp.Name), nameof(Emp.Department), nameof(Emp.Salary), nameof(Emp.Hired), nameof(Emp.Active) };
+    var manyRows = Enumerable.Range(0, 200).Select(i => new Emp
+    {
+        Name = "N" + i, Department = fields[i % 3], Salary = 1000 * i, Hired = new DateTime(2010, 1, 1).AddDays(i), Active = i % 2 == 0
+    }).ToList();
+
+    foreach (var n in new[] { 10, 30, 60, 100 })
+    {
+        var cols = new GridColumnCollection();
+        for (int i = 0; i < n; i++)
+            cols.Add(new GridColumn { FieldName = fields[i % fields.Length], Header = "C" + i, Width = new GridLength(100) });
+        cols.UpdateVisibleIndices();
+
+        var g = new JDataGrid { AutoGenerateColumns = false, Columns = cols, ItemsSource = manyRows };
+        var w = new Window { Width = 1200, Height = 600, Content = g };
+
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        w.Show();
+        ForceLayout(w);
+        sw.Stop();
+
+        int cells = g.GetVisualDescendants().OfType<JDataGridCell>().Count();
+        Console.WriteLine($"  cols={n,3}: initial layout {sw.ElapsedMilliseconds,5} ms, cells realized = {cells}");
+        w.Close();
+    }
 }
 catch (Exception ex)
 {

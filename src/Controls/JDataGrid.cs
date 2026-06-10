@@ -972,6 +972,14 @@ public class JDataGrid : TemplatedControl
         if (_rowsPresenter != null)
         {
             _rowsPresenter.ItemsSource = _dataSource.VisualRows;
+
+            // Rows no longer rebuild their cells on recycle (cells rebind instead),
+            // so push column-structure changes (reorder/freeze/visibility) to any
+            // already realized rows here.
+            foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<JDataGridRow>())
+            {
+                row.RefreshCells();
+            }
         }
 
         // Get frozen and scrollable columns

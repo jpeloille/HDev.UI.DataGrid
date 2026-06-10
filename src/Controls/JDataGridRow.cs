@@ -243,6 +243,13 @@ public class JDataGridRow : TemplatedControl
 
     #region Private Methods
 
+    /// <summary>
+    /// Rebuilds the row's cells from the current column set. Called by the grid
+    /// after a structural column change (reorder, freeze, visibility) so already
+    /// realized rows reflect the new layout.
+    /// </summary>
+    public void RefreshCells() => UpdateCells();
+
     private void UpdateCells()
     {
         if (Columns == null)
@@ -285,10 +292,14 @@ public class JDataGridRow : TemplatedControl
         {
             UpdateRowNumber();
         }
-        else if (change.Property == ColumnsProperty || change.Property == StyledElement.DataContextProperty)
+        else if (change.Property == ColumnsProperty)
         {
+            // Rebuild cells only when the column set changes.
             UpdateCells();
         }
+        // On DataContext change (row recycled to a new item during scroll) the
+        // cells rebind RowData via their RelativeSource binding and refresh their
+        // value; rebuilding the cell controls here would be redundant churn.
     }
 
     #endregion

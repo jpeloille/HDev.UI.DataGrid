@@ -45,8 +45,22 @@ base qui réfléchit à chaque cellule.
    - Option de calcul en arrière-plan (async) avec annulation pour > 100k lignes.
 
 1.3. **Virtualisation des colonnes + recyclage de cellules**
-   - Panel de cellules virtualisant horizontalement (rendre uniquement les colonnes visibles).
-   - Pool de réutilisation des `JDataGridCell` au scroll (recycling) plutôt que recréation.
+   - ✅ **Recyclage fait** : `JDataGridRow` ne reconstruit plus toutes ses cellules à
+     chaque recyclage de ligne (changement de DataContext au scroll) ; les cellules
+     re-bindent `RowData` et réutilisent les mêmes instances. Filet `RefreshCells`
+     pour refléter les changements structurels (réordre/freeze/visibilité) sur les
+     lignes déjà rendues. Vérifié dans `tests/HeadlessSmoke` (recycle = même instance,
+     valeur mise à jour).
+   - ⏳ **Virtualisation horizontale vraie = projet séparé.** Mesure (headless,
+     indicative) : le coût du layout initial croît linéairement avec le nombre de
+     colonnes (10→106ms/150 cellules, 60→474ms/900, 100→557ms/1500) car toutes les
+     colonnes sont matérialisées. Contrainte d'archi : le scroll horizontal appartient
+     au `ScrollViewer` externe, donc un `VirtualizingStackPanel` par ligne ne
+     virtualiserait rien (lignes mesurées en largeur infinie). Une vraie virtualisation
+     exige un **viewport horizontal partagé** piloté par l'offset de la grille —
+     redesign profond (colonnes figées, synchro d'en-tête, resize). À n'entreprendre
+     que si des grilles à 60+ colonnes saccadent sur un vrai écran après le fix de
+     recyclage. Sinon, rester sur many-rows (cas commun, déjà géré).
 
 1.4. **Modèle de lignes unifié (rows + group rows + summary rows)**
    - Une seule liste virtualisée de « visual rows » (data / group-header / group-summary /
