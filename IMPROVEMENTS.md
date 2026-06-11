@@ -107,7 +107,9 @@ base qui réfléchit à chaque cellule.
    caption, aligné sous les colonnes et synchronisé au scroll horizontal. Propriétés
    `ShowSummaryFooter` + collection `TotalSummaries`. Vérifié dans `tests/HeadlessSmoke`
    (moteur + rendu). Reste : agrégat Custom (délégué).
-4.2. **Group summaries** (cf. §3.3).
+4.2. ✅ **Group summaries** : agrégats par groupe affichés dans l'en-tête de groupe
+   (collection `GroupSummaries`), calculés sur les items de chaque groupe. Vérifié
+   headless (somme par département).
 4.3. **Summary sur sélection** (total des cellules sélectionnées, comme Excel).
 4.4. **Format & alignement** des résultats d'agrégat.
 

@@ -12,6 +12,7 @@ public class GridGroup : INotifyPropertyChanged
     private bool _isExpanded = true;
     private object? _key;
     private string _displayText = string.Empty;
+    private string _summaryText = string.Empty;
     private int _level;
     private GridGroup? _parent;
 
@@ -45,6 +46,21 @@ public class GridGroup : INotifyPropertyChanged
         {
             _displayText = value;
             OnPropertyChanged(nameof(DisplayText));
+        }
+    }
+
+    /// <summary>
+    /// Computed aggregate text for the group header (e.g. "Sum: 1,200 | Count: 3").
+    /// Populated by the grid when group summaries are configured.
+    /// </summary>
+    public string SummaryText
+    {
+        get => _summaryText;
+        set
+        {
+            if (_summaryText == value) return;
+            _summaryText = value;
+            OnPropertyChanged(nameof(SummaryText));
         }
     }
 

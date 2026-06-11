@@ -33,6 +33,9 @@ public class JDataGridGroupRow : TemplatedControl
     public static readonly StyledProperty<string> DisplayTextProperty =
         AvaloniaProperty.Register<JDataGridGroupRow, string>(nameof(DisplayText), string.Empty);
 
+    public static readonly StyledProperty<string> SummaryTextProperty =
+        AvaloniaProperty.Register<JDataGridGroupRow, string>(nameof(SummaryText), string.Empty);
+
     public static readonly StyledProperty<int> ItemCountProperty =
         AvaloniaProperty.Register<JDataGridGroupRow, int>(nameof(ItemCount), 0);
 
@@ -82,6 +85,12 @@ public class JDataGridGroupRow : TemplatedControl
     {
         get => GetValue(DisplayTextProperty);
         set => SetValue(DisplayTextProperty, value);
+    }
+
+    public string SummaryText
+    {
+        get => GetValue(SummaryTextProperty);
+        set => SetValue(SummaryTextProperty, value);
     }
 
     public int ItemCount
@@ -156,8 +165,25 @@ public class JDataGridGroupRow : TemplatedControl
         IsExpanded = _expandButton?.IsChecked ?? false;
     }
 
+    private GridGroup? _subscribedGroup;
+
     private void OnGroupChanged()
     {
+        if (_subscribedGroup != null)
+            _subscribedGroup.PropertyChanged -= OnGroupPropertyChanged;
+
+        _subscribedGroup = Group;
+
+        if (_subscribedGroup != null)
+            _subscribedGroup.PropertyChanged += OnGroupPropertyChanged;
+
+        UpdateFromGroup();
+    }
+
+    private void OnGroupPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        // SummaryText is computed by the grid after the group is built, so reflect
+        // late updates here.
         UpdateFromGroup();
     }
 
@@ -167,6 +193,7 @@ public class JDataGridGroupRow : TemplatedControl
 
         Level = Group.Level;
         DisplayText = Group.DisplayText;
+        SummaryText = Group.SummaryText;
         ItemCount = Group.TotalItemCount;
         IsExpanded = Group.IsExpanded;
     }

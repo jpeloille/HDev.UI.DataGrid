@@ -193,6 +193,18 @@ try
         .Any(t => t.Text != null && t.Text.Contains("382"));
     Check("summary footer: renders formatted salary sum (Σ 382,000)", footerRendersSum);
 
+    // 9. Group summaries: per-group aggregate shown in the group header.
+    grid.GroupSummaries.Add(new GridSummary { FieldName = nameof(Emp.Salary), SummaryType = SummaryType.Sum, FormatString = "N0", Caption = "Σ {0}" });
+    grid.GroupBy(nameof(Emp.Department));
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(window);
+
+    var groupSummaryTexts = grid.GetVisualDescendants().OfType<JDataGridGroupRow>()
+        .Select(g => g.SummaryText).ToList();
+    // Engineering = 90000 (Zoe) + 85000 (Bob) = 175000.
+    Check($"group summary: Engineering shows Σ 175,000 (got [{string.Join(", ", groupSummaryTexts)}])",
+        groupSummaryTexts.Any(t => t.Contains("175")));
+
     // --- Column-count scaling measurement (informs whether true column
     //     virtualization is warranted; absolute headless ms are indicative). ---
     Console.WriteLine();

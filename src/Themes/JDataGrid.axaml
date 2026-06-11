@@ -774,6 +774,9 @@
                         Spacing="8">
               <TextBlock Text="{TemplateBinding DisplayText}"
                          FontWeight="SemiBold" />
+              <TextBlock Text="{TemplateBinding SummaryText}"
+                         Foreground="Gray"
+                         VerticalAlignment="Center" />
             </StackPanel>
 
             <!-- Item Count -->

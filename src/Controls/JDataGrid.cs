@@ -274,6 +274,11 @@ public class JDataGrid : TemplatedControl
     /// </summary>
     public System.Collections.ObjectModel.ObservableCollection<GridSummary> TotalSummaries { get; } = new();
 
+    /// <summary>
+    /// Aggregates shown in each group header when grouping is active.
+    /// </summary>
+    public System.Collections.ObjectModel.ObservableCollection<GridSummary> GroupSummaries { get; } = new();
+
     public bool AllowSorting
     {
         get => GetValue(AllowSortingProperty);
@@ -441,6 +446,7 @@ public class JDataGrid : TemplatedControl
         _selection.SelectionChanged += OnSelectionManagerChanged;
         _dataSource.DataChanged += OnDataSourceChanged;
         TotalSummaries.CollectionChanged += (_, _) => UpdateSummaryFooter();
+        GroupSummaries.CollectionChanged += (_, _) => { ComputeGroupSummaries(); _dataSource.RebuildVisualRows(); };
     }
 
     static JDataGrid()
@@ -998,6 +1004,10 @@ public class JDataGrid : TemplatedControl
 
     private void RefreshView()
     {
+        // Compute group header aggregates before binding so realized group rows
+        // pick up the text.
+        ComputeGroupSummaries();
+
         // Bind data to rows presenter (interleaved group headers + data rows).
         if (_rowsPresenter != null)
         {
@@ -1084,6 +1094,34 @@ public class JDataGrid : TemplatedControl
         if (_summaryPresenter != null)
         {
             _summaryPresenter.ItemsSource = BuildFooterCells(Columns.GetScrollableColumns().ToList(), view);
+        }
+    }
+
+    /// <summary>
+    /// Computes the aggregate text for every group header from <see cref="GroupSummaries"/>.
+    /// </summary>
+    private void ComputeGroupSummaries()
+    {
+        if (!_dataSource.IsGrouped) return;
+
+        foreach (var group in _dataSource.Groups)
+        {
+            ComputeGroupSummary(group);
+        }
+    }
+
+    private void ComputeGroupSummary(GridGroup group)
+    {
+        if (GroupSummaries.Count > 0)
+        {
+            var items = group.GetAllItems().ToList();
+            group.SummaryText = string.Join("  |  ",
+                GroupSummaries.Select(s => s.ComputeText(items)).Where(t => !string.IsNullOrEmpty(t)));
+        }
+
+        foreach (var subGroup in group.SubGroups)
+        {
+            ComputeGroupSummary(subGroup);
         }
     }
 
