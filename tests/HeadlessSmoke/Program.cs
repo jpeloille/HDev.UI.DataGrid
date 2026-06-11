@@ -52,6 +52,12 @@ try
     int dataRows = grid.GetVisualDescendants().OfType<JDataGridRow>().Count();
     Check($"ungrouped: data rows render as JDataGridRow (found {dataRows})", dataRows > 0);
 
+    // GEOMETRY: a cell must have a real pixel width (catches the star-weight bug
+    // where Width.Value of a Star column is the weight 1.0 -> a 1px sliver).
+    var probeCell = grid.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var probeWidth = probeCell?.Bounds.Width ?? 0;
+    Check($"geometry: auto-generated cell has real width (Bounds.Width = {probeWidth:F0})", probeWidth > 20);
+
     // 2. Group: header rows render as JDataGridGroupRow.
     grid.GroupBy(nameof(Emp.Department));
     Dispatcher.UIThread.RunJobs();

@@ -6,6 +6,7 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Reactive;
 using Avalonia.VisualTree;
 using Julien.Avalonia.DataGrid.Models;
 using Models = Julien.Avalonia.DataGrid.Models;
@@ -45,6 +46,7 @@ public class JDataGrid : TemplatedControl
     private object? _editingItem;
     private GridColumn? _editingColumn;
     private JDataGridCell? _editingCell;
+    private IDisposable? _widthSubscription;
 
     #endregion
 
@@ -484,6 +486,12 @@ public class JDataGrid : TemplatedControl
         if (_scrollViewer != null)
         {
             _scrollViewer.ScrollChanged += OnScrollChanged;
+
+            // Recompute pixel widths (star/auto distribution) whenever the data
+            // viewport is resized.
+            _widthSubscription?.Dispose();
+            _widthSubscription = _scrollViewer.GetObservable(BoundsProperty)
+                .Subscribe(new AnonymousObserver<global::Avalonia.Rect>(_ => RecalculateColumnWidths()));
         }
 
         // Listen to column header events (bubbled from JDataGridColumnHeader)
@@ -912,8 +920,32 @@ public class JDataGrid : TemplatedControl
 
     private void OnColumnResizeCompleted(object? sender, ColumnResizeEventArgs e)
     {
-        // Column resize is already handled in the header
+        // Redistribute remaining width among star columns after a fixed resize.
+        RecalculateColumnWidths();
         e.Handled = true;
+    }
+
+    /// <summary>
+    /// Computes each visible column's pixel <see cref="GridColumn.ActualWidth"/>
+    /// from its Width mode (fixed/auto/star) and the available viewport, so star
+    /// and auto columns render at real widths instead of their raw GridLength value.
+    /// </summary>
+    private void RecalculateColumnWidths()
+    {
+        double available = _scrollViewer?.Bounds.Width ?? 0;
+        if (available <= 0) available = Bounds.Width;
+        if (available <= 0 || Columns.Count == 0) return;
+
+        var scrollable = Columns.GetScrollableColumns().ToList();
+        if (scrollable.Count > 0)
+            Helpers.ColumnWidthHelper.CalculateColumnWidths(scrollable, available);
+
+        var frozen = Columns.GetFrozenColumns().ToList();
+        if (frozen.Count > 0)
+        {
+            double frozenWidth = frozen.Sum(c => c.Width.IsAbsolute ? c.Width.Value : Math.Max(c.MinWidth, 80));
+            Helpers.ColumnWidthHelper.CalculateColumnWidths(frozen, frozenWidth);
+        }
     }
 
     private void OnColumnReorderCompleted(object? sender, ColumnReorderEventArgs e)
@@ -1004,6 +1036,9 @@ public class JDataGrid : TemplatedControl
 
     private void RefreshView()
     {
+        // Ensure columns have real pixel widths before cells/footer use them.
+        RecalculateColumnWidths();
+
         // Compute group header aggregates before binding so realized group rows
         // pick up the text.
         ComputeGroupSummaries();
@@ -1133,7 +1168,7 @@ public class JDataGrid : TemplatedControl
             var summary = TotalSummaries.FirstOrDefault(s => s.FieldName == column.FieldName);
             cells.Add(new GridFooterCell
             {
-                Width = column.Width.Value,
+                Width = column.ActualWidth,
                 Text = summary?.ComputeText(view) ?? string.Empty,
                 TextAlignment = column.TextAlignment
             });

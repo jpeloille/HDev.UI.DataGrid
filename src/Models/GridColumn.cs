@@ -90,6 +90,9 @@ public class GridColumn : AvaloniaObject
     public static readonly StyledProperty<IBrush?> ForegroundProperty =
         AvaloniaProperty.Register<GridColumn, IBrush?>(nameof(Foreground));
 
+    public static readonly StyledProperty<double> ActualWidthProperty =
+        AvaloniaProperty.Register<GridColumn, double>(nameof(ActualWidth), 100);
+
     #endregion
 
     #region Properties
@@ -279,9 +282,15 @@ public class GridColumn : AvaloniaObject
     #region Computed Properties
 
     /// <summary>
-    /// Gets the actual width in pixels for layout calculations.
+    /// Gets the actual rendered width in pixels (computed by the grid from the
+    /// Width mode — fixed/auto/star — and the available viewport). Cells, headers
+    /// and footers bind to this so star/auto columns get real pixel widths.
     /// </summary>
-    public double ActualWidth { get; internal set; }
+    public double ActualWidth
+    {
+        get => GetValue(ActualWidthProperty);
+        set => SetValue(ActualWidthProperty, value);
+    }
 
     /// <summary>
     /// The visual index after reordering (different from definition order).

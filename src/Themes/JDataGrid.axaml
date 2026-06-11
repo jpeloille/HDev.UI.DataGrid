@@ -84,7 +84,7 @@
                     <DataTemplate>
                       <controls:JDataGridColumnHeader Column="{Binding}"
                                                       HeaderText="{Binding Header}"
-                                                      Width="{Binding Width.Value}"
+                                                      Width="{Binding ActualWidth}"
                                                       SortDirection="{Binding SortDirection}"
                                                       AllowResize="{Binding AllowResize}" />
                     </DataTemplate>
@@ -113,7 +113,7 @@
                       <DataTemplate>
                         <controls:JDataGridColumnHeader Column="{Binding}"
                                                         HeaderText="{Binding Header}"
-                                                        Width="{Binding Width.Value}"
+                                                        Width="{Binding ActualWidth}"
                                                         SortDirection="{Binding SortDirection}"
                                                         AllowResize="{Binding AllowResize}" />
                       </DataTemplate>
@@ -151,7 +151,7 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
                       <controls:JDataGridFilterCell Column="{Binding}"
-                                                    Width="{Binding Width.Value}" />
+                                                    Width="{Binding ActualWidth}" />
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -176,7 +176,7 @@
                     <ItemsControl.ItemTemplate>
                       <DataTemplate>
                         <controls:JDataGridFilterCell Column="{Binding}"
-                                                      Width="{Binding Width.Value}" />
+                                                      Width="{Binding ActualWidth}" />
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
                   </ItemsControl>
@@ -534,7 +534,7 @@
                 <DataTemplate>
                   <controls:JDataGridCell Column="{Binding}"
                                           RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:JDataGridRow}}"
-                                          Width="{Binding Width.Value}" />
+                                          Width="{Binding ActualWidth}" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -557,7 +557,7 @@
                 <DataTemplate>
                   <controls:JDataGridCell Column="{Binding}"
                                           RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:JDataGridRow}}"
-                                          Width="{Binding Width.Value}" />
+                                          Width="{Binding ActualWidth}" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
