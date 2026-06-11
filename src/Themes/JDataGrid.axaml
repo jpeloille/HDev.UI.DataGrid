@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:Julien.Avalonia.DataGrid.Controls;assembly=Julien.Avalonia.DataGrid">
+                    xmlns:controls="clr-namespace:Julien.Avalonia.DataGrid.Controls;assembly=Julien.Avalonia.DataGrid"
+                    xmlns:models="clr-namespace:Julien.Avalonia.DataGrid.Models;assembly=Julien.Avalonia.DataGrid">
 
   <!-- ===== Colors ===== -->
   <Color x:Key="DataGridHeaderBackground">#F5F5F5</Color>
@@ -40,7 +41,7 @@
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="4">
-          <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
+          <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
             
             <!-- Group Panel (drag columns here to group) -->
             <controls:JDataGridGroupPanel x:Name="PART_GroupPanel"
@@ -253,8 +254,79 @@
               </ScrollViewer>
             </Grid>
 
-            <!-- Status Bar / Summary -->
+            <!-- Summary Footer (total aggregates, aligned with columns) -->
             <Border Grid.Row="4"
+                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
+                    BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    IsVisible="{TemplateBinding ShowSummaryFooter}">
+              <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
+                <!-- Row Indicator Space -->
+                <Border Grid.Column="0"
+                        Width="4"
+                        IsVisible="{TemplateBinding ShowRowIndicator}" />
+
+                <!-- Row Number Space -->
+                <Border Grid.Column="1"
+                        Width="40"
+                        IsVisible="{TemplateBinding ShowRowNumbers}" />
+
+                <!-- Frozen Summary Cells -->
+                <ItemsControl x:Name="PART_FrozenSummaryPresenter"
+                              Grid.Column="2">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="models:GridFooterCell">
+                      <Border Width="{Binding Width}" Padding="8,4">
+                        <TextBlock Text="{Binding Text}"
+                                   TextAlignment="{Binding TextAlignment}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" />
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Frozen Summary Separator -->
+                <Border x:Name="PART_FrozenSummarySeparator"
+                        Grid.Column="3"
+                        Width="2"
+                        Background="{StaticResource DataGridFrozenColumnSeparator}" />
+
+                <!-- Scrollable Summary Cells -->
+                <ScrollViewer x:Name="PART_SummaryScrollViewer"
+                              Grid.Column="4"
+                              HorizontalScrollBarVisibility="Hidden"
+                              VerticalScrollBarVisibility="Disabled">
+                  <ItemsControl x:Name="PART_SummaryPresenter">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate DataType="models:GridFooterCell">
+                        <Border Width="{Binding Width}" Padding="8,4">
+                          <TextBlock Text="{Binding Text}"
+                                     TextAlignment="{Binding TextAlignment}"
+                                     FontWeight="SemiBold"
+                                     VerticalAlignment="Center"
+                                     TextTrimming="CharacterEllipsis" />
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Grid>
+            </Border>
+
+            <!-- Status Bar -->
+            <Border Grid.Row="5"
                     Background="{StaticResource DataGridHeaderBackgroundBrush}"
                     BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
                     BorderThickness="0,1,0,0"

@@ -103,7 +103,10 @@ base qui réfléchit à chaque cellule.
 
 ## 4. Summaries / agrégats (absent)
 
-4.1. **Footer total summary** : Sum, Min, Max, Avg, Count, Custom, par colonne.
+4.1. ✅ **Footer total summary** : Count/Sum/Average/Min/Max par colonne, format +
+   caption, aligné sous les colonnes et synchronisé au scroll horizontal. Propriétés
+   `ShowSummaryFooter` + collection `TotalSummaries`. Vérifié dans `tests/HeadlessSmoke`
+   (moteur + rendu). Reste : agrégat Custom (délégué).
 4.2. **Group summaries** (cf. §3.3).
 4.3. **Summary sur sélection** (total des cellules sélectionnées, comme Excel).
 4.4. **Format & alignement** des résultats d'agrégat.

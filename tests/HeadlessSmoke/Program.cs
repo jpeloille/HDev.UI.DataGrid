@@ -172,6 +172,27 @@ try
     grid.Columns.UpdateVisibleIndices();
     structWindow.Close();
 
+    // 8. Summary engine + footer rendering.
+    var allItems = data.Cast<object>().ToList();
+    var sumSalary = new GridSummary { FieldName = nameof(Emp.Salary), SummaryType = SummaryType.Sum, FormatString = "N0", Caption = "Σ {0}" };
+    var avgSalary = new GridSummary { FieldName = nameof(Emp.Salary), SummaryType = SummaryType.Average };
+    var countNames = new GridSummary { FieldName = nameof(Emp.Name), SummaryType = SummaryType.Count };
+    var maxHired = new GridSummary { FieldName = nameof(Emp.Hired), SummaryType = SummaryType.Max };
+
+    Check("summary engine: Sum salaries == 382000", Convert.ToDouble(sumSalary.Compute(allItems)) == 382000d);
+    Check("summary engine: Average salary == 76400", Convert.ToDouble(avgSalary.Compute(allItems)) == 76400d);
+    Check("summary engine: Count == 5", Convert.ToInt32(countNames.Compute(allItems)) == 5);
+    Check("summary engine: Max hire date", (DateTime)maxHired.Compute(allItems)! == new DateTime(2021, 11, 20));
+
+    grid.TotalSummaries.Add(sumSalary);
+    grid.ShowSummaryFooter = true;
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(window);
+
+    bool footerRendersSum = grid.GetVisualDescendants().OfType<TextBlock>()
+        .Any(t => t.Text != null && t.Text.Contains("382"));
+    Check("summary footer: renders formatted salary sum (Σ 382,000)", footerRendersSum);
+
     // --- Column-count scaling measurement (informs whether true column
     //     virtualization is warranted; absolute headless ms are indicative). ---
     Console.WriteLine();

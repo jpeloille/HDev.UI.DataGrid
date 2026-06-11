@@ -35,6 +35,10 @@ public class JDataGrid : TemplatedControl
     private ItemsControl? _frozenHeaderPresenter;
     private ItemsControl? _filterRowPresenter;
     private ItemsControl? _frozenFilterPresenter;
+    private ScrollViewer? _summaryScrollViewer;
+    private ItemsControl? _summaryPresenter;
+    private ItemsControl? _frozenSummaryPresenter;
+    private Border? _frozenSummarySeparator;
     private JDataGridGroupPanel? _groupPanel;
     private Border? _frozenHeaderSeparator;
     private Border? _frozenFilterSeparator;
@@ -76,6 +80,9 @@ public class JDataGrid : TemplatedControl
 
     public static readonly StyledProperty<bool> ShowGroupPanelProperty =
         AvaloniaProperty.Register<JDataGrid, bool>(nameof(ShowGroupPanel), false);
+
+    public static readonly StyledProperty<bool> ShowSummaryFooterProperty =
+        AvaloniaProperty.Register<JDataGrid, bool>(nameof(ShowSummaryFooter), false);
 
     public static readonly StyledProperty<bool> AllowSortingProperty =
         AvaloniaProperty.Register<JDataGrid, bool>(nameof(AllowSorting), true);
@@ -255,6 +262,18 @@ public class JDataGrid : TemplatedControl
         set => SetValue(ShowGroupPanelProperty, value);
     }
 
+    public bool ShowSummaryFooter
+    {
+        get => GetValue(ShowSummaryFooterProperty);
+        set => SetValue(ShowSummaryFooterProperty, value);
+    }
+
+    /// <summary>
+    /// Aggregates shown in the summary footer, one or more per column (matched by
+    /// <see cref="GridSummary.FieldName"/>).
+    /// </summary>
+    public System.Collections.ObjectModel.ObservableCollection<GridSummary> TotalSummaries { get; } = new();
+
     public bool AllowSorting
     {
         get => GetValue(AllowSortingProperty);
@@ -421,6 +440,7 @@ public class JDataGrid : TemplatedControl
         Columns = new GridColumnCollection();
         _selection.SelectionChanged += OnSelectionManagerChanged;
         _dataSource.DataChanged += OnDataSourceChanged;
+        TotalSummaries.CollectionChanged += (_, _) => UpdateSummaryFooter();
     }
 
     static JDataGrid()
@@ -428,6 +448,7 @@ public class JDataGrid : TemplatedControl
         ItemsSourceProperty.Changed.AddClassHandler<JDataGrid>((grid, e) => grid.OnItemsSourceChanged(e));
         SelectionModeProperty.Changed.AddClassHandler<JDataGrid>((grid, e) => grid.OnSelectionModeChanged(e));
         SelectedItemProperty.Changed.AddClassHandler<JDataGrid>((grid, e) => grid.OnSelectedItemChanged(e));
+        ShowSummaryFooterProperty.Changed.AddClassHandler<JDataGrid>((grid, _) => grid.UpdateSummaryFooter());
     }
 
     #endregion
@@ -446,6 +467,10 @@ public class JDataGrid : TemplatedControl
         _frozenHeaderPresenter = e.NameScope.Find<ItemsControl>("PART_FrozenHeaderPresenter");
         _filterRowPresenter = e.NameScope.Find<ItemsControl>("PART_FilterRowPresenter");
         _frozenFilterPresenter = e.NameScope.Find<ItemsControl>("PART_FrozenFilterPresenter");
+        _summaryScrollViewer = e.NameScope.Find<ScrollViewer>("PART_SummaryScrollViewer");
+        _summaryPresenter = e.NameScope.Find<ItemsControl>("PART_SummaryPresenter");
+        _frozenSummaryPresenter = e.NameScope.Find<ItemsControl>("PART_FrozenSummaryPresenter");
+        _frozenSummarySeparator = e.NameScope.Find<Border>("PART_FrozenSummarySeparator");
         _groupPanel = e.NameScope.Find<JDataGridGroupPanel>("PART_GroupPanel");
         _frozenHeaderSeparator = e.NameScope.Find<Border>("PART_FrozenHeaderSeparator");
         _frozenFilterSeparator = e.NameScope.Find<Border>("PART_FrozenFilterSeparator");
@@ -861,6 +886,11 @@ public class JDataGrid : TemplatedControl
             {
                 _filterScrollViewer.Offset = new global::Avalonia.Vector(horizontalOffset, _filterScrollViewer.Offset.Y);
             }
+
+            if (_summaryScrollViewer != null)
+            {
+                _summaryScrollViewer.Offset = new global::Avalonia.Vector(horizontalOffset, _summaryScrollViewer.Offset.Y);
+            }
         }
     }
 
@@ -1024,6 +1054,53 @@ public class JDataGrid : TemplatedControl
         {
             _filterRowPresenter.ItemsSource = scrollableColumns;
         }
+
+        UpdateSummaryFooter();
+    }
+
+    /// <summary>
+    /// Recomputes the summary footer cells (one per visible column, aligned with
+    /// the rows) over the current filtered view and binds them to the presenters.
+    /// </summary>
+    private void UpdateSummaryFooter()
+    {
+        if (_summaryPresenter == null && _frozenSummaryPresenter == null)
+            return;
+
+        var view = _dataSource.View;
+
+        if (_frozenSummaryPresenter != null)
+        {
+            var frozen = Columns.GetFrozenColumns().ToList();
+            _frozenSummaryPresenter.ItemsSource = BuildFooterCells(frozen, view);
+            _frozenSummaryPresenter.IsVisible = frozen.Count > 0;
+        }
+
+        if (_frozenSummarySeparator != null)
+        {
+            _frozenSummarySeparator.IsVisible = Columns.GetFrozenColumns().Any();
+        }
+
+        if (_summaryPresenter != null)
+        {
+            _summaryPresenter.ItemsSource = BuildFooterCells(Columns.GetScrollableColumns().ToList(), view);
+        }
+    }
+
+    private List<GridFooterCell> BuildFooterCells(IReadOnlyList<GridColumn> columns, IReadOnlyList<object> view)
+    {
+        var cells = new List<GridFooterCell>(columns.Count);
+        foreach (var column in columns)
+        {
+            var summary = TotalSummaries.FirstOrDefault(s => s.FieldName == column.FieldName);
+            cells.Add(new GridFooterCell
+            {
+                Width = column.Width.Value,
+                Text = summary?.ComputeText(view) ?? string.Empty,
+                TextAlignment = column.TextAlignment
+            });
+        }
+        return cells;
     }
 
     #endregion
