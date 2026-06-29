@@ -513,6 +513,10 @@ public class JDataGrid : TemplatedControl
         AddHandler(JDataGridCell.BeginEditEvent, OnCellBeginEditRequested);
         AddHandler(JDataGridCell.EditEndedEvent, OnCellEditEnded);
 
+        // Mouse selection (bubbled from rows/cells)
+        AddHandler(JDataGridRow.RowClickEvent, OnRowClicked);
+        AddHandler(JDataGridCell.CellClickEvent, OnCellClicked);
+
         // Listen to group panel events
         AddHandler(JDataGridGroupPanel.ColumnGroupedEvent, OnColumnGrouped);
         AddHandler(JDataGridGroupPanel.ColumnUngroupedEvent, OnColumnUngrouped);
@@ -881,8 +885,38 @@ public class JDataGrid : TemplatedControl
         SetCurrentValue(SelectedItemProperty, _selection.SelectedItem);
         SetCurrentValue(SelectedItemsProperty, _selection.SelectedItems);
 
+        UpdateRowSelectionStates();
+
         RaiseEvent(new global::Avalonia.Controls.SelectionChangedEventArgs(SelectionChangedEvent, (System.Collections.IList)e.RemovedItems, (System.Collections.IList)e.AddedItems));
         SelectionChangedCommand?.Execute(_selection.SelectedItem);
+    }
+
+    private void OnRowClicked(object? sender, RowEventArgs e)
+    {
+        if (e.Item == null) return;
+        _selection.Select(e.Item, _dataSource.IndexOf(e.Item));
+    }
+
+    private void OnCellClicked(object? sender, CellEventArgs e)
+    {
+        if (e.Item == null) return;
+        _selection.CurrentColumn = e.Column;
+        _selection.Select(e.Item, _dataSource.IndexOf(e.Item));
+    }
+
+    /// <summary>
+    /// Pushes the current selection to the realized data rows so they highlight.
+    /// </summary>
+    private void UpdateRowSelectionStates()
+    {
+        if (_rowsPresenter == null) return;
+
+        foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<JDataGridRow>())
+        {
+            var item = row.DataContext;
+            row.IsSelected = item != null && _selection.IsSelected(item);
+            row.IsCurrent = item != null && ReferenceEquals(item, _selection.CurrentItem);
+        }
     }
 
     private void OnDataSourceChanged(object? sender, EventArgs e)
@@ -1079,45 +1113,31 @@ public class JDataGrid : TemplatedControl
         var scrollableColumns = Columns.GetScrollableColumns().ToList();
         var hasFrozenColumns = frozenColumns.Count > 0;
 
-        // Bind frozen columns to frozen header presenter
-        if (_frozenHeaderPresenter != null)
-        {
-            _frozenHeaderPresenter.ItemsSource = frozenColumns;
-            _frozenHeaderPresenter.IsVisible = hasFrozenColumns;
-        }
+        // Bind columns to the header/filter presenters only when the column set
+        // actually changed. Reassigning on every data refresh would recreate the
+        // header and filter cells, clearing in-progress filter text and stealing
+        // focus on each keystroke.
+        SetColumnsIfChanged(_frozenHeaderPresenter, frozenColumns);
+        if (_frozenHeaderPresenter != null) _frozenHeaderPresenter.IsVisible = hasFrozenColumns;
+        if (_frozenHeaderSeparator != null) _frozenHeaderSeparator.IsVisible = hasFrozenColumns;
 
-        // Show/hide frozen separator
-        if (_frozenHeaderSeparator != null)
-        {
-            _frozenHeaderSeparator.IsVisible = hasFrozenColumns;
-        }
+        SetColumnsIfChanged(_headerPresenter, scrollableColumns);
 
-        // Bind scrollable columns to header presenter
-        if (_headerPresenter != null)
-        {
-            _headerPresenter.ItemsSource = scrollableColumns;
-        }
+        SetColumnsIfChanged(_frozenFilterPresenter, frozenColumns);
+        if (_frozenFilterPresenter != null) _frozenFilterPresenter.IsVisible = hasFrozenColumns;
+        if (_frozenFilterSeparator != null) _frozenFilterSeparator.IsVisible = hasFrozenColumns;
 
-        // Bind frozen columns to frozen filter presenter
-        if (_frozenFilterPresenter != null)
-        {
-            _frozenFilterPresenter.ItemsSource = frozenColumns;
-            _frozenFilterPresenter.IsVisible = hasFrozenColumns;
-        }
-
-        // Show/hide frozen filter separator
-        if (_frozenFilterSeparator != null)
-        {
-            _frozenFilterSeparator.IsVisible = hasFrozenColumns;
-        }
-
-        // Bind scrollable columns to filter presenter
-        if (_filterRowPresenter != null)
-        {
-            _filterRowPresenter.ItemsSource = scrollableColumns;
-        }
+        SetColumnsIfChanged(_filterRowPresenter, scrollableColumns);
 
         UpdateSummaryFooter();
+    }
+
+    private static void SetColumnsIfChanged(ItemsControl? presenter, List<GridColumn> columns)
+    {
+        if (presenter == null) return;
+        if (presenter.ItemsSource is IEnumerable<GridColumn> current && current.SequenceEqual(columns))
+            return;
+        presenter.ItemsSource = columns;
     }
 
     /// <summary>
