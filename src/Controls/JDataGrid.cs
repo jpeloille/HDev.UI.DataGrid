@@ -491,7 +491,13 @@ public class JDataGrid : TemplatedControl
             // viewport is resized.
             _widthSubscription?.Dispose();
             _widthSubscription = _scrollViewer.GetObservable(BoundsProperty)
-                .Subscribe(new AnonymousObserver<global::Avalonia.Rect>(_ => RecalculateColumnWidths()));
+                .Subscribe(new AnonymousObserver<global::Avalonia.Rect>(_ =>
+                {
+                    RecalculateColumnWidths();
+                    // Footer cells are a snapshot of widths; rebuild them when the
+                    // viewport (and thus ActualWidth) changes so they stay aligned.
+                    UpdateSummaryFooter();
+                }));
         }
 
         // Listen to column header events (bubbled from JDataGridColumnHeader)
@@ -932,20 +938,31 @@ public class JDataGrid : TemplatedControl
     /// </summary>
     private void RecalculateColumnWidths()
     {
-        double available = _scrollViewer?.Bounds.Width ?? 0;
-        if (available <= 0) available = Bounds.Width;
-        if (available <= 0 || Columns.Count == 0) return;
+        double total = _scrollViewer?.Bounds.Width ?? 0;
+        if (total <= 0) total = Bounds.Width;
+        if (total <= 0 || Columns.Count == 0) return;
 
-        var scrollable = Columns.GetScrollableColumns().ToList();
-        if (scrollable.Count > 0)
-            Helpers.ColumnWidthHelper.CalculateColumnWidths(scrollable, available);
-
+        // Size frozen columns first; they occupy the left chrome alongside the row
+        // indicator and row-number gutter.
         var frozen = Columns.GetFrozenColumns().ToList();
         if (frozen.Count > 0)
         {
             double frozenWidth = frozen.Sum(c => c.Width.IsAbsolute ? c.Width.Value : Math.Max(c.MinWidth, 80));
             Helpers.ColumnWidthHelper.CalculateColumnWidths(frozen, frozenWidth);
         }
+
+        // Scrollable columns share the width remaining after the left chrome
+        // (indicator + row number + frozen cells + frozen separator), so star
+        // columns don't overflow the viewport and clip the last column.
+        double chrome = 0;
+        if (ShowRowIndicator) chrome += 4;
+        if (ShowRowNumbers) chrome += 40;
+        chrome += frozen.Sum(c => c.ActualWidth);
+        if (frozen.Count > 0) chrome += 2;
+
+        var scrollable = Columns.GetScrollableColumns().ToList();
+        if (scrollable.Count > 0)
+            Helpers.ColumnWidthHelper.CalculateColumnWidths(scrollable, Math.Max(0, total - chrome));
     }
 
     private void OnColumnReorderCompleted(object? sender, ColumnReorderEventArgs e)

@@ -746,24 +746,44 @@
             <Border Grid.Column="0"
                     Width="{Binding TotalIndent, RelativeSource={RelativeSource TemplatedParent}}" />
 
-            <!-- Expand/Collapse Button -->
+            <!-- Expand/Collapse Button. Neutralize the Fluent checked accent fill
+                 (which otherwise renders the chevron as a solid blue square) by
+                 overriding the toggle brush resources, keeping the default
+                 template so the chevron PathIcons stay in the namescope. -->
             <ToggleButton x:Name="PART_ExpandButton"
                           Grid.Column="1"
                           Width="24" Height="24"
                           Margin="4,0"
-                          Background="Transparent"
+                          Padding="0"
                           BorderThickness="0"
                           IsChecked="{TemplateBinding IsExpanded}">
+              <ToggleButton.Resources>
+                <SolidColorBrush x:Key="ToggleButtonBackground" Color="Transparent" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="Transparent" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="#E0E0E0" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#E0E0E0" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundPressed" Color="#D0D0D0" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#D0D0D0" />
+                <SolidColorBrush x:Key="ToggleButtonBorderBrush" Color="Transparent" />
+                <SolidColorBrush x:Key="ToggleButtonBorderBrushChecked" Color="Transparent" />
+                <SolidColorBrush x:Key="ToggleButtonBorderBrushPointerOver" Color="Transparent" />
+                <SolidColorBrush x:Key="ToggleButtonBorderBrushCheckedPointerOver" Color="Transparent" />
+              </ToggleButton.Resources>
               <Panel>
-                <PathIcon x:Name="ExpandedIcon"
-                          Width="10" Height="10"
-                          Data="M0,0 L6,5 L0,10 Z"
-                          RenderTransform="rotate(90deg)"
-                          IsVisible="False" />
-                <PathIcon x:Name="CollapsedIcon"
-                          Width="10" Height="10"
-                          Data="M0,0 L6,5 L0,10 Z"
-                          IsVisible="False" />
+                <TextBlock x:Name="ExpandedIcon"
+                           Text="▾"
+                           FontSize="11"
+                           Foreground="#5F6368"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           IsVisible="False" />
+                <TextBlock x:Name="CollapsedIcon"
+                           Text="▸"
+                           FontSize="11"
+                           Foreground="#5F6368"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           IsVisible="False" />
               </Panel>
             </ToggleButton>
 
@@ -796,12 +816,12 @@
     </Setter>
 
     <!-- Expanded State -->
-    <Style Selector="^:expanded /template/ PathIcon#ExpandedIcon">
+    <Style Selector="^:expanded /template/ TextBlock#ExpandedIcon">
       <Setter Property="IsVisible" Value="True" />
     </Style>
 
     <!-- Collapsed State -->
-    <Style Selector="^:collapsed /template/ PathIcon#CollapsedIcon">
+    <Style Selector="^:collapsed /template/ TextBlock#CollapsedIcon">
       <Setter Property="IsVisible" Value="True" />
     </Style>
 

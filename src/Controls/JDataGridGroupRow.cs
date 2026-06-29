@@ -196,6 +196,12 @@ public class JDataGridGroupRow : TemplatedControl
         SummaryText = Group.SummaryText;
         ItemCount = Group.TotalItemCount;
         IsExpanded = Group.IsExpanded;
+
+        // The :expanded/:collapsed pseudo-classes are otherwise only set on a
+        // *change* of IsExpanded; since the default is already true, set them
+        // explicitly so the chevron shows on first render.
+        PseudoClasses.Set(PC_Expanded, IsExpanded);
+        PseudoClasses.Set(PC_Collapsed, !IsExpanded);
     }
 
     private void OnExpandedChanged(bool isExpanded)
