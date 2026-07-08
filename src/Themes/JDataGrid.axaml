@@ -27,12 +27,12 @@
   <!-- ===== JDataGrid Theme ===== -->
   <ControlTheme x:Key="{x:Type controls:JDataGrid}" TargetType="controls:JDataGrid">
     <Setter Property="Background" Value="White" />
-    <Setter Property="BorderBrush" Value="{StaticResource DataGridHeaderBorderBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DataGridHeaderBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="AlternateRowBackground" Value="{StaticResource DataGridRowAlternateBrush}" />
-    <Setter Property="SelectedRowBackground" Value="{StaticResource DataGridRowSelectedBrush}" />
-    <Setter Property="HoverRowBackground" Value="{StaticResource DataGridRowHoverBrush}" />
-    <Setter Property="GridLinesColor" Value="{StaticResource DataGridGridLinesBrush}" />
+    <Setter Property="AlternateRowBackground" Value="{DynamicResource DataGridRowAlternateBrush}" />
+    <Setter Property="SelectedRowBackground" Value="{DynamicResource DataGridRowSelectedBrush}" />
+    <Setter Property="HoverRowBackground" Value="{DynamicResource DataGridRowHoverBrush}" />
+    <Setter Property="GridLinesColor" Value="{DynamicResource DataGridGridLinesBrush}" />
     <Setter Property="Focusable" Value="True" />
 
     <Setter Property="Template">
@@ -50,7 +50,7 @@
 
             <!-- Column Headers -->
             <Border Grid.Row="1"
-                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
+                    Background="{DynamicResource DataGridHeaderBackgroundBrush}"
                     IsVisible="{TemplateBinding ShowHeader}">
               <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
                 <!-- Row Indicator Space -->
@@ -61,8 +61,8 @@
                 <!-- Row Number Header -->
                 <Border Grid.Column="1"
                         Width="40"
-                        Background="{StaticResource DataGridHeaderBackgroundBrush}"
-                        BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                        Background="{DynamicResource DataGridHeaderBackgroundBrush}"
+                        BorderBrush="{DynamicResource DataGridHeaderBorderBrush}"
                         BorderThickness="0,0,1,1"
                         IsVisible="{TemplateBinding ShowRowNumbers}">
                   <TextBlock Text="#"
@@ -95,7 +95,7 @@
                 <Border x:Name="PART_FrozenHeaderSeparator"
                         Grid.Column="3"
                         Width="2"
-                        Background="{StaticResource DataGridFrozenColumnSeparator}" />
+                        Background="{DynamicResource DataGridFrozenColumnSeparator}" />
 
                 <!-- Scrollable Column Headers -->
                 <ScrollViewer x:Name="PART_HeaderScrollViewer"
@@ -125,8 +125,8 @@
 
             <!-- Filter Row -->
             <Border Grid.Row="2"
-                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
-                    BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                    Background="{DynamicResource DataGridHeaderBackgroundBrush}"
+                    BorderBrush="{DynamicResource DataGridHeaderBorderBrush}"
                     BorderThickness="0,0,0,1"
                     IsVisible="{TemplateBinding ShowFilterRow}">
               <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
@@ -160,7 +160,7 @@
                 <Border x:Name="PART_FrozenFilterSeparator"
                         Grid.Column="3"
                         Width="2"
-                        Background="{StaticResource DataGridFrozenColumnSeparator}" />
+                        Background="{DynamicResource DataGridFrozenColumnSeparator}" />
 
                 <!-- Scrollable Filter Controls -->
                 <ScrollViewer x:Name="PART_FilterScrollViewer"
@@ -256,8 +256,8 @@
 
             <!-- Summary Footer (total aggregates, aligned with columns) -->
             <Border Grid.Row="4"
-                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
-                    BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                    Background="{DynamicResource DataGridHeaderBackgroundBrush}"
+                    BorderBrush="{DynamicResource DataGridHeaderBorderBrush}"
                     BorderThickness="0,1,0,0"
                     IsVisible="{TemplateBinding ShowSummaryFooter}">
               <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
@@ -296,7 +296,7 @@
                 <Border x:Name="PART_FrozenSummarySeparator"
                         Grid.Column="3"
                         Width="2"
-                        Background="{StaticResource DataGridFrozenColumnSeparator}" />
+                        Background="{DynamicResource DataGridFrozenColumnSeparator}" />
 
                 <!-- Scrollable Summary Cells -->
                 <ScrollViewer x:Name="PART_SummaryScrollViewer"
@@ -327,8 +327,8 @@
 
             <!-- Status Bar -->
             <Border Grid.Row="5"
-                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
-                    BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                    Background="{DynamicResource DataGridHeaderBackgroundBrush}"
+                    BorderBrush="{DynamicResource DataGridHeaderBorderBrush}"
                     BorderThickness="0,1,0,0"
                     Padding="8,4">
               <StackPanel Orientation="Horizontal">
@@ -345,8 +345,8 @@
 
   <!-- ===== JDataGridColumnHeader Theme ===== -->
   <ControlTheme x:Key="{x:Type controls:JDataGridColumnHeader}" TargetType="controls:JDataGridColumnHeader">
-    <Setter Property="Background" Value="{StaticResource DataGridHeaderBackgroundBrush}" />
-    <Setter Property="BorderBrush" Value="{StaticResource DataGridHeaderBorderBrush}" />
+    <Setter Property="Background" Value="{DynamicResource DataGridHeaderBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource DataGridHeaderBorderBrush}" />
     <Setter Property="Padding" Value="8,0" />
     <Setter Property="MinWidth" Value="50" />
     <Setter Property="Cursor" Value="Hand" />
@@ -498,7 +498,7 @@
       <ControlTemplate>
         <Border x:Name="RowBorder"
                 Background="{TemplateBinding Background}"
-                BorderBrush="{StaticResource DataGridGridLinesBrush}"
+                BorderBrush="{DynamicResource DataGridGridLinesBrush}"
                 BorderThickness="0,0,0,1">
           <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*">
             <!-- Row Indicator -->
@@ -511,8 +511,8 @@
             <!-- Row Number -->
             <Border Grid.Column="1"
                     Width="40"
-                    Background="{StaticResource DataGridHeaderBackgroundBrush}"
-                    BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                    Background="{DynamicResource DataGridHeaderBackgroundBrush}"
+                    BorderBrush="{DynamicResource DataGridHeaderBorderBrush}"
                     BorderThickness="0,0,1,0"
                     IsVisible="{TemplateBinding ShowRowNumber}">
               <TextBlock x:Name="PART_RowNumber"
@@ -543,7 +543,7 @@
             <Border x:Name="PART_FrozenSeparator"
                     Grid.Column="3"
                     Width="2"
-                    Background="{StaticResource DataGridFrozenColumnSeparator}" />
+                    Background="{DynamicResource DataGridFrozenColumnSeparator}" />
 
             <!-- Scrollable Cells -->
             <ItemsControl x:Name="PART_CellsPresenter"
@@ -568,17 +568,17 @@
 
     <!-- Alternate Row -->
     <Style Selector="^:alternate">
-      <Setter Property="Background" Value="{StaticResource DataGridRowAlternateBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DataGridRowAlternateBrush}" />
     </Style>
 
     <!-- Hover State -->
     <Style Selector="^:pointerover">
-      <Setter Property="Background" Value="{StaticResource DataGridRowHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DataGridRowHoverBrush}" />
     </Style>
 
     <!-- Selected State -->
     <Style Selector="^:selected">
-      <Setter Property="Background" Value="{StaticResource DataGridRowSelectedBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DataGridRowSelectedBrush}" />
     </Style>
 
     <!-- Current Row Indicator -->
@@ -600,7 +600,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Border Background="{TemplateBinding Background}"
-                BorderBrush="{StaticResource DataGridGridLinesBrush}"
+                BorderBrush="{DynamicResource DataGridGridLinesBrush}"
                 BorderThickness="0,0,1,0"
                 Padding="{TemplateBinding Padding}">
           <Panel>
@@ -621,7 +621,7 @@
 
     <!-- Selected State -->
     <Style Selector="^:selected">
-      <Setter Property="Background" Value="{StaticResource DataGridCellSelectedBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DataGridCellSelectedBrush}" />
     </Style>
 
     <!-- Editing State -->
@@ -643,7 +643,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Border Padding="2"
-                BorderBrush="{StaticResource DataGridGridLinesBrush}"
+                BorderBrush="{DynamicResource DataGridGridLinesBrush}"
                 BorderThickness="0,0,1,0">
           <TextBox x:Name="PART_FilterTextBox"
                    Watermark="Filter..."
@@ -657,14 +657,14 @@
 
   <!-- ===== JDataGridGroupPanel Theme ===== -->
   <ControlTheme x:Key="{x:Type controls:JDataGridGroupPanel}" TargetType="controls:JDataGridGroupPanel">
-    <Setter Property="Background" Value="{StaticResource DataGridGroupBackgroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource DataGridGroupBackgroundBrush}" />
     <Setter Property="MinHeight" Value="36" />
 
     <Setter Property="Template">
       <ControlTemplate>
         <Border x:Name="PART_DropZone"
                 Background="{TemplateBinding Background}"
-                BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                BorderBrush="{DynamicResource DataGridHeaderBorderBrush}"
                 BorderThickness="0,0,0,1"
                 Padding="8"
                 MinHeight="{TemplateBinding MinHeight}">
@@ -733,14 +733,14 @@
 
   <!-- ===== JDataGridGroupRow Theme ===== -->
   <ControlTheme x:Key="{x:Type controls:JDataGridGroupRow}" TargetType="controls:JDataGridGroupRow">
-    <Setter Property="Background" Value="{StaticResource DataGridGroupBackgroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource DataGridGroupBackgroundBrush}" />
     <Setter Property="Height" Value="{Binding RowHeight, RelativeSource={RelativeSource Self}}" />
     <Setter Property="Cursor" Value="Hand" />
 
     <Setter Property="Template">
       <ControlTemplate>
         <Border Background="{TemplateBinding Background}"
-                BorderBrush="{StaticResource DataGridHeaderBorderBrush}"
+                BorderBrush="{DynamicResource DataGridHeaderBorderBrush}"
                 BorderThickness="0,0,0,1">
           <Grid ColumnDefinitions="Auto,Auto,*,Auto">
             <!-- Indent -->

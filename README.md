@@ -202,15 +202,25 @@ Tips for best performance:
 
 ## Styling
 
-Override theme resources:
+Override theme resources. Control templates resolve them via `DynamicResource`,
+so redefining the **brush** keys (and the colors used directly, like
+`DataGridFrozenColumnSeparator`) in your application restyles the grid:
 
 ```xml
 <Application.Resources>
-  <Color x:Key="DataGridHeaderBackground">#1976D2</Color>
-  <Color x:Key="DataGridRowSelected">#E3F2FD</Color>
-  <Color x:Key="DataGridRowHover">#F5F5F5</Color>
+  <SolidColorBrush x:Key="DataGridHeaderBackgroundBrush" Color="#1976D2" />
+  <SolidColorBrush x:Key="DataGridRowSelectedBrush" Color="#E3F2FD" />
+  <SolidColorBrush x:Key="DataGridRowHoverBrush" Color="#F5F5F5" />
+  <Color x:Key="DataGridFrozenColumnSeparator">#BDBDBD</Color>
 </Application.Resources>
 ```
+
+Overridable keys: `DataGridHeaderBackgroundBrush`, `DataGridHeaderBorderBrush`,
+`DataGridRowAlternateBrush`, `DataGridRowSelectedBrush`, `DataGridRowHoverBrush`,
+`DataGridGridLinesBrush`, `DataGridCellSelectedBrush`, `DataGridGroupBackgroundBrush`,
+plus the raw colors `DataGridFrozenColumnSeparator`, `DataGridGridLines`,
+`DataGridHeaderBackground`, `DataGridHeaderBorder`, `DataGridCellSelected`,
+`DataGridGroupBackground` where they are consumed directly.
 
 ## Architecture
 
