@@ -12,6 +12,13 @@ public class CardPanel : ContentControl
     public static readonly StyledProperty<bool> ShowSearchProperty =
         AvaloniaProperty.Register<CardPanel, bool>(nameof(ShowSearch), false);
 
+    public static readonly StyledProperty<string?> SearchTextProperty =
+        AvaloniaProperty.Register<CardPanel, string?>(
+            nameof(SearchText), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+
+    public static readonly StyledProperty<string?> SearchWatermarkProperty =
+        AvaloniaProperty.Register<CardPanel, string?>(nameof(SearchWatermark), "Search...");
+
     public static readonly StyledProperty<bool> ShowHeaderProperty =
         AvaloniaProperty.Register<CardPanel, bool>(nameof(ShowHeader), true);
 
@@ -31,6 +38,18 @@ public class CardPanel : ContentControl
     {
         get => GetValue(ShowSearchProperty);
         set => SetValue(ShowSearchProperty, value);
+    }
+
+    public string? SearchText
+    {
+        get => GetValue(SearchTextProperty);
+        set => SetValue(SearchTextProperty, value);
+    }
+
+    public string? SearchWatermark
+    {
+        get => GetValue(SearchWatermarkProperty);
+        set => SetValue(SearchWatermarkProperty, value);
     }
 
     public bool ShowHeader

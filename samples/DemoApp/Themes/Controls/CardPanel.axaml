@@ -51,18 +51,16 @@
                            Foreground="{DynamicResource TextPrimaryBrush}"
                            VerticalAlignment="Center" />
 
-                <!-- Search Button -->
-                <Button x:Name="PART_SearchButton"
-                        Grid.Column="2"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="6"
-                        IsVisible="{TemplateBinding ShowSearch}">
-                  <Path Width="14" Height="14"
-                        Data="M5.5,0.75 A4.75,4.75 0 1,1 5.5,10.25 A4.75,4.75 0 1,1 5.5,0.75 M9.25,9.25 L13.25,13.25"
-                        Stroke="{DynamicResource TextSecondaryBrush}"
-                        StrokeThickness="1.5" />
-                </Button>
+                <!-- Search Box -->
+                <TextBox x:Name="PART_SearchBox"
+                         Grid.Column="2"
+                         Theme="{DynamicResource WinXISearchBox}"
+                         Text="{Binding SearchText, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                         Watermark="{TemplateBinding SearchWatermark}"
+                         MinHeight="30"
+                         MinWidth="220"
+                         VerticalAlignment="Center"
+                         IsVisible="{TemplateBinding ShowSearch}" />
               </Grid>
             </Border>
 

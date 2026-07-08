@@ -258,8 +258,9 @@
 
         <!-- DataGrid Panel -->
         <controls:CardPanel Grid.Column="1"
-                            Title="Drag a column header here to group by that column"
+                            Title="Employees"
                             ShowSearch="True"
+                            SearchWatermark="Search employees..."
                             ShowHeader="True">
           <jdg:JDataGrid ItemsSource="{Binding Employees}"
                          SelectedItem="{Binding SelectedEmployee}"

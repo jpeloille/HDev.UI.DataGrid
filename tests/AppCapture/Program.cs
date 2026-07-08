@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using DemoApp.ViewModels;
 using DemoApp.Views;
 
@@ -35,6 +36,23 @@ vm.SelectedEmployee = vm.Employees[2];
 vm.ShowFilterRow = true;
 vm.ShowGroupPanel = true;
 Capture("app-blue-panels-selection");
+
+// Search box with text + focus: verifies the filled/active display (text
+// rendered via the two-way SearchText binding, watermark gone, focus accent
+// border).
+var searchCard = window.GetVisualDescendants()
+    .OfType<DemoApp.Controls.CardPanel>()
+    .FirstOrDefault(c => c.ShowSearch);
+var searchBox = searchCard?.GetVisualDescendants()
+    .OfType<TextBox>()
+    .FirstOrDefault(t => t.Name == "PART_SearchBox");
+if (searchCard != null)
+{
+    searchCard.SearchText = "Valérie";
+    searchBox?.Focus();
+}
+Capture("app-blue-search-active");
+Console.WriteLine($"  search binding: CardPanel.SearchText='{searchCard?.SearchText}', TextBox.Text='{searchBox?.Text}'");
 
 window.Close();
 Console.WriteLine($"Saved PNGs to {Path.GetFullPath(outDir)}");
