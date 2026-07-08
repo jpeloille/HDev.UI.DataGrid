@@ -20,7 +20,6 @@ public class JDataGridRow : TemplatedControl
     private Border? _frozenSeparator;
     private Border? _rowIndicator;
     private TextBlock? _rowNumber;
-    private bool _isPointerOver;
 
     #endregion
 
@@ -212,14 +211,12 @@ public class JDataGridRow : TemplatedControl
     protected override void OnPointerEntered(PointerEventArgs e)
     {
         base.OnPointerEntered(e);
-        _isPointerOver = true;
         PseudoClasses.Set(PC_PointerOver, true);
     }
 
     protected override void OnPointerExited(PointerEventArgs e)
     {
         base.OnPointerExited(e);
-        _isPointerOver = false;
         PseudoClasses.Set(PC_PointerOver, false);
     }
 
