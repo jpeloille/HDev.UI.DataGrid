@@ -14,11 +14,16 @@ namespace DemoApp.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
+    private List<Employee> _allEmployees;
+
     [ObservableProperty]
     private ObservableCollection<Employee> _employees;
 
     [ObservableProperty]
     private Employee? _selectedEmployee;
+
+    [ObservableProperty]
+    private string? _searchText;
 
     [ObservableProperty]
     private bool _showFilterRow;
@@ -46,7 +51,8 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel()
     {
-        _employees = SampleDataGenerator.GenerateEmployees(1000);
+        _allEmployees = SampleDataGenerator.GenerateEmployees(1000).ToList();
+        _employees = new ObservableCollection<Employee>(_allEmployees);
         _availableSkins = new ObservableCollection<SkinInfo>
         {
             new SkinInfo
@@ -130,21 +136,48 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    partial void OnSearchTextChanged(string? value) => ApplySearch();
+
+    private void ApplySearch()
+    {
+        var query = SearchText?.Trim();
+        Employees = string.IsNullOrEmpty(query)
+            ? new ObservableCollection<Employee>(_allEmployees)
+            : new ObservableCollection<Employee>(_allEmployees.Where(e => Matches(e, query)));
+        UpdateStatusText();
+    }
+
+    private static bool Matches(Employee e, string query) =>
+        ContainsInsensitive(e.FirstName, query) ||
+        ContainsInsensitive(e.LastName, query) ||
+        ContainsInsensitive(e.Email, query) ||
+        ContainsInsensitive(e.Department, query) ||
+        ContainsInsensitive(e.Position, query) ||
+        ContainsInsensitive(e.Country, query);
+
+    // Accent-insensitive contains: "valerie" matches "Valérie".
+    private static bool ContainsInsensitive(string? source, string query) =>
+        source != null &&
+        System.Globalization.CultureInfo.InvariantCulture.CompareInfo.IndexOf(
+            source, query,
+            System.Globalization.CompareOptions.IgnoreCase |
+            System.Globalization.CompareOptions.IgnoreNonSpace) >= 0;
+
     [RelayCommand]
     private void RefreshData()
     {
         IsLoading = true;
-        
+
         // Simulate loading delay
         Task.Run(async () =>
         {
             await Task.Delay(500);
-            
+
             Avalonia.Threading.Dispatcher.UIThread.Post(() =>
             {
-                Employees = SampleDataGenerator.GenerateEmployees(DataRowCount);
+                _allEmployees = SampleDataGenerator.GenerateEmployees(DataRowCount).ToList();
                 IsLoading = false;
-                UpdateStatusText();
+                ApplySearch();
             });
         });
     }
@@ -154,7 +187,7 @@ public partial class MainViewModel : ObservableObject
     {
         var newEmployee = new Employee
         {
-            Id = Employees.Count + 1,
+            Id = _allEmployees.Count + 1,
             FirstName = "New",
             LastName = "Employee",
             Email = "new.employee@company.com",
@@ -167,6 +200,7 @@ public partial class MainViewModel : ObservableObject
             Country = "France"
         };
 
+        _allEmployees.Add(newEmployee);
         Employees.Add(newEmployee);
         SelectedEmployee = newEmployee;
         UpdateStatusText();
@@ -177,6 +211,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (SelectedEmployee != null)
         {
+            _allEmployees.Remove(SelectedEmployee);
             Employees.Remove(SelectedEmployee);
             SelectedEmployee = null;
             UpdateStatusText();
@@ -231,7 +266,9 @@ public partial class MainViewModel : ObservableObject
 
     private void UpdateStatusText()
     {
-        StatusText = $"{Employees.Count:N0} employees";
+        StatusText = string.IsNullOrEmpty(SearchText?.Trim())
+            ? $"{Employees.Count:N0} employees"
+            : $"{Employees.Count:N0} of {_allEmployees.Count:N0} employees";
         if (SelectedEmployee != null)
         {
             StatusText += $" | Selected: {SelectedEmployee.FullName}";

@@ -260,6 +260,7 @@
         <controls:CardPanel Grid.Column="1"
                             Title="Employees"
                             ShowSearch="True"
+                            SearchText="{Binding SearchText, Mode=TwoWay}"
                             SearchWatermark="Search employees..."
                             ShowHeader="True">
           <jdg:JDataGrid ItemsSource="{Binding Employees}"

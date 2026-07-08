@@ -46,13 +46,17 @@ var searchCard = window.GetVisualDescendants()
 var searchBox = searchCard?.GetVisualDescendants()
     .OfType<TextBox>()
     .FirstOrDefault(t => t.Name == "PART_SearchBox");
-if (searchCard != null)
+int totalBefore = vm.Employees.Count;
+if (searchBox != null)
 {
-    searchCard.SearchText = "Valérie";
-    searchBox?.Focus();
+    // Type into the box (accent-less on purpose: search must match "Valérie").
+    searchBox.Focus();
+    searchBox.Text = "valerie";
 }
 Capture("app-blue-search-active");
-Console.WriteLine($"  search binding: CardPanel.SearchText='{searchCard?.SearchText}', TextBox.Text='{searchBox?.Text}'");
+bool filtered = vm.Employees.Count > 0 && vm.Employees.Count < totalBefore
+    && vm.Employees.All(emp => emp.FirstName.Contains("Valérie") || emp.LastName.Contains("Valérie"));
+Console.WriteLine($"  search end-to-end: box='{searchBox?.Text}' -> vm.SearchText='{vm.SearchText}', rows {totalBefore} -> {vm.Employees.Count}, status='{vm.StatusText}' | {(filtered ? "FILTERED OK" : "NOT FILTERED")}");
 
 window.Close();
 Console.WriteLine($"Saved PNGs to {Path.GetFullPath(outDir)}");
