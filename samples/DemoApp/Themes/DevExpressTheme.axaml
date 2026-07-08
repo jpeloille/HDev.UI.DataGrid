@@ -1,0 +1,20 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ResourceDictionary.MergedDictionaries>
+    <!-- Default color theme (Blue) -->
+    <ResourceInclude Source="avares://DemoApp/Themes/Colors/BlueTheme.axaml" />
+
+    <!-- Control styles -->
+    <ResourceInclude Source="avares://DemoApp/Themes/Controls/CardPanel.axaml" />
+    <ResourceInclude Source="avares://DemoApp/Themes/Controls/RibbonControl.axaml" />
+  </ResourceDictionary.MergedDictionaries>
+
+  <!-- Shared Design Tokens -->
+  <CornerRadius x:Key="CardCornerRadius">8</CornerRadius>
+  <CornerRadius x:Key="SmallCornerRadius">4</CornerRadius>
+  <Thickness x:Key="CardPadding">0</Thickness>
+  <BoxShadows x:Key="CardShadow">0 2 8 0 #20000000</BoxShadows>
+  <BoxShadows x:Key="ElevatedShadow">0 4 16 0 #30000000</BoxShadows>
+
+</ResourceDictionary>

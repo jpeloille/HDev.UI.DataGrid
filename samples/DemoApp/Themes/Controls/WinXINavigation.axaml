@@ -1,0 +1,300 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         WINXI NAVIGATION STYLES
+         DevExpress-inspired navigation components (sidebar, navbar, breadcrumb)
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                    NAVIGATION VIEW ITEM                           ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXINavigationViewItem" TargetType="ListBoxItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Margin" Value="4,2" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_Border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <!-- Selection indicator -->
+                        <Border x:Name="PART_SelectionIndicator"
+                                Width="3"
+                                Height="16"
+                                Margin="-8,0,8,0"
+                                Background="Transparent"
+                                CornerRadius="2"
+                                VerticalAlignment="Center" />
+                        
+                        <!-- Content -->
+                        <ContentPresenter Grid.Column="1"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="#0A000000" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        </Style>
+        
+        <Style Selector="^:pressed">
+            <Setter Property="Background" Value="#12000000" />
+        </Style>
+        
+        <Style Selector="^:selected">
+            <Setter Property="Background" Value="#15000000" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+        </Style>
+        
+        <Style Selector="^:selected /template/ Border#PART_SelectionIndicator">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+        </Style>
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                      SIDEBAR / NAV PANE                           ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXISidebar" TargetType="ListBox">
+        <Setter Property="Background" Value="{DynamicResource LayerBackgroundBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4,8" />
+        <Setter Property="MinWidth" Value="200" />
+        <Setter Property="MaxWidth" Value="320" />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{DynamicResource SurfaceStrokeBrush}"
+                        BorderThickness="0,0,1,0">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsPresenter Margin="{TemplateBinding Padding}" />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                      TOP NAVIGATION BAR                           ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXINavBarItem" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_Border"
+                        Background="{TemplateBinding Background}"
+                        Padding="{TemplateBinding Padding}">
+                    <Grid RowDefinitions="*,2">
+                        <ContentPresenter Grid.Row="0"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalAlignment="Center" />
+                        
+                        <Border x:Name="PART_ActiveIndicator"
+                                Grid.Row="1"
+                                Height="2"
+                                Background="{DynamicResource AccentBrush}"
+                                CornerRadius="1"
+                                Margin="0,4,0,0"
+                                IsVisible="False" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        </Style>
+        
+        <Style Selector="^:pointerover /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#0A000000" />
+        </Style>
+        
+        <Style Selector="^.active">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+        </Style>
+        
+        <Style Selector="^.active /template/ Border#PART_ActiveIndicator">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                        BREADCRUMB                                 ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIBreadcrumbItem" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4,4" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <Border x:Name="PART_Border"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="2"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+                    </Border>
+                    
+                    <Path x:Name="PART_Separator"
+                          Data="M 0,0 L 3,4 L 0,8"
+                          Stroke="{DynamicResource TextTertiaryBrush}"
+                          StrokeThickness="1"
+                          Margin="8,0"
+                          VerticalAlignment="Center" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#0A000000" />
+        </Style>
+        
+        <Style Selector="^:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        </Style>
+        
+        <Style Selector="^.current">
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+        
+        <Style Selector="^.current /template/ Path#PART_Separator">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                      HAMBURGER MENU BUTTON                        ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIHamburgerButton" TargetType="ToggleButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_Border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="4">
+                    <Canvas Width="16" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Line StartPoint="0,0" EndPoint="16,0" 
+                              Stroke="{TemplateBinding Foreground}" StrokeThickness="2" StrokeLineCap="Round" />
+                        <Line StartPoint="0,5" EndPoint="16,5" 
+                              Stroke="{TemplateBinding Foreground}" StrokeThickness="2" StrokeLineCap="Round" />
+                        <Line StartPoint="0,10" EndPoint="16,10" 
+                              Stroke="{TemplateBinding Foreground}" StrokeThickness="2" StrokeLineCap="Round" />
+                    </Canvas>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#0A000000" />
+        </Style>
+        
+        <Style Selector="^:pressed /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#12000000" />
+        </Style>
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                      SEARCH BOX                                   ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXISearchBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource SurfaceSecondaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="36,8,12,8" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="MinWidth" Value="200" />
+        <Setter Property="Watermark" Value="Search..." />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_Border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <Grid>
+                        <Path Data="M 6,0 A 6,6 0 1 0 6,12 A 6,6 0 1 0 6,0 M 10.5,10.5 L 14,14"
+                              Stroke="{DynamicResource TextTertiaryBrush}"
+                              StrokeThickness="1.5"
+                              StrokeLineCap="Round"
+                              Width="14"
+                              Height="14"
+                              Stretch="Uniform"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center"
+                              Margin="12,0,0,0" />
+                        
+                        <ScrollViewer x:Name="PART_ScrollViewer"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Hidden">
+                            <Panel>
+                                <TextBlock x:Name="PART_Watermark"
+                                           Text="{TemplateBinding Watermark}"
+                                           Foreground="{DynamicResource TextTertiaryBrush}"
+                                           IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                                           Margin="{TemplateBinding Padding}"
+                                           VerticalAlignment="Center" />
+                                <TextPresenter x:Name="PART_TextPresenter"
+                                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                                               CaretBrush="{DynamicResource AccentBrush}"
+                                               SelectionBrush="{DynamicResource AccentBrush}"
+                                               Margin="{TemplateBinding Padding}"
+                                               VerticalAlignment="Center" />
+                            </Panel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:focus /template/ Border#PART_Border">
+            <Setter Property="Background" Value="{DynamicResource SurfacePrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+    </ControlTheme>
+
+</ResourceDictionary>

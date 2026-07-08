@@ -1,0 +1,415 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         WINXI ADDITIONAL COMPONENTS
+         DevExpress-inspired dialogs, badges, info bars, and utility controls
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                        BADGES                                     ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <!-- Standard Badge -->
+    <ControlTheme x:Key="WinXIBadge" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Padding" Value="6,2" />
+    </ControlTheme>
+    
+    <!-- Success Badge -->
+    <ControlTheme x:Key="WinXIBadgeSuccess" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Padding" Value="6,2" />
+    </ControlTheme>
+    
+    <!-- Warning Badge -->
+    <ControlTheme x:Key="WinXIBadgeWarning" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Padding" Value="6,2" />
+    </ControlTheme>
+    
+    <!-- Error Badge -->
+    <ControlTheme x:Key="WinXIBadgeError" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource ErrorBrush}" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Padding" Value="6,2" />
+    </ControlTheme>
+    
+    <!-- Dot Badge (notification indicator) -->
+    <ControlTheme x:Key="WinXIDotBadge" TargetType="Ellipse">
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Height" Value="8" />
+        <Setter Property="Fill" Value="{DynamicResource ErrorBrush}" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                       INFO BARS                                   ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <!-- Base Info Bar -->
+    <ControlTheme x:Key="WinXIInfoBar" TargetType="Border">
+        <Setter Property="Background" Value="#E6F3FF" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="16,12" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+    </ControlTheme>
+    
+    <!-- Success Info Bar -->
+    <ControlTheme x:Key="WinXIInfoBarSuccess" TargetType="Border">
+        <Setter Property="Background" Value="#E6F7E6" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="16,12" />
+    </ControlTheme>
+    
+    <!-- Warning Info Bar -->
+    <ControlTheme x:Key="WinXIInfoBarWarning" TargetType="Border">
+        <Setter Property="Background" Value="#FFF8E6" />
+        <Setter Property="BorderBrush" Value="{DynamicResource WarningBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="16,12" />
+    </ControlTheme>
+    
+    <!-- Error Info Bar -->
+    <ControlTheme x:Key="WinXIInfoBarError" TargetType="Border">
+        <Setter Property="Background" Value="#FFEBE9" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ErrorBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="16,12" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                        AVATAR                                     ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIAvatar" TargetType="Border">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="ClipToBounds" Value="True" />
+    </ControlTheme>
+    
+    <ControlTheme x:Key="WinXIAvatarSmall" TargetType="Border">
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="CornerRadius" Value="14" />
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="ClipToBounds" Value="True" />
+    </ControlTheme>
+    
+    <ControlTheme x:Key="WinXIAvatarLarge" TargetType="Border">
+        <Setter Property="Width" Value="64" />
+        <Setter Property="Height" Value="64" />
+        <Setter Property="CornerRadius" Value="32" />
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="ClipToBounds" Value="True" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                        DIVIDER                                    ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIDivider" TargetType="Border">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="Margin" Value="0,8" />
+    </ControlTheme>
+    
+    <ControlTheme x:Key="WinXIDividerVertical" TargetType="Border">
+        <Setter Property="Width" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="Margin" Value="8,0" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                       SKELETON LOADER                             ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXISkeleton" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Opacity" Value="0.5" />
+    </ControlTheme>
+    
+    <ControlTheme x:Key="WinXISkeletonCircle" TargetType="Ellipse">
+        <Setter Property="Fill" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Opacity" Value="0.5" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                        CHIP / TAG                                 ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIChip" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceSecondaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="12,4" />
+        <Setter Property="Height" Value="28" />
+    </ControlTheme>
+    
+    <ControlTheme x:Key="WinXIChipAccent" TargetType="Border">
+        <Setter Property="Background" Value="#E6F3FF" />
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="12,4" />
+        <Setter Property="Height" Value="28" />
+    </ControlTheme>
+    
+    <ControlTheme x:Key="WinXIChipSuccess" TargetType="Border">
+        <Setter Property="Background" Value="#E6F7E6" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SuccessBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="12,4" />
+        <Setter Property="Height" Value="28" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                      LOADING SPINNER                              ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <!-- Note: Actual animation requires code-behind or behaviors -->
+    <ControlTheme x:Key="WinXISpinner" TargetType="Border">
+        <Setter Property="Width" Value="24" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="BorderThickness" Value="3" />
+        <Setter Property="CornerRadius" Value="12" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                      EMPTY STATE                                  ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIEmptyState" TargetType="Border">
+        <Setter Property="Padding" Value="32" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                    DIALOG / CONTENT DIALOG                        ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIDialogOverlay" TargetType="Border">
+        <Setter Property="Background" Value="#80000000" />
+    </ControlTheme>
+    
+    <ControlTheme x:Key="WinXIDialog" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfacePrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="BoxShadow" Value="0 16 48 0 #40000000" />
+        <Setter Property="MinWidth" Value="320" />
+        <Setter Property="MaxWidth" Value="600" />
+        <Setter Property="Padding" Value="24" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                       FLYOUT / POPUP                              ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIFlyout" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfacePrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="BoxShadow" Value="0 8 32 0 #30000000" />
+        <Setter Property="Padding" Value="8" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                       ICON BUTTON                                 ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIIconButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Width" Value="36" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_Border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#0A000000" />
+        </Style>
+        
+        <Style Selector="^:pressed /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#12000000" />
+        </Style>
+        
+        <Style Selector="^:disabled">
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
+    </ControlTheme>
+    
+    <ControlTheme x:Key="WinXIIconButtonAccent" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Width" Value="36" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Cursor" Value="Hand" />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_Border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#150078D4" />
+        </Style>
+        
+        <Style Selector="^:pressed /template/ Border#PART_Border">
+            <Setter Property="Background" Value="#250078D4" />
+        </Style>
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                       NUMERIC UP/DOWN                             ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXINumericUpDown" TargetType="NumericUpDown">
+        <Setter Property="Background" Value="{DynamicResource SurfacePrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="11,5,11,6" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border x:Name="PART_Border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox x:Name="PART_TextBox"
+                                 Grid.Column="0"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Padding="{TemplateBinding Padding}"
+                                 VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="4,0">
+                            <RepeatButton x:Name="PART_IncreaseButton"
+                                          Width="20"
+                                          Height="12"
+                                          Background="Transparent"
+                                          BorderThickness="0">
+                                <Path Data="M 0,4 L 4,0 L 8,4"
+                                      Stroke="{DynamicResource TextSecondaryBrush}"
+                                      StrokeThickness="1"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                            </RepeatButton>
+                            <RepeatButton x:Name="PART_DecreaseButton"
+                                          Width="20"
+                                          Height="12"
+                                          Background="Transparent"
+                                          BorderThickness="0">
+                                <Path Data="M 0,0 L 4,4 L 8,0"
+                                      Stroke="{DynamicResource TextSecondaryBrush}"
+                                      StrokeThickness="1"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                            </RepeatButton>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        
+        <Style Selector="^:pointerover /template/ Border#PART_Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource TextTertiaryBrush}" />
+        </Style>
+        
+        <Style Selector="^:focus /template/ Border#PART_Border">
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+        </Style>
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                      DATE PICKER (Simple)                         ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXIDatePicker" TargetType="DatePicker">
+        <Setter Property="Background" Value="{DynamicResource SurfacePrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="FontSize" Value="14" />
+    </ControlTheme>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                      TIME PICKER (Simple)                         ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <ControlTheme x:Key="WinXITimePicker" TargetType="TimePicker">
+        <Setter Property="Background" Value="{DynamicResource SurfacePrimaryBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceStrokeBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="FontSize" Value="14" />
+    </ControlTheme>
+
+</ResourceDictionary>

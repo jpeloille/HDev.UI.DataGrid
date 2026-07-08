@@ -4,8 +4,27 @@
              RequestedThemeVariant="Light">
 
   <Application.Styles>
+    <!-- Base Fluent theme (required as foundation) -->
     <FluentTheme />
+
+    <!-- DataGrid component styles -->
     <StyleInclude Source="avares://Julien.Avalonia.DataGrid/Themes/Index.axaml" />
+
+    <!-- App-specific styles (ribbon, etc.) -->
+    <StyleInclude Source="avares://DemoApp/Themes/Styles.axaml" />
   </Application.Styles>
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <!-- WinXI Theme Bundle - colors, tokens, and control themes -->
+        <ResourceInclude Source="avares://DemoApp/Themes/WinXIThemeBundle.axaml" />
+
+        <!-- Control styles for CardPanel and Ribbon -->
+        <ResourceInclude Source="avares://DemoApp/Themes/Controls/CardPanel.axaml" />
+        <ResourceInclude Source="avares://DemoApp/Themes/Controls/RibbonControl.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
 
 </Application>

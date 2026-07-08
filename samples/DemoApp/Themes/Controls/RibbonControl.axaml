@@ -1,0 +1,149 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:DemoApp.Controls">
+
+  <!-- Ribbon Control Theme -->
+  <ControlTheme x:Key="{x:Type controls:Ribbon}" TargetType="controls:Ribbon">
+    <Setter Property="Background" Value="{DynamicResource RibbonBackgroundBrush}" />
+
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:Ribbon">
+        <Grid RowDefinitions="Auto,Auto">
+          <!-- Tab Headers (on blue title bar) -->
+          <Border Grid.Row="0"
+                  Background="{DynamicResource TitleBarBackgroundBrush}"
+                  Padding="8,0,0,0">
+            <ItemsPresenter x:Name="PART_ItemsPresenter">
+              <ItemsPresenter.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="0" />
+                </ItemsPanelTemplate>
+              </ItemsPresenter.ItemsPanel>
+            </ItemsPresenter>
+          </Border>
+
+          <!-- Tab Content (Groups) -->
+          <Border Grid.Row="1"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{DynamicResource SeparatorBrush}"
+                  BorderThickness="0,0,0,1"
+                  Padding="8,4"
+                  MinHeight="85">
+            <ContentPresenter x:Name="PART_SelectedContentHost"
+                              Content="{TemplateBinding SelectedContent}"
+                              ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Ribbon Tab Item Theme -->
+  <ControlTheme x:Key="{x:Type controls:RibbonTab}" TargetType="controls:RibbonTab">
+    <Setter Property="Padding" Value="16,8" />
+    <Setter Property="Foreground" Value="#CCFFFFFF" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Cursor" Value="Hand" />
+
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:RibbonTab">
+        <Border x:Name="PART_Border"
+                Background="Transparent"
+                Padding="{TemplateBinding Padding}">
+          <Grid RowDefinitions="*,3">
+            <ContentPresenter Grid.Row="0"
+                              Content="{TemplateBinding Header}"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center" />
+            <!-- Active indicator bar -->
+            <Border x:Name="PART_Indicator"
+                    Grid.Row="1"
+                    Background="{DynamicResource RibbonTabActiveIndicatorBrush}"
+                    CornerRadius="1.5"
+                    Margin="4,2,4,0"
+                    IsVisible="False" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style Selector="^:selected">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <Style Selector="^:selected /template/ Border#PART_Indicator">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <!-- Ribbon Group Theme -->
+  <ControlTheme x:Key="{x:Type controls:RibbonGroup}" TargetType="controls:RibbonGroup">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="Margin" Value="4,0" />
+
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:RibbonGroup">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{DynamicResource RibbonGroupBorderBrush}"
+                BorderThickness="0,0,1,0"
+                Padding="{TemplateBinding Padding}"
+                Margin="{TemplateBinding Margin}">
+          <Grid RowDefinitions="*,Auto">
+            <!-- Group Content -->
+            <ContentPresenter Grid.Row="0"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              VerticalAlignment="Center" />
+
+            <!-- Group Label -->
+            <TextBlock Grid.Row="1"
+                       Text="{TemplateBinding GroupLabel}"
+                       FontSize="11"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
+                       HorizontalAlignment="Center"
+                       Margin="0,6,0,0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Skin Selector Item Theme -->
+  <ControlTheme x:Key="SkinItemTheme" TargetType="ListBoxItem">
+    <Setter Property="Padding" Value="4" />
+    <Setter Property="Margin" Value="2" />
+    <Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="2" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="Cursor" Value="Hand" />
+
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ListBoxItem">
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+
+    <Style Selector="^:selected">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

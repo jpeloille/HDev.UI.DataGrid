@@ -1,0 +1,137 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         WINXI DEVEXPRESS-STYLE DARK THEME FOR AVALONIA UI
+         A modern, polished Windows 11-inspired dark theme
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                    DARK COLOR PALETTE                             ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <!-- Primary Accent Colors (brighter for dark theme) -->
+    <Color x:Key="AccentColor">#60CDFF</Color>
+    <Color x:Key="AccentColorLight">#99DCFF</Color>
+    <Color x:Key="AccentColorDark">#0078D4</Color>
+    <Color x:Key="AccentColorPressed">#005A9E</Color>
+    
+    <!-- Background Colors (Mica-inspired dark) -->
+    <Color x:Key="MicaBackgroundColor">#1C1C1C</Color>
+    <Color x:Key="MicaBackgroundDarkColor">#0F0F0F</Color>
+    <Color x:Key="LayerBackgroundColor">#2D2D2D</Color>
+    <Color x:Key="LayerBackgroundDarkColor">#1F1F1F</Color>
+    <Color x:Key="CardBackgroundColor">#323232</Color>
+    <Color x:Key="CardBackgroundDarkColor">#252525</Color>
+    
+    <!-- Surface Colors -->
+    <Color x:Key="SurfacePrimaryColor">#2D2D2D</Color>
+    <Color x:Key="SurfaceSecondaryColor">#333333</Color>
+    <Color x:Key="SurfaceTertiaryColor">#3A3A3A</Color>
+    <Color x:Key="SurfaceStrokeColor">#454545</Color>
+    <Color x:Key="SurfaceStrokeColorLight">#555555</Color>
+    
+    <!-- Text Colors -->
+    <Color x:Key="TextPrimaryColor">#FFFFFF</Color>
+    <Color x:Key="TextSecondaryColor">#C5C5C5</Color>
+    <Color x:Key="TextTertiaryColor">#9A9A9A</Color>
+    <Color x:Key="TextDisabledColor">#6E6E6E</Color>
+    <Color x:Key="TextOnAccentColor">#000000</Color>
+    
+    <!-- State Colors -->
+    <Color x:Key="HoverOverlayColor">#15FFFFFF</Color>
+    <Color x:Key="PressedOverlayColor">#20FFFFFF</Color>
+    <Color x:Key="SelectedOverlayColor">#18FFFFFF</Color>
+    <Color x:Key="FocusBorderColor">#60CDFF</Color>
+    
+    <!-- Semantic Colors -->
+    <Color x:Key="SuccessColor">#6CCB5F</Color>
+    <Color x:Key="WarningColor">#FCE100</Color>
+    <Color x:Key="ErrorColor">#FF99A4</Color>
+    <Color x:Key="InfoColor">#60CDFF</Color>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                         BRUSHES                                   ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="AccentLightBrush" Color="{StaticResource AccentColorLight}" />
+    <SolidColorBrush x:Key="AccentDarkBrush" Color="{StaticResource AccentColorDark}" />
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="{StaticResource AccentColorPressed}" />
+    
+    <SolidColorBrush x:Key="MicaBackgroundBrush" Color="{StaticResource MicaBackgroundColor}" />
+    <SolidColorBrush x:Key="LayerBackgroundBrush" Color="{StaticResource LayerBackgroundColor}" />
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackgroundColor}" />
+    
+    <SolidColorBrush x:Key="SurfacePrimaryBrush" Color="{StaticResource SurfacePrimaryColor}" />
+    <SolidColorBrush x:Key="SurfaceSecondaryBrush" Color="{StaticResource SurfaceSecondaryColor}" />
+    <SolidColorBrush x:Key="SurfaceTertiaryBrush" Color="{StaticResource SurfaceTertiaryColor}" />
+    <SolidColorBrush x:Key="SurfaceStrokeBrush" Color="{StaticResource SurfaceStrokeColor}" />
+    
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="TextTertiaryBrush" Color="{StaticResource TextTertiaryColor}" />
+    <SolidColorBrush x:Key="TextDisabledBrush" Color="{StaticResource TextDisabledColor}" />
+    <SolidColorBrush x:Key="TextOnAccentBrush" Color="{StaticResource TextOnAccentColor}" />
+    
+    <SolidColorBrush x:Key="HoverOverlayBrush" Color="{StaticResource HoverOverlayColor}" />
+    <SolidColorBrush x:Key="PressedOverlayBrush" Color="{StaticResource PressedOverlayColor}" />
+    <SolidColorBrush x:Key="SelectedOverlayBrush" Color="{StaticResource SelectedOverlayColor}" />
+    <SolidColorBrush x:Key="FocusBorderBrush" Color="{StaticResource FocusBorderColor}" />
+    
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ErrorColor}" />
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource InfoColor}" />
+
+    <!-- Gradient Brushes -->
+    <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource AccentColorLight}" Offset="0" />
+        <GradientStop Color="{StaticResource AccentColor}" Offset="1" />
+    </LinearGradientBrush>
+    
+    <LinearGradientBrush x:Key="SubtleGradientBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#333333" Offset="0" />
+        <GradientStop Color="#2A2A2A" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- ╔═══════════════════════════════════════════════════════════════════╗
+         ║                    DESIGN TOKENS                                  ║
+         ╚═══════════════════════════════════════════════════════════════════╝ -->
+    
+    <!-- Corner Radius -->
+    <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+    <CornerRadius x:Key="ControlCornerRadiusLarge">6</CornerRadius>
+    <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="CardCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="DialogCornerRadius">12</CornerRadius>
+    
+    <!-- Thickness -->
+    <Thickness x:Key="ControlBorderThickness">1</Thickness>
+    <Thickness x:Key="ControlBorderThicknessBottom">0,0,0,1</Thickness>
+    <Thickness x:Key="FocusBorderThickness">2</Thickness>
+    <Thickness x:Key="CardPadding">16</Thickness>
+    <Thickness x:Key="ControlPadding">11,5,11,6</Thickness>
+    <Thickness x:Key="ButtonPadding">11,5,11,6</Thickness>
+    
+    <!-- Shadows (softer for dark theme) -->
+    <BoxShadows x:Key="CardShadow">0 2 8 0 #40000000</BoxShadows>
+    <BoxShadows x:Key="CardShadowHover">0 4 16 0 #50000000</BoxShadows>
+    <BoxShadows x:Key="PopupShadow">0 8 32 0 #60000000</BoxShadows>
+    <BoxShadows x:Key="DialogShadow">0 16 48 0 #70000000</BoxShadows>
+    <BoxShadows x:Key="ButtonShadow">0 1 3 0 #20000000</BoxShadows>
+    
+    <!-- Typography -->
+    <x:Double x:Key="CaptionFontSize">12</x:Double>
+    <x:Double x:Key="BodyFontSize">14</x:Double>
+    <x:Double x:Key="SubtitleFontSize">16</x:Double>
+    <x:Double x:Key="TitleFontSize">20</x:Double>
+    <x:Double x:Key="HeaderFontSize">28</x:Double>
+    <x:Double x:Key="DisplayFontSize">34</x:Double>
+    
+    <FontWeight x:Key="RegularFontWeight">Normal</FontWeight>
+    <FontWeight x:Key="MediumFontWeight">Medium</FontWeight>
+    <FontWeight x:Key="SemiBoldFontWeight">SemiBold</FontWeight>
+    <FontWeight x:Key="BoldFontWeight">Bold</FontWeight>
+
+</ResourceDictionary>

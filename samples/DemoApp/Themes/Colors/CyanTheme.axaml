@@ -1,0 +1,46 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Primary Accent Colors -->
+  <Color x:Key="AccentColor">#00B7C3</Color>
+  <Color x:Key="AccentColorLight">#00D4E1</Color>
+  <Color x:Key="AccentColorDark">#008B96</Color>
+
+  <!-- Title Bar -->
+  <Color x:Key="TitleBarBackground">#00B7C3</Color>
+  <Color x:Key="TitleBarForeground">#FFFFFF</Color>
+
+  <!-- Ribbon -->
+  <Color x:Key="RibbonBackground">#F3F3F3</Color>
+  <Color x:Key="RibbonTabBackground">#FFFFFF</Color>
+  <Color x:Key="RibbonTabActiveIndicator">#00B7C3</Color>
+  <Color x:Key="RibbonGroupBorder">#E0E0E0</Color>
+
+  <!-- Card Panels -->
+  <Color x:Key="CardBackground">#FFFFFF</Color>
+  <Color x:Key="CardBorder">#E0E0E0</Color>
+
+  <!-- General UI -->
+  <Color x:Key="PageBackground">#F0F0F0</Color>
+  <Color x:Key="SeparatorColor">#E0E0E0</Color>
+  <Color x:Key="TextPrimary">#1A1A1A</Color>
+  <Color x:Key="TextSecondary">#666666</Color>
+
+  <!-- Brushes -->
+  <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+  <SolidColorBrush x:Key="AccentLightBrush" Color="{StaticResource AccentColorLight}" />
+  <SolidColorBrush x:Key="AccentDarkBrush" Color="{StaticResource AccentColorDark}" />
+  <SolidColorBrush x:Key="TitleBarBackgroundBrush" Color="{StaticResource TitleBarBackground}" />
+  <SolidColorBrush x:Key="TitleBarForegroundBrush" Color="{StaticResource TitleBarForeground}" />
+  <SolidColorBrush x:Key="RibbonBackgroundBrush" Color="{StaticResource RibbonBackground}" />
+  <SolidColorBrush x:Key="RibbonTabBackgroundBrush" Color="{StaticResource RibbonTabBackground}" />
+  <SolidColorBrush x:Key="RibbonTabActiveIndicatorBrush" Color="{StaticResource RibbonTabActiveIndicator}" />
+  <SolidColorBrush x:Key="RibbonGroupBorderBrush" Color="{StaticResource RibbonGroupBorder}" />
+  <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource CardBackground}" />
+  <SolidColorBrush x:Key="CardBorderBrush" Color="{StaticResource CardBorder}" />
+  <SolidColorBrush x:Key="PageBackgroundBrush" Color="{StaticResource PageBackground}" />
+  <SolidColorBrush x:Key="SeparatorBrush" Color="{StaticResource SeparatorColor}" />
+  <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}" />
+  <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}" />
+
+</ResourceDictionary>
