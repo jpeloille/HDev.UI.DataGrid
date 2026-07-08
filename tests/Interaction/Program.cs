@@ -139,6 +139,70 @@ else
     Check("filter: filter textbox found", false);
 }
 
+// === 6. Edit via double-click ===
+void DoubleClick(Control c)
+{
+    var p = c.TranslatePoint(new Point(c.Bounds.Width / 2, c.Bounds.Height / 2), window) ?? new Point();
+    window.MouseMove(p, RawInputModifiers.None);
+    window.MouseDown(p, MouseButton.Left, RawInputModifiers.None);
+    window.MouseUp(p, MouseButton.Left, RawInputModifiers.None);
+    window.MouseDown(p, MouseButton.Left, RawInputModifiers.None);
+    window.MouseUp(p, MouseButton.Left, RawInputModifiers.None);
+    Pump();
+}
+
+var danRow = Rows().FirstOrDefault(r => (r.DataContext as Emp)?.Name == "Dan");
+if (danRow != null)
+{
+    var nameCell = danRow.GetVisualDescendants().OfType<JDataGridCell>().First();
+    DoubleClick(nameCell);
+    bool editing = grid.GetVisualDescendants().OfType<JDataGridCell>().Any(c => c.IsEditing);
+    Check("edit: double-click starts editing", editing);
+    if (editing)
+    {
+        window.KeyTextInput("Daniel");
+        Pump();
+        window.KeyPress(Key.Enter, RawInputModifiers.None);
+        Pump();
+        Check($"edit: commit writes value (Name='{(danRow.DataContext as Emp)?.Name}')",
+            (danRow.DataContext as Emp)?.Name == "Daniel");
+    }
+}
+
+// === 7. Column resize by dragging the header grip ===
+void Drag(Point from, Point to)
+{
+    window.MouseMove(from, RawInputModifiers.None);
+    window.MouseDown(from, MouseButton.Left, RawInputModifiers.None);
+    window.MouseMove(new Point((from.X + to.X) / 2, from.Y), RawInputModifiers.None);
+    window.MouseMove(to, RawInputModifiers.None);
+    window.MouseUp(to, MouseButton.Left, RawInputModifiers.None);
+    Pump();
+}
+
+var salaryHeader = Header(nameof(Emp.Salary));
+// The 6px resize grip sits inside the header's 8px right padding, so target
+// ~11px in from the right edge, not the very edge (which is padding).
+var gripPt = salaryHeader.TranslatePoint(new Point(salaryHeader.Bounds.Width - 11, salaryHeader.Bounds.Height / 2), window) ?? new Point();
+double wBefore = grid.Columns.First(c => c.FieldName == nameof(Emp.Salary)).ActualWidth;
+Drag(gripPt, new Point(gripPt.X + 70, gripPt.Y));
+double wAfter = grid.Columns.First(c => c.FieldName == nameof(Emp.Salary)).ActualWidth;
+Check($"resize: dragging the grip widens the column ({wBefore:F0} -> {wAfter:F0})", wAfter > wBefore + 20);
+Save("int-04-resized");
+
+// === 8. Column reorder (INFO only) ===
+// Reorder uses DragDrop.DoDragDrop (OS-level drag/drop), which the headless
+// simulated mouse moves cannot initiate. Not a product verdict — needs the real
+// app or a DnD-aware harness. Reported as info, not counted as a failure.
+var nameH = Header(nameof(Emp.Name));
+var deptH = Header(nameof(Emp.Department));
+var fromPt = nameH.TranslatePoint(new Point(nameH.Bounds.Width / 2, nameH.Bounds.Height / 2), window) ?? new Point();
+var toPt = deptH.TranslatePoint(new Point(deptH.Bounds.Width / 2, deptH.Bounds.Height / 2), window) ?? new Point();
+int idxBefore = grid.Columns.First(c => c.FieldName == nameof(Emp.Name)).VisibleIndex;
+Drag(fromPt, toPt);
+int idxAfter = grid.Columns.First(c => c.FieldName == nameof(Emp.Name)).VisibleIndex;
+Console.WriteLine($"  [INFO] reorder via simulated DnD not exercised (OS drag/drop); Name index {idxBefore} -> {idxAfter} — verify in the real app");
+
 Console.WriteLine(failed == 0 ? "Interaction: ALL PASS" : $"Interaction: {failed} FAILED");
 Environment.ExitCode = failed == 0 ? 0 : 1;
 
