@@ -703,9 +703,10 @@
                               VerticalAlignment="Center"
                               Command="{Binding $parent[controls:JDataGridGroupPanel].RemoveGroupCommand}"
                               CommandParameter="{Binding}">
-                        <PathIcon Width="10" Height="10"
-                                  Data="M0,0 L8,8 M8,0 L0,8"
-                                  Foreground="Gray" />
+                        <Path Width="8" Height="8"
+                              Data="M0,0 L8,8 M8,0 L0,8"
+                              Stroke="Gray"
+                              StrokeThickness="1.5" />
                       </Button>
                     </StackPanel>
                   </Border>
@@ -725,7 +726,7 @@
     </Style>
 
     <!-- Hide placeholder when columns are grouped -->
-    <Style Selector="^:has-items /template/ TextBlock#PlaceholderText">
+    <Style Selector="^[HasGroups=True] /template/ TextBlock#PlaceholderText">
       <Setter Property="IsVisible" Value="False" />
     </Style>
   </ControlTheme>

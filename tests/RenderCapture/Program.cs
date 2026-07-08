@@ -32,7 +32,50 @@ Capture("02-grouped", BuildGrid(data, group: true, filter: false, summary: true)
 // Scenario 3: filter row visible.
 Capture("03-filter-row", BuildGrid(data, group: false, filter: true, summary: false));
 
+// Scenario 4: group panel with a chip. Exercises the drop RESULT (chip render,
+// placeholder hidden) without OS drag/drop, which is not available headless.
+// This is the headless-verifiable half of the drag-to-group path.
+var panelGrid = BuildGrid(data, group: false, filter: false, summary: false);
+panelGrid.ShowGroupPanel = true;
+CaptureGroupPanel("04-group-panel-chip", panelGrid);
+
 Console.WriteLine($"Saved PNGs to {Path.GetFullPath(outDir)}");
+
+void CaptureGroupPanel(string name, JDataGrid grid)
+{
+    var window = new Window { Width = 1100, Height = 200, Content = grid };
+    window.Show();
+    for (int i = 0; i < 5; i++)
+    {
+        Dispatcher.UIThread.RunJobs();
+        window.Measure(new Size(window.Width, window.Height));
+        window.Arrange(new Rect(0, 0, window.Width, window.Height));
+    }
+    Dispatcher.UIThread.RunJobs();
+
+    // Simulate what a successful drop does: seed the panel's grouped columns and
+    // group the data, then re-layout.
+    var panel = grid.GetVisualDescendants().OfType<JDataGridGroupPanel>().FirstOrDefault();
+    var deptCol = grid.Columns.First(c => c.FieldName == nameof(Emp.Department));
+    if (panel != null)
+    {
+        panel.GroupedColumns.Add(deptCol);
+        grid.GroupBy(nameof(Emp.Department));
+    }
+    for (int i = 0; i < 5; i++)
+    {
+        Dispatcher.UIThread.RunJobs();
+        window.Measure(new Size(window.Width, window.Height));
+        window.Arrange(new Rect(0, 0, window.Width, window.Height));
+    }
+    Dispatcher.UIThread.RunJobs();
+
+    var frame = window.CaptureRenderedFrame();
+    frame?.Save(Path.Combine(outDir, name + ".png"));
+    var hasGroups = panel?.HasGroups;
+    Console.WriteLine($"  {name}: {(frame != null ? "ok" : "NULL FRAME")} | chips={panel?.GroupedColumns.Count} | HasGroups={hasGroups}");
+    window.Close();
+}
 
 void Capture(string name, JDataGrid grid)
 {

@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Julien.Avalonia.DataGrid.Models;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace Julien.Avalonia.DataGrid.Controls;
 
@@ -29,6 +30,9 @@ public class JDataGridGroupPanel : TemplatedControl
 
     public static readonly StyledProperty<bool> IsDragOverProperty =
         AvaloniaProperty.Register<JDataGridGroupPanel, bool>(nameof(IsDragOver), false);
+
+    public static readonly StyledProperty<bool> HasGroupsProperty =
+        AvaloniaProperty.Register<JDataGridGroupPanel, bool>(nameof(HasGroups), false);
 
     #endregion
 
@@ -76,13 +80,72 @@ public class JDataGridGroupPanel : TemplatedControl
         set => SetValue(IsDragOverProperty, value);
     }
 
+    /// <summary>
+    /// True when at least one column is grouped. Drives the placeholder text
+    /// visibility (the `:has-items` pseudo-class does not apply to this
+    /// non-items TemplatedControl).
+    /// </summary>
+    public bool HasGroups
+    {
+        get => GetValue(HasGroupsProperty);
+        private set => SetValue(HasGroupsProperty, value);
+    }
+
     #endregion
 
     #region Constructor
 
     public JDataGridGroupPanel()
     {
+        RemoveGroupCommand = new RemoveGroupRelayCommand(this);
         GroupedColumns = new ObservableCollection<GridColumn>();
+    }
+
+    static JDataGridGroupPanel()
+    {
+        GroupedColumnsProperty.Changed.AddClassHandler<JDataGridGroupPanel>((panel, e) =>
+        {
+            if (e.OldValue is ObservableCollection<GridColumn> oldCol)
+                oldCol.CollectionChanged -= panel.OnGroupedColumnsChanged;
+            if (e.NewValue is ObservableCollection<GridColumn> newCol)
+                newCol.CollectionChanged += panel.OnGroupedColumnsChanged;
+            panel.UpdateHasGroups();
+        });
+    }
+
+    private void OnGroupedColumnsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        => UpdateHasGroups();
+
+    private void UpdateHasGroups() => HasGroups = GroupedColumns.Count > 0;
+
+    #endregion
+
+    #region Commands
+
+    /// <summary>
+    /// Removes the grouping for the column passed as command parameter
+    /// (bound to the "x" button on each group chip).
+    /// </summary>
+    public ICommand RemoveGroupCommand { get; }
+
+    private sealed class RemoveGroupRelayCommand : ICommand
+    {
+        private readonly JDataGridGroupPanel _owner;
+
+        public RemoveGroupRelayCommand(JDataGridGroupPanel owner) => _owner = owner;
+
+        // CanExecute is a pure function of the parameter, so it never changes for
+        // a given chip; no need to raise this. Empty accessors satisfy ICommand
+        // without an unused backing field.
+        public event EventHandler? CanExecuteChanged { add { } remove { } }
+
+        public bool CanExecute(object? parameter) => parameter is GridColumn;
+
+        public void Execute(object? parameter)
+        {
+            if (parameter is GridColumn column)
+                _owner.RemoveGroup(column);
+        }
     }
 
     #endregion
@@ -100,6 +163,7 @@ public class JDataGridGroupPanel : TemplatedControl
         DragDrop.SetAllowDrop(this, true);
 
         AddHandler(DragDrop.DragEnterEvent, OnDragEnter);
+        AddHandler(DragDrop.DragOverEvent, OnDragOver);
         AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
         AddHandler(DragDrop.DropEvent, OnDrop);
     }
@@ -115,6 +179,23 @@ public class JDataGridGroupPanel : TemplatedControl
             IsDragOver = true;
             e.DragEffects = DragDropEffects.Move;
             e.Handled = true;
+        }
+    }
+
+    // Avalonia's drag/drop advertises drop acceptance from the effect returned by
+    // DragOver (which fires continuously), not DragEnter (once). Without this the
+    // XDND/platform layer reports "won't accept" and Drop never fires.
+    private void OnDragOver(object? sender, DragEventArgs e)
+    {
+        if (e.Data.Contains("GridColumn"))
+        {
+            IsDragOver = true;
+            e.DragEffects = DragDropEffects.Move;
+            e.Handled = true;
+        }
+        else
+        {
+            e.DragEffects = DragDropEffects.None;
         }
     }
 
