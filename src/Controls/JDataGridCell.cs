@@ -253,28 +253,8 @@ public class JDataGridCell : TemplatedControl
 
     private void UpdateDisplayText()
     {
-        if (Value == null)
-        {
-            DisplayText = string.Empty;
-            return;
-        }
-
-        if (Column != null && !string.IsNullOrEmpty(Column.FormatString))
-        {
-            DisplayText = string.Format($"{{0:{Column.FormatString}}}", Value);
-        }
-        else if (Value is bool boolValue)
-        {
-            DisplayText = boolValue ? "✓" : "";
-        }
-        else if (Value is DateTime dateValue)
-        {
-            DisplayText = dateValue.ToShortDateString();
-        }
-        else
-        {
-            DisplayText = Value.ToString();
-        }
+        // Formatage partagé avec l'auto-fit et l'export (GridColumn.FormatValue)
+        DisplayText = Models.GridColumn.FormatValue(Column, Value);
     }
 
     /// <summary>

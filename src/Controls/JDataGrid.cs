@@ -505,6 +505,7 @@ public class JDataGrid : TemplatedControl
         AddHandler(JDataGridColumnHeader.ResizeCompletedEvent, OnColumnResizeCompleted);
         AddHandler(JDataGridColumnHeader.ReorderCompletedEvent, OnColumnReorderCompleted);
         AddHandler(JDataGridColumnHeader.FreezeRequestedEvent, OnColumnFreezeRequested);
+        AddHandler(JDataGridColumnHeader.AutoFitRequestedEvent, OnColumnAutoFitRequested);
 
         // Listen to filter cell events (bubbled from JDataGridFilterCell)
         AddHandler(JDataGridFilterCell.FilterChangedEvent, OnFilterChanged);
@@ -901,7 +902,102 @@ public class JDataGrid : TemplatedControl
     {
         if (e.Item == null) return;
         _selection.CurrentColumn = e.Column;
-        _selection.Select(e.Item, _dataSource.IndexOf(e.Item));
+
+        // Mode cellule : la cellule cliquée devient la sélection (pas la ligne)
+        if (SelectionMode == SelectionMode.Cell && e.Column != null)
+        {
+            SelectCellAt(_dataSource.IndexOf(e.Item), e.Column);
+        }
+        else
+        {
+            _selection.Select(e.Item, _dataSource.IndexOf(e.Item));
+        }
+    }
+
+    /// <summary>
+    /// Sélectionne une cellule (mode Cell) : état visuel + item courant + scroll
+    /// </summary>
+    private void SelectCellAt(int rowIndex, Models.GridColumn column)
+    {
+        if (rowIndex < 0 || rowIndex >= _dataSource.FilteredCount) return;
+
+        _selection.SelectCell(rowIndex, column);
+        var item = _dataSource.GetItemAt(rowIndex);
+        _selection.CurrentItem = item;
+        UpdateCellSelectionStates();
+        if (item != null)
+            ScrollIntoView(item);
+    }
+
+    /// <summary>
+    /// Pousse la sélection de cellules vers les cellules réalisées (mode Cell)
+    /// </summary>
+    private void UpdateCellSelectionStates()
+    {
+        if (_rowsPresenter == null) return;
+
+        foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<JDataGridRow>())
+        {
+            var item = row.DataContext;
+            var rowIndex = item != null ? _dataSource.IndexOf(item) : -1;
+
+            // En mode cellule, la ligne n'est pas surlignée — seule la cellule l'est
+            row.IsSelected = false;
+            row.IsCurrent = item != null && ReferenceEquals(item, _selection.CurrentItem);
+
+            foreach (var cell in row.GetVisualDescendants().OfType<JDataGridCell>())
+            {
+                cell.IsSelected = rowIndex >= 0 && cell.Column != null &&
+                    _selection.IsCellSelected(rowIndex, cell.Column);
+            }
+        }
+    }
+
+    private void MoveCellHorizontal(int delta, bool wrap)
+    {
+        var columns = Columns.GetVisibleColumns().ToList();
+        if (columns.Count == 0) return;
+
+        var currentIndex = _selection.CurrentColumn != null
+            ? columns.IndexOf(_selection.CurrentColumn)
+            : 0;
+        if (currentIndex < 0) currentIndex = 0;
+
+        var rowIndex = Math.Max(0, _selection.CurrentRowIndex);
+        var newIndex = currentIndex + delta;
+
+        if (wrap)
+        {
+            // Tab en fin de ligne -> première cellule de la ligne suivante (et inverse)
+            if (newIndex >= columns.Count)
+            {
+                if (rowIndex >= _dataSource.FilteredCount - 1) return;
+                newIndex = 0;
+                rowIndex++;
+            }
+            else if (newIndex < 0)
+            {
+                if (rowIndex <= 0) return;
+                newIndex = columns.Count - 1;
+                rowIndex--;
+            }
+        }
+        else
+        {
+            newIndex = Math.Clamp(newIndex, 0, columns.Count - 1);
+        }
+
+        SelectCellAt(rowIndex, columns[newIndex]);
+    }
+
+    private void MoveCellVertical(int delta)
+    {
+        var column = _selection.CurrentColumn ?? Columns.GetVisibleColumns().FirstOrDefault();
+        if (column == null) return;
+
+        var rowIndex = Math.Clamp(_selection.CurrentRowIndex + delta,
+            0, Math.Max(0, _dataSource.FilteredCount - 1));
+        SelectCellAt(rowIndex, column);
     }
 
     /// <summary>
@@ -952,7 +1048,10 @@ public class JDataGrid : TemplatedControl
     {
         if (!AllowSorting || e.Column == null) return;
 
-        _dataSource.ToggleSort(e.Column.FieldName, append: false);
+        // Shift+clic : tri multi-colonnes (le tri existant est conservé, la
+        // colonne cliquée s'ajoute comme critère suivant)
+        var append = e.Modifiers.HasFlag(KeyModifiers.Shift);
+        _dataSource.ToggleSort(e.Column.FieldName, append);
         UpdateColumnSortIndicators();
 
         e.Handled = true;
@@ -1008,11 +1107,118 @@ public class JDataGrid : TemplatedControl
         e.Handled = true;
     }
 
+    private void OnColumnAutoFitRequested(object? sender, ColumnEventArgs e)
+    {
+        if (e.Column == null) return;
+        AutoFitColumn(e.Column);
+        e.Handled = true;
+    }
+
+    /// <summary>
+    /// Ajuste la largeur de la colonne à son contenu (en-tête + 100 premières
+    /// lignes de la vue courante, formatées comme les cellules)
+    /// </summary>
+    public void AutoFitColumn(Models.GridColumn column)
+    {
+        double MeasureText(string text, global::Avalonia.Media.FontWeight weight)
+            => new global::Avalonia.Media.FormattedText(
+                text,
+                System.Globalization.CultureInfo.CurrentCulture,
+                global::Avalonia.Media.FlowDirection.LeftToRight,
+                new global::Avalonia.Media.Typeface(FontFamily, weight: weight),
+                FontSize > 0 ? FontSize : 14,
+                global::Avalonia.Media.Brushes.Black).Width;
+
+        // En-tête : padding + glyphes tri/pin
+        var headerWidth = MeasureText(column.Header ?? "", global::Avalonia.Media.FontWeight.SemiBold) + 52;
+
+        var width = Helpers.ColumnWidthHelper.MeasureColumnWidth(
+            column,
+            _dataSource.View,
+            (item, col) => MeasureText(col.GetDisplayText(item), global::Avalonia.Media.FontWeight.Normal) + 18,
+            headerWidth);
+
+        width = Math.Clamp(Math.Ceiling(width), column.MinWidth,
+            double.IsInfinity(column.MaxWidth) ? double.MaxValue : column.MaxWidth);
+
+        column.Width = new GridLength(width);
+        column.ActualWidth = width;
+        RecalculateColumnWidths();
+        RefreshView();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // COPIE PRESSE-PAPIER + EXPORT CSV
+    // ═══════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Copie les lignes sélectionnées dans le presse-papier (TSV, en-têtes
+    /// incluses), dans l'ordre de la vue courante. Sans sélection : rien.
+    /// </summary>
+    public async Task CopySelectionToClipboardAsync()
+    {
+        var selected = new HashSet<object>(_selection.SelectedItems);
+        if (selected.Count == 0 && _selection.CurrentItem != null)
+            selected.Add(_selection.CurrentItem);
+        if (selected.Count == 0) return;
+
+        var rows = _dataSource.View.Where(selected.Contains);
+        var text = BuildDelimitedText(rows, '\t', includeHeaders: true, quote: false);
+
+        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+        if (clipboard != null)
+            await clipboard.SetTextAsync(text);
+    }
+
+    /// <summary>
+    /// Exporte la vue courante (tri + filtres appliqués) en CSV.
+    /// Séparateur ';' par défaut (locales à virgule décimale).
+    /// </summary>
+    public string ToCsv(char separator = ';', bool includeHeaders = true)
+        => BuildDelimitedText(_dataSource.View, separator, includeHeaders, quote: true);
+
+    /// <summary>Exporte la vue courante en fichier CSV (UTF-8 avec BOM, pour Excel)</summary>
+    public async Task ExportCsvAsync(string path, char separator = ';', bool includeHeaders = true)
+    {
+        var csv = ToCsv(separator, includeHeaders);
+        await System.IO.File.WriteAllTextAsync(path, csv,
+            new System.Text.UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+    }
+
+    private string BuildDelimitedText(IEnumerable<object> rows, char separator,
+        bool includeHeaders, bool quote)
+    {
+        var columns = Columns.GetVisibleColumns().ToList();
+        var sb = new System.Text.StringBuilder();
+
+        string Escape(string field)
+        {
+            if (!quote) return field.Replace('\t', ' ').Replace('\n', ' ').Replace('\r', ' ');
+            if (field.Contains(separator) || field.Contains('"') || field.Contains('\n') || field.Contains('\r'))
+                return $"\"{field.Replace("\"", "\"\"")}\"";
+            return field;
+        }
+
+        if (includeHeaders)
+            sb.AppendLine(string.Join(separator, columns.Select(c => Escape(c.Header ?? c.FieldName))));
+
+        foreach (var row in rows)
+            sb.AppendLine(string.Join(separator, columns.Select(c => Escape(c.GetDisplayText(row)))));
+
+        return sb.ToString();
+    }
+
     private void OnColumnFreezeRequested(object? sender, ColumnFreezeEventArgs e)
     {
         if (e.Column == null) return;
 
+        // Le pin GÈLE réellement la colonne (presenter figé à gauche) — il ne
+        // faisait que verrouiller la position. Une colonne gelée est aussi
+        // verrouillée (non réordonnable).
+        e.Column.IsFrozen = e.Freeze;
         e.Column.IsPositionLocked = e.Freeze;
+        RecalculateColumnWidths();
+        RefreshView();
         e.Handled = true;
     }
 
@@ -1020,19 +1226,22 @@ public class JDataGrid : TemplatedControl
     {
         if (!AllowFiltering || e.Column == null) return;
 
-        if (string.IsNullOrWhiteSpace(e.FilterText))
+        var valueless = JDataGridFilterCell.IsValueless(e.Operator);
+
+        if (string.IsNullOrWhiteSpace(e.FilterText) && !valueless)
         {
-            // Remove filter for this column
+            // Remove filter for this column (les opérateurs sans valeur
+            // — Vide, Aujourd'hui... — s'appliquent avec un texte vide)
             _dataSource.RemoveFilter(e.Column.FieldName);
         }
         else
         {
-            // Add or update filter for this column
+            // Add or update filter for this column, with the selected operator
             var filter = new Models.GridFilter
             {
                 FieldName = e.Column.FieldName,
-                Operator = Models.FilterOperator.Contains,
-                Value = e.FilterText,
+                Operator = e.Operator,
+                Value = valueless ? null : e.FilterText,
                 IsCaseSensitive = false
             };
             _dataSource.AddFilter(filter);
@@ -1224,13 +1433,43 @@ public class JDataGrid : TemplatedControl
         switch (e.Key)
         {
             case Key.Up:
-                MoveSelection(-1, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
+                if (SelectionMode == SelectionMode.Cell)
+                    MoveCellVertical(-1);
+                else
+                    MoveSelection(-1, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
                 e.Handled = true;
                 break;
 
             case Key.Down:
-                MoveSelection(1, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
+                if (SelectionMode == SelectionMode.Cell)
+                    MoveCellVertical(1);
+                else
+                    MoveSelection(1, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
                 e.Handled = true;
+                break;
+
+            case Key.Left:
+                if (SelectionMode == SelectionMode.Cell)
+                {
+                    MoveCellHorizontal(-1, wrap: false);
+                    e.Handled = true;
+                }
+                break;
+
+            case Key.Right:
+                if (SelectionMode == SelectionMode.Cell)
+                {
+                    MoveCellHorizontal(1, wrap: false);
+                    e.Handled = true;
+                }
+                break;
+
+            case Key.Tab:
+                if (SelectionMode == SelectionMode.Cell)
+                {
+                    MoveCellHorizontal(e.KeyModifiers.HasFlag(KeyModifiers.Shift) ? -1 : 1, wrap: true);
+                    e.Handled = true;
+                }
                 break;
 
             case Key.PageUp:
@@ -1259,6 +1498,14 @@ public class JDataGrid : TemplatedControl
                 if (e.KeyModifiers.HasFlag(KeyModifiers.Control) && SelectionMode == SelectionMode.Multiple)
                 {
                     _selection.SelectAll(_dataSource.View);
+                    e.Handled = true;
+                }
+                break;
+
+            case Key.C:
+                if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+                {
+                    _ = CopySelectionToClipboardAsync();
                     e.Handled = true;
                 }
                 break;
@@ -1377,6 +1624,9 @@ public class CellEditEventArgs : RoutedEventArgs
 public class ColumnEventArgs : RoutedEventArgs
 {
     public GridColumn Column { get; }
+
+    /// <summary>Modificateurs clavier au moment du geste (Shift+clic = multi-tri)</summary>
+    public KeyModifiers Modifiers { get; init; }
 
     public ColumnEventArgs(RoutedEvent routedEvent, GridColumn column)
         : base(routedEvent)

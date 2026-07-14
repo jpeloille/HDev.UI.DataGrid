@@ -98,6 +98,16 @@ public class JDataGridColumnHeader : TemplatedControl
         RoutedEvent.Register<JDataGridColumnHeader, ColumnFreezeEventArgs>(
             nameof(FreezeRequested), RoutingStrategies.Bubble);
 
+    public static readonly RoutedEvent<ColumnEventArgs> AutoFitRequestedEvent =
+        RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
+            nameof(AutoFitRequested), RoutingStrategies.Bubble);
+
+    public event EventHandler<ColumnEventArgs>? AutoFitRequested
+    {
+        add => AddHandler(AutoFitRequestedEvent, value);
+        remove => RemoveHandler(AutoFitRequestedEvent, value);
+    }
+
     public event EventHandler<ColumnEventArgs>? SortRequested
     {
         add => AddHandler(SortRequestedEvent, value);
@@ -349,7 +359,10 @@ public class JDataGridColumnHeader : TemplatedControl
 
         if (!_isResizing && AllowSort && Column != null)
         {
-            RaiseEvent(new ColumnEventArgs(SortRequestedEvent, Column));
+            RaiseEvent(new ColumnEventArgs(SortRequestedEvent, Column)
+            {
+                Modifiers = e.KeyModifiers
+            });
         }
     }
 
@@ -483,6 +496,14 @@ public class JDataGridColumnHeader : TemplatedControl
         var point = e.GetCurrentPoint(this);
         if (point.Properties.IsLeftButtonPressed)
         {
+            // Double-clic sur le grip = ajuster la largeur au contenu
+            if (e.ClickCount == 2 && AllowResize)
+            {
+                AutoFitWidth();
+                e.Handled = true;
+                return;
+            }
+
             _isResizing = true;
             _resizeStartPoint = point.Position;
             _originalWidth = Column.ActualWidth > 0 ? Column.ActualWidth : Bounds.Width;
@@ -528,14 +549,16 @@ public class JDataGridColumnHeader : TemplatedControl
     {
         if (Column != null)
         {
-            var lockPosition = !IsPositionLocked;
-            RaiseEvent(new ColumnFreezeEventArgs(FreezeRequestedEvent, Column, lockPosition));
+            var freeze = !IsFrozen;
+            RaiseEvent(new ColumnFreezeEventArgs(FreezeRequestedEvent, Column, freeze));
         }
     }
 
     private void AutoFitWidth()
     {
-        // TODO: Calculate optimal width based on content
+        // Le calcul nécessite les données : délégué à la grille via événement
+        if (Column != null)
+            RaiseEvent(new ColumnEventArgs(AutoFitRequestedEvent, Column));
     }
 
     #endregion

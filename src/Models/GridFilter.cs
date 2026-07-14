@@ -41,7 +41,10 @@ public class GridFilter
             };
         }
 
-        if (Value == null && Operator != FilterOperator.IsNull && Operator != FilterOperator.IsNotNull)
+        var valueless = Operator is FilterOperator.IsNull or FilterOperator.IsNotNull
+            or FilterOperator.Today or FilterOperator.ThisWeek
+            or FilterOperator.ThisMonth or FilterOperator.ThisYear;
+        if (Value == null && !valueless)
         {
             return true; // No filter value set
         }
@@ -75,15 +78,27 @@ public class GridFilter
     private bool CompareEquals(object itemValue, object? filterValue)
     {
         if (filterValue == null) return false;
-        
+
         if (itemValue is string s1 && filterValue is string s2)
         {
             return IsCaseSensitive
                 ? s1.Equals(s2, StringComparison.Ordinal)
                 : s1.Equals(s2, StringComparison.OrdinalIgnoreCase);
         }
-        
-        return itemValue.Equals(filterValue);
+
+        if (itemValue.Equals(filterValue)) return true;
+
+        // Valeur de filtre saisie en texte (filter row) vs cellule typée :
+        // convertir avant de comparer, comme Compare()
+        try
+        {
+            var converted = Convert.ChangeType(filterValue, itemValue.GetType());
+            return itemValue.Equals(converted);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private bool StringContains(object itemValue, object? filterValue)

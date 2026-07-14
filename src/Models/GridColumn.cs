@@ -361,6 +361,32 @@ public class GridColumn : AvaloniaObject
         return Helpers.PropertyAccessor.TrySetValue(item, FieldName, value);
     }
 
+    /// <summary>
+    /// Formats a raw cell value the way cells display it (FormatString,
+    /// checkmark for bools, short date). Shared by cell rendering, auto-fit
+    /// and export so they always agree.
+    /// </summary>
+    public static string FormatValue(GridColumn? column, object? value)
+    {
+        if (value == null) return string.Empty;
+
+        if (column != null && !string.IsNullOrEmpty(column.FormatString))
+            return string.Format($"{{0:{column.FormatString}}}", value);
+
+        return value switch
+        {
+            bool b => b ? "✓" : "",
+            DateTime d => d.ToShortDateString(),
+            _ => value.ToString() ?? string.Empty
+        };
+    }
+
+    /// <summary>
+    /// Gets the display text of this column for a data item.
+    /// </summary>
+    public string GetDisplayText(object item)
+        => FormatValue(this, GetCellValue(item));
+
     #endregion
 }
 

@@ -645,11 +645,25 @@
         <Border Padding="2"
                 BorderBrush="{DynamicResource DataGridGridLinesBrush}"
                 BorderThickness="0,0,1,0">
-          <TextBox x:Name="PART_FilterTextBox"
-                   Watermark="Filter..."
-                   FontSize="11"
-                   Padding="4,2"
-                   VerticalAlignment="Center" />
+          <DockPanel>
+            <!-- Sélecteur d'opérateur (menu par type de colonne) -->
+            <Button x:Name="PART_OperatorButton"
+                    DockPanel.Dock="Left"
+                    Width="24"
+                    FontSize="11"
+                    Padding="0"
+                    Margin="0,0,2,0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    HorizontalContentAlignment="Center"
+                    VerticalAlignment="Stretch"
+                    ToolTip.Tip="Opérateur de filtre" />
+            <TextBox x:Name="PART_FilterTextBox"
+                     Watermark="Filter..."
+                     FontSize="11"
+                     Padding="4,2"
+                     VerticalAlignment="Center" />
+          </DockPanel>
         </Border>
       </ControlTemplate>
     </Setter>
