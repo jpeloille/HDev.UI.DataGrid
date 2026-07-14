@@ -24,9 +24,18 @@
   <SolidColorBrush x:Key="DataGridCellSelectedBrush" Color="{StaticResource DataGridCellSelected}" />
   <SolidColorBrush x:Key="DataGridGroupBackgroundBrush" Color="{StaticResource DataGridGroupBackground}" />
 
+  <!-- Clés supplémentaires (surfaces auparavant codées en dur — thémables) -->
+  <SolidColorBrush x:Key="DataGridBackgroundBrush" Color="White" />
+  <SolidColorBrush x:Key="DataGridCellEditingBrush" Color="#FFF3E0" />
+  <SolidColorBrush x:Key="DataGridGroupChipBrush" Color="#E0E0E0" />
+  <SolidColorBrush x:Key="DataGridGroupChipBorderBrush" Color="#BDBDBD" />
+  <SolidColorBrush x:Key="DataGridDropZoneActiveBrush" Color="#E3F2FD" />
+  <SolidColorBrush x:Key="DataGridDropZoneActiveBorderBrush" Color="#1976D2" />
+  <Color x:Key="DataGridPressed">#D0D0D0</Color>
+
   <!-- ===== JDataGrid Theme ===== -->
   <ControlTheme x:Key="{x:Type controls:JDataGrid}" TargetType="controls:JDataGrid">
-    <Setter Property="Background" Value="White" />
+    <Setter Property="Background" Value="{DynamicResource DataGridBackgroundBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource DataGridHeaderBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="AlternateRowBackground" Value="{DynamicResource DataGridRowAlternateBrush}" />
@@ -467,7 +476,7 @@
 
     <!-- Hover State -->
     <Style Selector="^:pointerover">
-      <Setter Property="Background" Value="#E8E8E8" />
+      <Setter Property="Background" Value="{DynamicResource DataGridRowHoverBrush}" />
     </Style>
 
     <!-- Show pin button on hover -->
@@ -588,7 +597,7 @@
 
     <!-- Editing State -->
     <Style Selector="^:editing">
-      <Setter Property="Background" Value="#FFF3E0" />
+      <Setter Property="Background" Value="{DynamicResource DataGridCellEditingBrush}" />
     </Style>
   </ControlTheme>
 
@@ -702,8 +711,8 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Border Background="#E0E0E0"
-                          BorderBrush="#BDBDBD"
+                  <Border Background="{DynamicResource DataGridGroupChipBrush}"
+                          BorderBrush="{DynamicResource DataGridGroupChipBorderBrush}"
                           BorderThickness="1"
                           CornerRadius="4"
                           Padding="8,4">
@@ -734,8 +743,8 @@
 
     <!-- Drag Over State -->
     <Style Selector="^[IsDragOver=True] /template/ Border#PART_DropZone">
-      <Setter Property="Background" Value="#E3F2FD" />
-      <Setter Property="BorderBrush" Value="#1976D2" />
+      <Setter Property="Background" Value="{DynamicResource DataGridDropZoneActiveBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource DataGridDropZoneActiveBorderBrush}" />
       <Setter Property="BorderThickness" Value="2" />
     </Style>
 
@@ -775,10 +784,10 @@
               <ToggleButton.Resources>
                 <SolidColorBrush x:Key="ToggleButtonBackground" Color="Transparent" />
                 <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="Transparent" />
-                <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="#E0E0E0" />
-                <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#E0E0E0" />
-                <SolidColorBrush x:Key="ToggleButtonBackgroundPressed" Color="#D0D0D0" />
-                <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#D0D0D0" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="{DynamicResource DataGridRowHover}" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="{DynamicResource DataGridRowHover}" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundPressed" Color="{DynamicResource DataGridPressed}" />
+                <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="{DynamicResource DataGridPressed}" />
                 <SolidColorBrush x:Key="ToggleButtonBorderBrush" Color="Transparent" />
                 <SolidColorBrush x:Key="ToggleButtonBorderBrushChecked" Color="Transparent" />
                 <SolidColorBrush x:Key="ToggleButtonBorderBrushPointerOver" Color="Transparent" />
