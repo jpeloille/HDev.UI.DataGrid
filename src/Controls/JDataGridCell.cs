@@ -253,8 +253,35 @@ public class JDataGridCell : TemplatedControl
 
     private void UpdateDisplayText()
     {
-        // Formatage partagé avec l'auto-fit et l'export (GridColumn.FormatValue)
+        // Formatage partagé avec l'auto-fit et l'export (GridColumn.FormatValue).
+        // Toujours calculé, même sous CellTemplate : la copie TSV, l'export CSV
+        // et le best-fit lisent DisplayText.
         DisplayText = Models.GridColumn.FormatValue(Column, Value);
+        ApplyCellTemplate();
+    }
+
+    /// <summary>
+    /// Honore GridColumn.CellTemplate : le presenter reçoit l'ITEM DE LIGNE
+    /// (RowData, pas seulement Value — un badge veut lire plusieurs propriétés)
+    /// et le template de la colonne. Sans template, on RESTITUE le TemplateBinding
+    /// vers DisplayText via ClearValue : une valeur locale prime sur le binding du
+    /// thème, l'écraser sans le rendre laisserait la cellule figée au recyclage.
+    /// </summary>
+    private void ApplyCellTemplate()
+    {
+        if (_contentPresenter == null) return;
+
+        var template = Column?.CellTemplate;
+        if (template != null && RowData != null)
+        {
+            _contentPresenter.ContentTemplate = template;
+            _contentPresenter.Content = RowData;
+        }
+        else
+        {
+            _contentPresenter.ClearValue(ContentPresenter.ContentTemplateProperty);
+            _contentPresenter.ClearValue(ContentPresenter.ContentProperty);
+        }
     }
 
     /// <summary>

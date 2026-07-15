@@ -211,6 +211,63 @@ try
     Check($"group summary: Engineering shows Σ 175,000 (got [{string.Join(", ", groupSummaryTexts)}])",
         groupSummaryTexts.Any(t => t.Contains("175")));
 
+    // 10. CellTemplate: the presenter must host the ROW ITEM through the
+    //     column's template (badges read several properties), keep DisplayText
+    //     computed (copy/export/best-fit), survive recycling, and RESTORE the
+    //     plain-text TemplateBinding when the template is removed.
+    var tplColumn = new GridColumn
+    {
+        FieldName = nameof(Emp.Name),
+        Header = "Badge",
+        Width = new GridLength(200),
+        CellTemplate = new Avalonia.Controls.Templates.FuncDataTemplate<Emp>((emp, _) =>
+            emp == null ? new TextBlock() : new Border
+            {
+                Tag = "cell-template-probe",
+                Child = new TextBlock { Text = $"{emp.Name}·{emp.Department}" }
+            })
+    };
+    var tplColumns = new GridColumnCollection { tplColumn };
+    tplColumns.UpdateVisibleIndices();
+
+    var tplRow = new JDataGridRow { Columns = tplColumns };
+    var tplWindow = new Window { Width = 900, Height = 60, Content = tplRow };
+    tplWindow.Show();
+    tplRow.DataContext = data[2]; // Carol / Sales
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(tplWindow);
+
+    var tplCell = tplRow.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var probe = tplCell?.GetVisualDescendants().OfType<Border>()
+        .FirstOrDefault(b => (string?)b.Tag == "cell-template-probe");
+    var probeText = probe?.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault()?.Text;
+    Check($"cell template: row item rendered through template (got '{probeText}')",
+        probeText == "Carol·Sales");
+    Check($"cell template: DisplayText still computed for copy/export ('{tplCell?.DisplayText}')",
+        tplCell?.DisplayText == "Carol");
+
+    // Recycling under template: new DataContext -> new templated content.
+    tplRow.DataContext = data[3]; // Dan / Sales
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(tplWindow);
+    var probeText2 = tplRow.GetVisualDescendants().OfType<Border>()
+        .FirstOrDefault(b => (string?)b.Tag == "cell-template-probe")
+        ?.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault()?.Text;
+    Check($"cell template: recycling re-templates the new row item (got '{probeText2}')",
+        probeText2 == "Dan·Sales");
+
+    // Template removed -> ClearValue must hand back the DisplayText TemplateBinding.
+    tplColumn.CellTemplate = null;
+    tplRow.DataContext = data[4]; // Eve (change triggers re-apply, like recycling)
+    Dispatcher.UIThread.RunJobs();
+    ForceLayout(tplWindow);
+    var tplCellAfter = tplRow.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var backToText = tplCellAfter?.GetVisualDescendants().OfType<Border>()
+        .All(b => (string?)b.Tag != "cell-template-probe") ?? false;
+    Check($"cell template removed: plain DisplayText binding restored (DisplayText='{tplCellAfter?.DisplayText}')",
+        backToText && tplCellAfter?.DisplayText == "Eve");
+    tplWindow.Close();
+
     // --- Column-count scaling measurement (informs whether true column
     //     virtualization is warranted; absolute headless ms are indicative). ---
     Console.WriteLine();
