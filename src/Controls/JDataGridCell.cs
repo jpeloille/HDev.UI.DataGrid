@@ -6,6 +6,7 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using Julien.Avalonia.DataGrid.Models;
 
 namespace Julien.Avalonia.DataGrid.Controls;
@@ -197,6 +198,17 @@ public class JDataGridCell : TemplatedControl
         UpdateDisplayText();
     }
 
+    /// <summary>
+    /// Rattrape la pose du template ignorée pendant que la cellule était détachée :
+    /// une cellule recyclée est réattachée avec son nouvel item, et c'est ici — arbre
+    /// visuel cohérent — que le presenter peut être touché sans risque.
+    /// </summary>
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        ApplyCellTemplate();
+    }
+
     #endregion
 
     #region Pointer Events
@@ -270,6 +282,14 @@ public class JDataGridCell : TemplatedControl
     private void ApplyCellTemplate()
     {
         if (_contentPresenter == null) return;
+
+        // Le recyclage détache la cellule ; son binding RowData (ancêtre
+        // JDataGridRow, cf. Themes/JDataGrid.axaml) perd alors sa cible, publie une
+        // erreur et nous rappelle ICI, en plein détachement. Toucher au presenter à
+        // cet instant réentre dans SetVisualParent sur un arbre à moitié démonté et
+        // tue le process. Détaché, il n'y a rien à peindre : OnAttachedToVisualTree
+        // rejouera la pose sur l'état à jour.
+        if (this.GetVisualRoot() == null) return;
 
         var template = Column?.CellTemplate;
         if (template != null && RowData != null)

@@ -268,6 +268,89 @@ try
         backToText && tplCellAfter?.DisplayText == "Eve");
     tplWindow.Close();
 
+    // 11. CellTemplate under REAL virtualization recycling. Check 10 only swaps a
+    //     row's DataContext while it stays on screen; it never detaches anything,
+    //     which is why it missed the crash below. Scrolling drives the true path —
+    //     VirtualizingStackPanel.RecycleElement -> ClearItemContainer -> detach —
+    //     and detaching breaks the cell's RowData ancestor binding, which republishes
+    //     and re-enters ApplyCellTemplate in the middle of the detach.
+    var scrollData = Enumerable.Range(0, 300).Select(i => new Emp
+    {
+        Name = "Row" + i, Department = i % 2 == 0 ? "Engineering" : "Sales",
+        Salary = 1000 * i, Hired = new DateTime(2010, 1, 1).AddDays(i), Active = i % 2 == 0
+    }).ToList();
+
+    var scrollColumns = new GridColumnCollection
+    {
+        new GridColumn
+        {
+            FieldName = nameof(Emp.Name),
+            Header = "Badge",
+            Width = new GridLength(200),
+            CellTemplate = new Avalonia.Controls.Templates.FuncDataTemplate<Emp>((emp, _) =>
+                emp == null ? new TextBlock() : new Border
+                {
+                    Tag = "recycle-probe",
+                    Child = new TextBlock { Text = $"{emp.Name}·{emp.Department}" }
+                })
+        }
+    };
+    scrollColumns.UpdateVisibleIndices();
+
+    var scrollGrid = new JDataGrid { AutoGenerateColumns = false, Columns = scrollColumns, ItemsSource = scrollData };
+    // Viewport far smaller than the content: forces virtualization.
+    var scrollWindow = new Window { Width = 400, Height = 200, Content = scrollGrid };
+    scrollWindow.Show();
+    ForceLayout(scrollWindow);
+
+    // First paint must already show templated content — a guard that defers the
+    // template must not leave the visible cells blank.
+    var firstPaint = scrollGrid.GetVisualDescendants().OfType<Border>()
+        .FirstOrDefault(b => (string?)b.Tag == "recycle-probe")
+        ?.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault()?.Text;
+    Check($"virtualized template: first paint renders the template (got '{firstPaint}')",
+        firstPaint == "Row0·Engineering");
+
+    var scroller = scrollGrid.GetVisualDescendants().OfType<ScrollViewer>()
+        .FirstOrDefault(s => s.Extent.Height > s.Viewport.Height);
+    Check("virtualized template: content actually virtualizes (scrollable viewport found)",
+        scroller != null);
+
+    if (scroller != null)
+    {
+        // Scrolling past the realized window forces RecycleElementsBefore: this is
+        // what killed the app on the first double-click in Synaxis.
+        for (int i = 1; i <= 8; i++)
+        {
+            scroller.Offset = new Vector(0, i * 400);
+            ForceLayout(scrollWindow);
+        }
+
+        Check("virtualized template: scrolling recycles rows without tearing the visual tree", true);
+
+        // A recycled cell must show the item it was recycled ONTO, not stale content.
+        var afterScroll = scrollGrid.GetVisualDescendants().OfType<Border>()
+            .Where(b => (string?)b.Tag == "recycle-probe")
+            .Select(b => b.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault()?.Text)
+            .Where(t => !string.IsNullOrEmpty(t))
+            .ToList();
+        Check($"virtualized template: recycled cells show their new item ({afterScroll.Count} probes, e.g. '{afterScroll.FirstOrDefault()}')",
+            afterScroll.Count > 0 && afterScroll.All(t => t != "Row0·Engineering"));
+
+        // Scrolling back must re-template too (recycle in the other direction).
+        scroller.Offset = new Vector(0, 0);
+        ForceLayout(scrollWindow);
+        var backToTop = scrollGrid.GetVisualDescendants().OfType<Border>()
+            .Where(b => (string?)b.Tag == "recycle-probe")
+            .Select(b => b.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault()?.Text)
+            .ToList();
+        Console.WriteLine($"      (probes back at top: {string.Join(", ", backToTop)})");
+        Check($"virtualized template: scrolling back re-templates the first row",
+            backToTop.Contains("Row0·Engineering"));
+    }
+
+    scrollWindow.Close();
+
     // --- Column-count scaling measurement (informs whether true column
     //     virtualization is warranted; absolute headless ms are indicative). ---
     Console.WriteLine();
