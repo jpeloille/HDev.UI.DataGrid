@@ -304,7 +304,7 @@ public class GridColumn : AvaloniaObject
     /// <summary>
     /// Creates a binding for this column's field.
     /// </summary>
-    public IBinding CreateBinding()
+    public BindingBase CreateBinding()
     {
         var binding = new Binding(FieldName);
         

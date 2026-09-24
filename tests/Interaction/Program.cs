@@ -1,3 +1,4 @@
+using Avalonia.Media.Imaging;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
@@ -61,7 +62,7 @@ void Pump()
 
 void Save(string name)
 {
-    window.CaptureRenderedFrame()?.Save(Path.Combine(outDir, name + ".png"));
+    window.CaptureRenderedFrame()?.Save(Path.Combine(outDir, name + ".png"), PngBitmapEncoderOptions.Default);
 }
 
 void Click(Control c)
@@ -107,7 +108,7 @@ Save("int-02-selected");
 grid.Focus();
 Pump();
 var beforeNav = grid.SelectedItem as Emp;
-window.KeyPress(Key.Down, RawInputModifiers.None);
+window.KeyPress(Key.Down, RawInputModifiers.None, PhysicalKey.ArrowDown, null);
 Pump();
 var afterNav = grid.SelectedItem as Emp;
 Check($"keyboard: Down arrow moves selection ('{beforeNav?.Name}' -> '{afterNav?.Name}')",
@@ -162,7 +163,7 @@ if (danRow != null)
     {
         window.KeyTextInput("Daniel");
         Pump();
-        window.KeyPress(Key.Enter, RawInputModifiers.None);
+        window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
         Pump();
         Check($"edit: commit writes value (Name='{(danRow.DataContext as Emp)?.Name}')",
             (danRow.DataContext as Emp)?.Name == "Daniel");

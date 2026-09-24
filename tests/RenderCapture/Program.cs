@@ -71,7 +71,7 @@ void CaptureGroupPanel(string name, JDataGrid grid)
     Dispatcher.UIThread.RunJobs();
 
     var frame = window.CaptureRenderedFrame();
-    frame?.Save(Path.Combine(outDir, name + ".png"));
+    frame?.Save(Path.Combine(outDir, name + ".png"), PngBitmapEncoderOptions.Default);
     var hasGroups = panel?.HasGroups;
     Console.WriteLine($"  {name}: {(frame != null ? "ok" : "NULL FRAME")} | chips={panel?.GroupedColumns.Count} | HasGroups={hasGroups}");
     window.Close();
@@ -96,7 +96,7 @@ void Capture(string name, JDataGrid grid)
 
     var frame = window.CaptureRenderedFrame();
     var path = Path.Combine(outDir, name + ".png");
-    frame?.Save(path);
+    frame?.Save(path, PngBitmapEncoderOptions.Default);
 
     var widthDump = string.Join(", ", grid.Columns.Select(c => $"{c.Header}={c.ActualWidth:F0}"));
     Console.WriteLine($"  {name}: {(frame != null ? "ok" : "NULL FRAME")} | widths: {widthDump} | sum={grid.Columns.Sum(c => c.ActualWidth):F0}");

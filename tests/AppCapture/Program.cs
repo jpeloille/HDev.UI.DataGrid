@@ -73,6 +73,6 @@ void Capture(string name)
 
     var frame = window.CaptureRenderedFrame();
     var path = Path.Combine(outDir, name + ".png");
-    frame?.Save(path);
+    frame?.Save(path, PngBitmapEncoderOptions.Default);
     Console.WriteLine($"  {name}: {(frame != null ? "ok" : "NULL FRAME")}");
 }

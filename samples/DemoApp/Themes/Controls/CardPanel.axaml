@@ -56,7 +56,7 @@
                          Grid.Column="2"
                          Theme="{DynamicResource WinXISearchBox}"
                          Text="{Binding SearchText, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                         Watermark="{TemplateBinding SearchWatermark}"
+                         PlaceholderText="{TemplateBinding SearchWatermark}"
                          MinHeight="30"
                          MinWidth="220"
                          VerticalAlignment="Center"

@@ -90,7 +90,7 @@
                     </ItemsPanelTemplate>
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:GridColumn">
                       <controls:JDataGridColumnHeader Column="{Binding}"
                                                       HeaderText="{Binding Header}"
                                                       Width="{Binding ActualWidth}"
@@ -119,7 +119,7 @@
                       </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
-                      <DataTemplate>
+                      <DataTemplate x:DataType="models:GridColumn">
                         <controls:JDataGridColumnHeader Column="{Binding}"
                                                         HeaderText="{Binding Header}"
                                                         Width="{Binding ActualWidth}"
@@ -158,7 +158,7 @@
                     </ItemsPanelTemplate>
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:GridColumn">
                       <controls:JDataGridFilterCell Column="{Binding}"
                                                     Width="{Binding ActualWidth}" />
                     </DataTemplate>
@@ -183,7 +183,7 @@
                       </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
-                      <DataTemplate>
+                      <DataTemplate x:DataType="models:GridColumn">
                         <controls:JDataGridFilterCell Column="{Binding}"
                                                       Width="{Binding ActualWidth}" />
                       </DataTemplate>
@@ -540,7 +540,7 @@
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:GridColumn">
                   <controls:JDataGridCell Column="{Binding}"
                                           RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:JDataGridRow}}"
                                           Width="{Binding ActualWidth}" />
@@ -563,7 +563,7 @@
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:GridColumn">
                   <controls:JDataGridCell Column="{Binding}"
                                           RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:JDataGridRow}}"
                                           Width="{Binding ActualWidth}" />
@@ -668,7 +668,7 @@
                     VerticalAlignment="Stretch"
                     ToolTip.Tip="Opérateur de filtre" />
             <TextBox x:Name="PART_FilterTextBox"
-                     Watermark="Filter..."
+                     PlaceholderText="Filter..."
                      FontSize="11"
                      Padding="4,2"
                      VerticalAlignment="Center" />
@@ -710,7 +710,7 @@
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:GridColumn">
                   <Border Background="{DynamicResource DataGridGroupChipBrush}"
                           BorderBrush="{DynamicResource DataGridGroupChipBorderBrush}"
                           BorderThickness="1"

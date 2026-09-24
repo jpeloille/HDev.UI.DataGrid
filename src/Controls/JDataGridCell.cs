@@ -289,7 +289,7 @@ public class JDataGridCell : TemplatedControl
         // cet instant réentre dans SetVisualParent sur un arbre à moitié démonté et
         // tue le process. Détaché, il n'y a rien à peindre : OnAttachedToVisualTree
         // rejouera la pose sur l'état à jour.
-        if (this.GetVisualRoot() == null) return;
+        if (!this.IsAttachedToVisualTree()) return;
 
         var template = Column?.CellTemplate;
         if (template != null && RowData != null)

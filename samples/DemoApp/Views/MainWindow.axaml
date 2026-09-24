@@ -10,9 +10,8 @@
         Width="1400" Height="900"
         WindowStartupLocation="CenterScreen"
         ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="40"
-        SystemDecorations="BorderOnly"
+        WindowDecorations="BorderOnly"
         Background="{DynamicResource PageBackgroundBrush}">
 
   <Design.DataContext>

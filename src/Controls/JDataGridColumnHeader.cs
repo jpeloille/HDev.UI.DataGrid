@@ -23,7 +23,16 @@ public class JDataGridColumnHeader : TemplatedControl
     private bool _isDragging;
     private bool _isPointerPressed;
     private Point _dragStartPoint;
+    // DoDragDropAsync exige l'appui d'origine ; le seuil n'est franchi qu'au Moved.
+    private PointerPressedEventArgs? _dragPressArgs;
     private const double DragThreshold = 5.0;
+
+    /// <summary>
+    /// Format de glisser-déposer d'une colonne (en-tête → réordonnancement ou zone de groupement).
+    /// Reste dans le processus : jamais sérialisé vers la plateforme.
+    /// </summary>
+    internal static readonly DataFormat<GridColumn> ColumnDragFormat =
+        DataFormat.CreateInProcessFormat<GridColumn>("GridColumn");
     private Border? _dropIndicatorLeft;
     private Border? _dropIndicatorRight;
 
@@ -333,6 +342,7 @@ public class JDataGridColumnHeader : TemplatedControl
         if (point.Properties.IsLeftButtonPressed)
         {
             _dragStartPoint = point.Position;
+            _dragPressArgs = e;
             _isPointerPressed = true;
 
             if (e.ClickCount == 2 && AllowResize)
@@ -351,6 +361,7 @@ public class JDataGridColumnHeader : TemplatedControl
         var wasDragging = _isDragging;
         _isDragging = false;
         _isPointerPressed = false;
+        _dragPressArgs = null;
 
         if (wasDragging)
         {
@@ -371,7 +382,8 @@ public class JDataGridColumnHeader : TemplatedControl
         base.OnPointerMoved(e);
 
         // Don't allow dragging if column is locked or reordering is disabled
-        if (!_isPointerPressed || _isDragging || _isResizing || Column == null || IsPositionLocked || !AllowReorder)
+        if (!_isPointerPressed || _isDragging || _isResizing || Column == null || IsPositionLocked || !AllowReorder
+            || _dragPressArgs == null)
             return;
 
         var point = e.GetCurrentPoint(this);
@@ -385,12 +397,12 @@ public class JDataGridColumnHeader : TemplatedControl
             _isPointerPressed = false;
 
             // Start drag operation
-            var data = new DataObject();
-            data.Set("GridColumn", Column);
+            var pressArgs = _dragPressArgs;
+            _dragPressArgs = null;
+            var data = new DataTransfer();
+            data.Add(DataTransferItem.Create(ColumnDragFormat, Column));
 
-#pragma warning disable CS0618 // DoDragDrop is obsolete but DoDragDropAsync is not available in public API
-            await DragDrop.DoDragDrop(e, data, DragDropEffects.Move);
-#pragma warning restore CS0618
+            await DragDrop.DoDragDropAsync(pressArgs, data, DragDropEffects.Move);
             _isDragging = false;
         }
     }
@@ -402,9 +414,9 @@ public class JDataGridColumnHeader : TemplatedControl
         // Don't allow dropping on locked columns
         if (!AllowReorder || Column == null || IsPositionLocked) return;
 
-        if (e.Data.Contains("GridColumn"))
+        if (e.DataTransfer.Contains(ColumnDragFormat))
         {
-            var draggedColumn = e.Data.Get("GridColumn") as GridColumn;
+            var draggedColumn = e.DataTransfer.TryGetValue(ColumnDragFormat);
             if (draggedColumn != null && draggedColumn != Column && !draggedColumn.IsPositionLocked)
             {
                 UpdateDropIndicator(e);
@@ -419,9 +431,9 @@ public class JDataGridColumnHeader : TemplatedControl
         // Don't allow dropping on locked columns
         if (!AllowReorder || Column == null || IsPositionLocked) return;
 
-        if (e.Data.Contains("GridColumn"))
+        if (e.DataTransfer.Contains(ColumnDragFormat))
         {
-            var draggedColumn = e.Data.Get("GridColumn") as GridColumn;
+            var draggedColumn = e.DataTransfer.TryGetValue(ColumnDragFormat);
             if (draggedColumn != null && draggedColumn != Column && !draggedColumn.IsPositionLocked)
             {
                 UpdateDropIndicator(e);
@@ -445,7 +457,7 @@ public class JDataGridColumnHeader : TemplatedControl
         // Don't allow dropping on locked columns
         if (!AllowReorder || Column == null || IsPositionLocked) return;
 
-        if (e.Data.Get("GridColumn") is GridColumn draggedColumn && draggedColumn != Column && !draggedColumn.IsPositionLocked)
+        if (e.DataTransfer.TryGetValue(ColumnDragFormat) is GridColumn draggedColumn && draggedColumn != Column && !draggedColumn.IsPositionLocked)
         {
             var position = e.GetPosition(this);
             var dropOnLeft = position.X < Bounds.Width / 2;

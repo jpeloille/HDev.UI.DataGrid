@@ -174,7 +174,7 @@ public class JDataGridGroupPanel : TemplatedControl
 
     private void OnDragEnter(object? sender, DragEventArgs e)
     {
-        if (e.Data.Contains("GridColumn"))
+        if (e.DataTransfer.Contains(JDataGridColumnHeader.ColumnDragFormat))
         {
             IsDragOver = true;
             e.DragEffects = DragDropEffects.Move;
@@ -187,7 +187,7 @@ public class JDataGridGroupPanel : TemplatedControl
     // XDND/platform layer reports "won't accept" and Drop never fires.
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        if (e.Data.Contains("GridColumn"))
+        if (e.DataTransfer.Contains(JDataGridColumnHeader.ColumnDragFormat))
         {
             IsDragOver = true;
             e.DragEffects = DragDropEffects.Move;
@@ -209,7 +209,7 @@ public class JDataGridGroupPanel : TemplatedControl
     {
         IsDragOver = false;
 
-        if (e.Data.Get("GridColumn") is GridColumn column)
+        if (e.DataTransfer.TryGetValue(JDataGridColumnHeader.ColumnDragFormat) is GridColumn column)
         {
             // Check if column is already grouped
             if (!GroupedColumns.Contains(column) && column.AllowGroup)
