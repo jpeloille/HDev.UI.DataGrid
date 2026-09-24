@@ -5,9 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     
     <!-- Package Info -->
-    <PackageId>Julien.Avalonia.DataGrid</PackageId>
+    <PackageId>HDev.UI.DataGrid</PackageId>
     <Version>1.0.0</Version>
-    <Authors>Julien</Authors>
     <Description>A feature-rich DataGrid control for Avalonia UI inspired by DevExpress</Description>
     <PackageTags>avalonia;datagrid;ui;controls</PackageTags>
     

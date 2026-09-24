@@ -7,7 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DemoApp.Controls;
 using DemoApp.Models;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Models;
 using System.Collections.ObjectModel;
 
 namespace DemoApp.ViewModels;

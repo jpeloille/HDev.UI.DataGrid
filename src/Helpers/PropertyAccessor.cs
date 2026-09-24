@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Julien.Avalonia.DataGrid.Helpers;
+namespace HDev.UI.DataGrid.Helpers;
 
 /// <summary>
 /// High-performance property access using compiled expression-tree delegates,

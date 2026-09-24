@@ -1,12 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Models;
 
-namespace Julien.Avalonia.DataGrid.Controls;
+namespace HDev.UI.DataGrid;
 
 /// <summary>
 /// Selects the row template per item type for the grid's virtualized rows
-/// presenter: <see cref="JDataGridGroupRow"/> for <see cref="GridGroup"/> headers,
+/// presenter: <see cref="HDevDataGridGroupRow"/> for <see cref="GridGroup"/> headers,
 /// otherwise the data-row template.
 /// <para>
 /// This is set as the ItemsControl's <c>ItemTemplate</c> (not added to its

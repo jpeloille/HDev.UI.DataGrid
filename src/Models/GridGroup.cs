@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Julien.Avalonia.DataGrid.Models;
+namespace HDev.UI.DataGrid.Models;
 
 /// <summary>
 /// Represents a group of items in the DataGrid.

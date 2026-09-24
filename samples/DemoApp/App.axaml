@@ -8,7 +8,7 @@
     <FluentTheme />
 
     <!-- DataGrid component styles -->
-    <StyleInclude Source="avares://Julien.Avalonia.DataGrid/Themes/Index.axaml" />
+    <StyleInclude Source="avares://HDev.UI.DataGrid/Themes/Index.axaml" />
 
     <!-- App-specific styles (ribbon, etc.) -->
     <StyleInclude Source="avares://DemoApp/Themes/Styles.axaml" />

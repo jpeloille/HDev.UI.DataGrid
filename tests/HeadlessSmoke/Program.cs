@@ -5,11 +5,11 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Julien.Avalonia.DataGrid.Controls;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid;
+using HDev.UI.DataGrid.Models;
 
 // Headless render smoke test: boots Avalonia without a display, renders a real
-// JDataGrid (which applies the control template + resolves bindings — the layer
+// HDevDataGrid (which applies the control template + resolves bindings — the layer
 // the build and the model-level checks do NOT exercise), then drives grouping
 // and expand/collapse. Exits non-zero on any exception or failed assertion.
 
@@ -35,7 +35,7 @@ try
         new() { Name = "Eve", Department = "HR", Salary = 65000, Hired = new DateTime(2017, 9, 9), Active = false },
     };
 
-    var grid = new JDataGrid
+    var grid = new HDevDataGrid
     {
         ItemsSource = data,
         AutoGenerateColumns = true,
@@ -47,25 +47,25 @@ try
     Dispatcher.UIThread.RunJobs();
     ForceLayout(window);
 
-    // 1. Data rows render as JDataGridRow (the fallback DataTemplate must match,
+    // 1. Data rows render as HDevDataGridRow (the fallback DataTemplate must match,
     //    otherwise items would render as plain text -> zero rows).
-    int dataRows = grid.GetVisualDescendants().OfType<JDataGridRow>().Count();
-    Check($"ungrouped: data rows render as JDataGridRow (found {dataRows})", dataRows > 0);
+    int dataRows = grid.GetVisualDescendants().OfType<HDevDataGridRow>().Count();
+    Check($"ungrouped: data rows render as HDevDataGridRow (found {dataRows})", dataRows > 0);
 
     // GEOMETRY: a cell must have a real pixel width (catches the star-weight bug
     // where Width.Value of a Star column is the weight 1.0 -> a 1px sliver).
-    var probeCell = grid.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var probeCell = grid.GetVisualDescendants().OfType<HDevDataGridCell>().FirstOrDefault();
     var probeWidth = probeCell?.Bounds.Width ?? 0;
     Check($"geometry: auto-generated cell has real width (Bounds.Width = {probeWidth:F0})", probeWidth > 20);
 
-    // 2. Group: header rows render as JDataGridGroupRow.
+    // 2. Group: header rows render as HDevDataGridGroupRow.
     grid.GroupBy(nameof(Emp.Department));
     Dispatcher.UIThread.RunJobs();
     ForceLayout(window);
 
-    int groupRows = grid.GetVisualDescendants().OfType<JDataGridGroupRow>().Count();
-    int dataRowsGrouped = grid.GetVisualDescendants().OfType<JDataGridRow>().Count();
-    Check($"grouped: group headers render as JDataGridGroupRow (found {groupRows})", groupRows > 0);
+    int groupRows = grid.GetVisualDescendants().OfType<HDevDataGridGroupRow>().Count();
+    int dataRowsGrouped = grid.GetVisualDescendants().OfType<HDevDataGridRow>().Count();
+    Check($"grouped: group headers render as HDevDataGridGroupRow (found {groupRows})", groupRows > 0);
     Check($"grouped: data rows still render (found {dataRowsGrouped})", dataRowsGrouped > 0);
 
     // 3. Collapse all -> data rows disappear, headers remain.
@@ -73,8 +73,8 @@ try
     Dispatcher.UIThread.RunJobs();
     ForceLayout(window);
 
-    int groupRowsCollapsed = grid.GetVisualDescendants().OfType<JDataGridGroupRow>().Count();
-    int dataRowsCollapsed = grid.GetVisualDescendants().OfType<JDataGridRow>().Count();
+    int groupRowsCollapsed = grid.GetVisualDescendants().OfType<HDevDataGridGroupRow>().Count();
+    int dataRowsCollapsed = grid.GetVisualDescendants().OfType<HDevDataGridRow>().Count();
     Check($"collapsed: headers remain (found {groupRowsCollapsed})", groupRowsCollapsed > 0);
     Check($"collapsed: data rows hidden (found {dataRowsCollapsed})", dataRowsCollapsed == 0);
 
@@ -83,7 +83,7 @@ try
     Dispatcher.UIThread.RunJobs();
     ForceLayout(window);
 
-    int dataRowsReexpanded = grid.GetVisualDescendants().OfType<JDataGridRow>().Count();
+    int dataRowsReexpanded = grid.GetVisualDescendants().OfType<HDevDataGridRow>().Count();
     Check($"re-expanded: data rows return (found {dataRowsReexpanded})", dataRowsReexpanded > 0);
 
     // 5. Edit cycle: ungroup, edit the Name cell of Alice, commit, verify write-back.
@@ -101,7 +101,7 @@ try
         Dispatcher.UIThread.RunJobs();
         ForceLayout(window);
 
-        var cell = grid.GetVisualDescendants().OfType<JDataGridCell>()
+        var cell = grid.GetVisualDescendants().OfType<HDevDataGridCell>()
             .FirstOrDefault(c => Equals(c.RowData, alice) && c.Column == nameColumn);
         Check("edit: target cell entered editing state", cell is { IsEditing: true });
 
@@ -120,7 +120,7 @@ try
         grid.BeginEdit(alice, nameColumn);
         Dispatcher.UIThread.RunJobs();
         ForceLayout(window);
-        var cell2 = grid.GetVisualDescendants().OfType<JDataGridCell>()
+        var cell2 = grid.GetVisualDescendants().OfType<HDevDataGridCell>()
             .FirstOrDefault(c => Equals(c.RowData, alice) && c.Column == nameColumn);
         var editor2 = cell2?.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
         if (editor2 != null)
@@ -134,19 +134,19 @@ try
 
     // 6. Row recycle: changing a row's DataContext must update the displayed cell
     //    value by rebinding, reusing the same cell instances (no rebuild churn).
-    var recycleRow = new JDataGridRow { Columns = grid.Columns };
+    var recycleRow = new HDevDataGridRow { Columns = grid.Columns };
     var recycleWindow = new Window { Width = 900, Height = 60, Content = recycleRow };
     recycleWindow.Show();
     recycleRow.DataContext = data[1]; // Bob
     Dispatcher.UIThread.RunJobs();
     ForceLayout(recycleWindow);
-    var cellBefore = recycleRow.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var cellBefore = recycleRow.GetVisualDescendants().OfType<HDevDataGridCell>().FirstOrDefault();
     var textBefore = cellBefore?.DisplayText;
 
     recycleRow.DataContext = data[2]; // Carol
     Dispatcher.UIThread.RunJobs();
     ForceLayout(recycleWindow);
-    var cellAfter = recycleRow.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var cellAfter = recycleRow.GetVisualDescendants().OfType<HDevDataGridCell>().FirstOrDefault();
     var textAfter = cellAfter?.DisplayText;
 
     Check($"recycle: cell value rebinds on DataContext change ('{textBefore}' -> '{textAfter}')",
@@ -158,20 +158,20 @@ try
     // 7. RefreshCells reflects a structural column change on an already-realized
     //    row (the safety net for reorder/freeze/visibility now that recycle no
     //    longer rebuilds cells).
-    var structRow = new JDataGridRow { Columns = grid.Columns };
+    var structRow = new HDevDataGridRow { Columns = grid.Columns };
     var structWindow = new Window { Width = 900, Height = 60, Content = structRow };
     structWindow.Show();
     structRow.DataContext = data[0];
     Dispatcher.UIThread.RunJobs();
     ForceLayout(structWindow);
-    int cellsBeforeHide = structRow.GetVisualDescendants().OfType<JDataGridCell>().Count();
+    int cellsBeforeHide = structRow.GetVisualDescendants().OfType<HDevDataGridCell>().Count();
 
     grid.Columns[0].IsVisible = false;
     grid.Columns.UpdateVisibleIndices();
     structRow.RefreshCells();
     Dispatcher.UIThread.RunJobs();
     ForceLayout(structWindow);
-    int cellsAfterHide = structRow.GetVisualDescendants().OfType<JDataGridCell>().Count();
+    int cellsAfterHide = structRow.GetVisualDescendants().OfType<HDevDataGridCell>().Count();
     Check($"RefreshCells reflects hidden column ({cellsBeforeHide} -> {cellsAfterHide})", cellsAfterHide == cellsBeforeHide - 1);
 
     grid.Columns[0].IsVisible = true;
@@ -205,7 +205,7 @@ try
     Dispatcher.UIThread.RunJobs();
     ForceLayout(window);
 
-    var groupSummaryTexts = grid.GetVisualDescendants().OfType<JDataGridGroupRow>()
+    var groupSummaryTexts = grid.GetVisualDescendants().OfType<HDevDataGridGroupRow>()
         .Select(g => g.SummaryText).ToList();
     // Engineering = 90000 (Zoe) + 85000 (Bob) = 175000.
     Check($"group summary: Engineering shows Σ 175,000 (got [{string.Join(", ", groupSummaryTexts)}])",
@@ -230,14 +230,14 @@ try
     var tplColumns = new GridColumnCollection { tplColumn };
     tplColumns.UpdateVisibleIndices();
 
-    var tplRow = new JDataGridRow { Columns = tplColumns };
+    var tplRow = new HDevDataGridRow { Columns = tplColumns };
     var tplWindow = new Window { Width = 900, Height = 60, Content = tplRow };
     tplWindow.Show();
     tplRow.DataContext = data[2]; // Carol / Sales
     Dispatcher.UIThread.RunJobs();
     ForceLayout(tplWindow);
 
-    var tplCell = tplRow.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var tplCell = tplRow.GetVisualDescendants().OfType<HDevDataGridCell>().FirstOrDefault();
     var probe = tplCell?.GetVisualDescendants().OfType<Border>()
         .FirstOrDefault(b => (string?)b.Tag == "cell-template-probe");
     var probeText = probe?.GetVisualDescendants().OfType<TextBlock>().FirstOrDefault()?.Text;
@@ -261,7 +261,7 @@ try
     tplRow.DataContext = data[4]; // Eve (change triggers re-apply, like recycling)
     Dispatcher.UIThread.RunJobs();
     ForceLayout(tplWindow);
-    var tplCellAfter = tplRow.GetVisualDescendants().OfType<JDataGridCell>().FirstOrDefault();
+    var tplCellAfter = tplRow.GetVisualDescendants().OfType<HDevDataGridCell>().FirstOrDefault();
     var backToText = tplCellAfter?.GetVisualDescendants().OfType<Border>()
         .All(b => (string?)b.Tag != "cell-template-probe") ?? false;
     Check($"cell template removed: plain DisplayText binding restored (DisplayText='{tplCellAfter?.DisplayText}')",
@@ -297,7 +297,7 @@ try
     };
     scrollColumns.UpdateVisibleIndices();
 
-    var scrollGrid = new JDataGrid { AutoGenerateColumns = false, Columns = scrollColumns, ItemsSource = scrollData };
+    var scrollGrid = new HDevDataGrid { AutoGenerateColumns = false, Columns = scrollColumns, ItemsSource = scrollData };
     // Viewport far smaller than the content: forces virtualization.
     var scrollWindow = new Window { Width = 400, Height = 200, Content = scrollGrid };
     scrollWindow.Show();
@@ -368,7 +368,7 @@ try
             cols.Add(new GridColumn { FieldName = fields[i % fields.Length], Header = "C" + i, Width = new GridLength(100) });
         cols.UpdateVisibleIndices();
 
-        var g = new JDataGrid { AutoGenerateColumns = false, Columns = cols, ItemsSource = manyRows };
+        var g = new HDevDataGrid { AutoGenerateColumns = false, Columns = cols, ItemsSource = manyRows };
         var w = new Window { Width = 1200, Height = 600, Content = g };
 
         var sw = System.Diagnostics.Stopwatch.StartNew();
@@ -376,7 +376,7 @@ try
         ForceLayout(w);
         sw.Stop();
 
-        int cells = g.GetVisualDescendants().OfType<JDataGridCell>().Count();
+        int cells = g.GetVisualDescendants().OfType<HDevDataGridCell>().Count();
         Console.WriteLine($"  cols={n,3}: initial layout {sw.ElapsedMilliseconds,5} ms, cells realized = {cells}");
         w.Close();
     }
@@ -405,7 +405,7 @@ public class SmokeApp : Application
         Styles.Add(new FluentTheme());
         Styles.Add(new StyleInclude(new Uri("avares://HeadlessSmoke"))
         {
-            Source = new Uri("avares://Julien.Avalonia.DataGrid/Themes/Index.axaml")
+            Source = new Uri("avares://HDev.UI.DataGrid/Themes/Index.axaml")
         });
     }
 }

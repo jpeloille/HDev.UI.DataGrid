@@ -7,8 +7,8 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Julien.Avalonia.DataGrid.Controls;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid;
+using HDev.UI.DataGrid.Models;
 
 // Drives the grid through REAL simulated input (mouse/keyboard via the headless
 // input pipeline) and asserts the resulting state — testing the event wiring
@@ -39,7 +39,7 @@ var data = new List<Emp>
     new() { Name = "Eve", Department = "HR", Salary = 65000 },
 };
 
-var grid = new JDataGrid { AutoGenerateColumns = false, ItemsSource = data, ShowFilterRow = true };
+var grid = new HDevDataGrid { AutoGenerateColumns = false, ItemsSource = data, ShowFilterRow = true };
 grid.Columns.Add(new GridColumn { FieldName = nameof(Emp.Name), Header = "Name", Width = new GridLength(2, GridUnitType.Star) });
 grid.Columns.Add(new GridColumn { FieldName = nameof(Emp.Department), Header = "Department", Width = new GridLength(1.5, GridUnitType.Star) });
 grid.Columns.Add(new GridColumn { FieldName = nameof(Emp.Salary), Header = "Salary", Width = new GridLength(140), ColumnType = ColumnType.Numeric, FormatString = "C0" });
@@ -74,10 +74,10 @@ void Click(Control c)
     Pump();
 }
 
-JDataGridColumnHeader Header(string field) =>
-    grid.GetVisualDescendants().OfType<JDataGridColumnHeader>().First(h => h.Column?.FieldName == field);
+HDevDataGridColumnHeader Header(string field) =>
+    grid.GetVisualDescendants().OfType<HDevDataGridColumnHeader>().First(h => h.Column?.FieldName == field);
 
-List<JDataGridRow> Rows() => grid.GetVisualDescendants().OfType<JDataGridRow>()
+List<HDevDataGridRow> Rows() => grid.GetVisualDescendants().OfType<HDevDataGridRow>()
     .OrderBy(r => r.TranslatePoint(new Point(), window)?.Y ?? 0).ToList();
 
 // === 1. Sort by clicking the Salary header ===
@@ -115,7 +115,7 @@ Check($"keyboard: Down arrow moves selection ('{beforeNav?.Name}' -> '{afterNav?
     afterNav != null && !ReferenceEquals(afterNav, beforeNav));
 
 // === 5. Filter typing reduces the view ===
-var deptFilter = grid.GetVisualDescendants().OfType<JDataGridFilterCell>()
+var deptFilter = grid.GetVisualDescendants().OfType<HDevDataGridFilterCell>()
     .First(f => f.Column?.FieldName == nameof(Emp.Department));
 var filterBox = deptFilter.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
 if (filterBox != null)
@@ -155,9 +155,9 @@ void DoubleClick(Control c)
 var danRow = Rows().FirstOrDefault(r => (r.DataContext as Emp)?.Name == "Dan");
 if (danRow != null)
 {
-    var nameCell = danRow.GetVisualDescendants().OfType<JDataGridCell>().First();
+    var nameCell = danRow.GetVisualDescendants().OfType<HDevDataGridCell>().First();
     DoubleClick(nameCell);
-    bool editing = grid.GetVisualDescendants().OfType<JDataGridCell>().Any(c => c.IsEditing);
+    bool editing = grid.GetVisualDescendants().OfType<HDevDataGridCell>().Any(c => c.IsEditing);
     Check("edit: double-click starts editing", editing);
     if (editing)
     {
@@ -214,7 +214,7 @@ public class CaptureApp : Application
         Styles.Add(new FluentTheme());
         Styles.Add(new StyleInclude(new Uri("avares://Interaction"))
         {
-            Source = new Uri("avares://Julien.Avalonia.DataGrid/Themes/Index.axaml")
+            Source = new Uri("avares://HDev.UI.DataGrid/Themes/Index.axaml")
         });
     }
 }

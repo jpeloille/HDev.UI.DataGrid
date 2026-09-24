@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 
-namespace Julien.Avalonia.DataGrid.Models;
+namespace HDev.UI.DataGrid.Models;
 
 /// <summary>
 /// Manages selection state for the DataGrid.

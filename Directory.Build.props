@@ -2,5 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>14</LangVersion>
+
+    <!-- Marque HDev (Hiram) -->
+    <Authors>Julien Peloille</Authors>
+    <Company>HDev</Company>
+    <Product>HDev.UI</Product>
   </PropertyGroup>
 </Project>

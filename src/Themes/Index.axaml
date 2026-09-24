@@ -4,7 +4,7 @@
   <Styles.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <ResourceInclude Source="avares://Julien.Avalonia.DataGrid/Themes/JDataGrid.axaml" />
+        <ResourceInclude Source="avares://HDev.UI.DataGrid/Themes/HDevDataGrid.axaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Styles.Resources>

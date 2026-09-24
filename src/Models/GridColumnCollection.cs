@@ -1,6 +1,6 @@
 using Avalonia.Collections;
 
-namespace Julien.Avalonia.DataGrid.Models;
+namespace HDev.UI.DataGrid.Models;
 
 /// <summary>
 /// Observable collection of GridColumn with additional helper methods.

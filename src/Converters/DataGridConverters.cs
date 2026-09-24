@@ -3,7 +3,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using System.Globalization;
 
-namespace Julien.Avalonia.DataGrid.Converters;
+namespace HDev.UI.DataGrid.Converters;
 
 /// <summary>
 /// Converts TextAlignment to HorizontalAlignment.

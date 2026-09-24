@@ -1,6 +1,6 @@
-# Plan d'amélioration — JDataGrid vers le niveau DevExpress
+# Plan d'amélioration — HDevDataGrid vers le niveau DevExpress
 
-> Objectif : amener `Julien.Avalonia.DataGrid` au niveau de fonctionnalités, de
+> Objectif : amener `HDev.UI.DataGrid` au niveau de fonctionnalités, de
 > performance et de finition d'un `GridControl` DevExpress. Ce document liste
 > **toutes** les améliorations proposées, classées par thème, puis priorisées en
 > phases livrables.
@@ -45,7 +45,7 @@ base qui réfléchit à chaque cellule.
    - Option de calcul en arrière-plan (async) avec annulation pour > 100k lignes.
 
 1.3. **Virtualisation des colonnes + recyclage de cellules**
-   - ✅ **Recyclage fait** : `JDataGridRow` ne reconstruit plus toutes ses cellules à
+   - ✅ **Recyclage fait** : `HDevDataGridRow` ne reconstruit plus toutes ses cellules à
      chaque recyclage de ligne (changement de DataContext au scroll) ; les cellules
      re-bindent `RowData` et réutilisent les mêmes instances. Filet `RefreshCells`
      pour refléter les changements structurels (réordre/freeze/visibilité) sur les

@@ -3,14 +3,14 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Models;
 
-namespace Julien.Avalonia.DataGrid.Controls;
+namespace HDev.UI.DataGrid;
 
 /// <summary>
 /// Represents a group row header in the DataGrid.
 /// </summary>
-public class JDataGridGroupRow : TemplatedControl
+public class HDevDataGridGroupRow : TemplatedControl
 {
     #region Private Fields
 
@@ -22,35 +22,35 @@ public class JDataGridGroupRow : TemplatedControl
     #region Styled Properties
 
     public static readonly StyledProperty<GridGroup?> GroupProperty =
-        AvaloniaProperty.Register<JDataGridGroupRow, GridGroup?>(nameof(Group));
+        AvaloniaProperty.Register<HDevDataGridGroupRow, GridGroup?>(nameof(Group));
 
     public static readonly StyledProperty<bool> IsExpandedProperty =
-        AvaloniaProperty.Register<JDataGridGroupRow, bool>(nameof(IsExpanded), true);
+        AvaloniaProperty.Register<HDevDataGridGroupRow, bool>(nameof(IsExpanded), true);
 
     public static readonly StyledProperty<int> LevelProperty =
-        AvaloniaProperty.Register<JDataGridGroupRow, int>(nameof(Level), 0);
+        AvaloniaProperty.Register<HDevDataGridGroupRow, int>(nameof(Level), 0);
 
     public static readonly StyledProperty<string> DisplayTextProperty =
-        AvaloniaProperty.Register<JDataGridGroupRow, string>(nameof(DisplayText), string.Empty);
+        AvaloniaProperty.Register<HDevDataGridGroupRow, string>(nameof(DisplayText), string.Empty);
 
     public static readonly StyledProperty<string> SummaryTextProperty =
-        AvaloniaProperty.Register<JDataGridGroupRow, string>(nameof(SummaryText), string.Empty);
+        AvaloniaProperty.Register<HDevDataGridGroupRow, string>(nameof(SummaryText), string.Empty);
 
     public static readonly StyledProperty<int> ItemCountProperty =
-        AvaloniaProperty.Register<JDataGridGroupRow, int>(nameof(ItemCount), 0);
+        AvaloniaProperty.Register<HDevDataGridGroupRow, int>(nameof(ItemCount), 0);
 
     public static readonly StyledProperty<double> IndentWidthProperty =
-        AvaloniaProperty.Register<JDataGridGroupRow, double>(nameof(IndentWidth), 20);
+        AvaloniaProperty.Register<HDevDataGridGroupRow, double>(nameof(IndentWidth), 20);
 
     public static readonly StyledProperty<double> RowHeightProperty =
-        AvaloniaProperty.Register<JDataGridGroupRow, double>(nameof(RowHeight), 32);
+        AvaloniaProperty.Register<HDevDataGridGroupRow, double>(nameof(RowHeight), 32);
 
     #endregion
 
     #region Routed Events
 
     public static readonly RoutedEvent<GroupEventArgs> ExpandChangedEvent =
-        RoutedEvent.Register<JDataGridGroupRow, GroupEventArgs>(
+        RoutedEvent.Register<HDevDataGridGroupRow, GroupEventArgs>(
             nameof(ExpandChanged), RoutingStrategies.Bubble);
 
     public event EventHandler<GroupEventArgs>? ExpandChanged
@@ -123,9 +123,9 @@ public class JDataGridGroupRow : TemplatedControl
     private static readonly string PC_Expanded = ":expanded";
     private static readonly string PC_Collapsed = ":collapsed";
 
-    static JDataGridGroupRow()
+    static HDevDataGridGroupRow()
     {
-        IsExpandedProperty.Changed.AddClassHandler<JDataGridGroupRow>((row, e) =>
+        IsExpandedProperty.Changed.AddClassHandler<HDevDataGridGroupRow>((row, e) =>
         {
             var isExpanded = (bool)e.NewValue!;
             row.PseudoClasses.Set(PC_Expanded, isExpanded);
@@ -133,7 +133,7 @@ public class JDataGridGroupRow : TemplatedControl
             row.OnExpandedChanged(isExpanded);
         });
 
-        GroupProperty.Changed.AddClassHandler<JDataGridGroupRow>((row, e) => row.OnGroupChanged());
+        GroupProperty.Changed.AddClassHandler<HDevDataGridGroupRow>((row, e) => row.OnGroupChanged());
     }
 
     #endregion

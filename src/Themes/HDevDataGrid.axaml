@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:Julien.Avalonia.DataGrid.Controls;assembly=Julien.Avalonia.DataGrid"
-                    xmlns:models="clr-namespace:Julien.Avalonia.DataGrid.Models;assembly=Julien.Avalonia.DataGrid">
+                    xmlns:controls="clr-namespace:HDev.UI.DataGrid;assembly=HDev.UI.DataGrid"
+                    xmlns:models="clr-namespace:HDev.UI.DataGrid.Models;assembly=HDev.UI.DataGrid">
 
   <!-- ===== Colors ===== -->
   <Color x:Key="DataGridHeaderBackground">#F5F5F5</Color>
@@ -33,8 +33,8 @@
   <SolidColorBrush x:Key="DataGridDropZoneActiveBorderBrush" Color="#1976D2" />
   <Color x:Key="DataGridPressed">#D0D0D0</Color>
 
-  <!-- ===== JDataGrid Theme ===== -->
-  <ControlTheme x:Key="{x:Type controls:JDataGrid}" TargetType="controls:JDataGrid">
+  <!-- ===== HDevDataGrid Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:HDevDataGrid}" TargetType="controls:HDevDataGrid">
     <Setter Property="Background" Value="{DynamicResource DataGridBackgroundBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource DataGridHeaderBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
@@ -53,7 +53,7 @@
           <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
             
             <!-- Group Panel (drag columns here to group) -->
-            <controls:JDataGridGroupPanel x:Name="PART_GroupPanel"
+            <controls:HDevDataGridGroupPanel x:Name="PART_GroupPanel"
                                           Grid.Row="0"
                                           IsVisible="{TemplateBinding ShowGroupPanel}" />
 
@@ -91,7 +91,7 @@
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="models:GridColumn">
-                      <controls:JDataGridColumnHeader Column="{Binding}"
+                      <controls:HDevDataGridColumnHeader Column="{Binding}"
                                                       HeaderText="{Binding Header}"
                                                       Width="{Binding ActualWidth}"
                                                       SortDirection="{Binding SortDirection}"
@@ -120,7 +120,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                       <DataTemplate x:DataType="models:GridColumn">
-                        <controls:JDataGridColumnHeader Column="{Binding}"
+                        <controls:HDevDataGridColumnHeader Column="{Binding}"
                                                         HeaderText="{Binding Header}"
                                                         Width="{Binding ActualWidth}"
                                                         SortDirection="{Binding SortDirection}"
@@ -159,7 +159,7 @@
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="models:GridColumn">
-                      <controls:JDataGridFilterCell Column="{Binding}"
+                      <controls:HDevDataGridFilterCell Column="{Binding}"
                                                     Width="{Binding ActualWidth}" />
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
@@ -184,7 +184,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                       <DataTemplate x:DataType="models:GridColumn">
-                        <controls:JDataGridFilterCell Column="{Binding}"
+                        <controls:HDevDataGridFilterCell Column="{Binding}"
                                                       Width="{Binding ActualWidth}" />
                       </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -244,17 +244,17 @@
                     <controls:GridRowTemplateSelector>
                       <controls:GridRowTemplateSelector.GroupTemplate>
                         <DataTemplate>
-                          <controls:JDataGridGroupRow Group="{Binding}"
-                                                      RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}" />
+                          <controls:HDevDataGridGroupRow Group="{Binding}"
+                                                      RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:HDevDataGrid}}" />
                         </DataTemplate>
                       </controls:GridRowTemplateSelector.GroupTemplate>
                       <controls:GridRowTemplateSelector.RowTemplate>
                         <DataTemplate>
-                          <controls:JDataGridRow DataContext="{Binding}"
-                                                 Columns="{Binding Columns, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
-                                                 RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
-                                                 ShowRowNumber="{Binding ShowRowNumbers, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}"
-                                                 ShowRowIndicator="{Binding ShowRowIndicator, RelativeSource={RelativeSource AncestorType=controls:JDataGrid}}" />
+                          <controls:HDevDataGridRow DataContext="{Binding}"
+                                                 Columns="{Binding Columns, RelativeSource={RelativeSource AncestorType=controls:HDevDataGrid}}"
+                                                 RowHeight="{Binding RowHeight, RelativeSource={RelativeSource AncestorType=controls:HDevDataGrid}}"
+                                                 ShowRowNumber="{Binding ShowRowNumbers, RelativeSource={RelativeSource AncestorType=controls:HDevDataGrid}}"
+                                                 ShowRowIndicator="{Binding ShowRowIndicator, RelativeSource={RelativeSource AncestorType=controls:HDevDataGrid}}" />
                         </DataTemplate>
                       </controls:GridRowTemplateSelector.RowTemplate>
                     </controls:GridRowTemplateSelector>
@@ -352,8 +352,8 @@
     </Setter>
   </ControlTheme>
 
-  <!-- ===== JDataGridColumnHeader Theme ===== -->
-  <ControlTheme x:Key="{x:Type controls:JDataGridColumnHeader}" TargetType="controls:JDataGridColumnHeader">
+  <!-- ===== HDevDataGridColumnHeader Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:HDevDataGridColumnHeader}" TargetType="controls:HDevDataGridColumnHeader">
     <Setter Property="Background" Value="{DynamicResource DataGridHeaderBackgroundBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource DataGridHeaderBorderBrush}" />
     <Setter Property="Padding" Value="8,0" />
@@ -498,8 +498,8 @@
     </Style>
   </ControlTheme>
 
-  <!-- ===== JDataGridRow Theme ===== -->
-  <ControlTheme x:Key="{x:Type controls:JDataGridRow}" TargetType="controls:JDataGridRow">
+  <!-- ===== HDevDataGridRow Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:HDevDataGridRow}" TargetType="controls:HDevDataGridRow">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Height" Value="{Binding RowHeight, RelativeSource={RelativeSource Self}}" />
 
@@ -541,8 +541,8 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:GridColumn">
-                  <controls:JDataGridCell Column="{Binding}"
-                                          RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:JDataGridRow}}"
+                  <controls:HDevDataGridCell Column="{Binding}"
+                                          RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:HDevDataGridRow}}"
                                           Width="{Binding ActualWidth}" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
@@ -564,8 +564,8 @@
               </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:GridColumn">
-                  <controls:JDataGridCell Column="{Binding}"
-                                          RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:JDataGridRow}}"
+                  <controls:HDevDataGridCell Column="{Binding}"
+                                          RowData="{Binding DataContext, RelativeSource={RelativeSource AncestorType=controls:HDevDataGridRow}}"
                                           Width="{Binding ActualWidth}" />
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
@@ -601,8 +601,8 @@
     </Style>
   </ControlTheme>
 
-  <!-- ===== JDataGridCell Theme ===== -->
-  <ControlTheme x:Key="{x:Type controls:JDataGridCell}" TargetType="controls:JDataGridCell">
+  <!-- ===== HDevDataGridCell Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:HDevDataGridCell}" TargetType="controls:HDevDataGridCell">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Padding" Value="8,4" />
 
@@ -647,8 +647,8 @@
     </Style>
   </ControlTheme>
 
-  <!-- ===== JDataGridFilterCell Theme ===== -->
-  <ControlTheme x:Key="{x:Type controls:JDataGridFilterCell}" TargetType="controls:JDataGridFilterCell">
+  <!-- ===== HDevDataGridFilterCell Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:HDevDataGridFilterCell}" TargetType="controls:HDevDataGridFilterCell">
     <Setter Property="Template">
       <ControlTemplate>
         <Border Padding="2"
@@ -678,8 +678,8 @@
     </Setter>
   </ControlTheme>
 
-  <!-- ===== JDataGridGroupPanel Theme ===== -->
-  <ControlTheme x:Key="{x:Type controls:JDataGridGroupPanel}" TargetType="controls:JDataGridGroupPanel">
+  <!-- ===== HDevDataGridGroupPanel Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:HDevDataGridGroupPanel}" TargetType="controls:HDevDataGridGroupPanel">
     <Setter Property="Background" Value="{DynamicResource DataGridGroupBackgroundBrush}" />
     <Setter Property="MinHeight" Value="36" />
 
@@ -724,7 +724,7 @@
                               Background="Transparent"
                               BorderThickness="0"
                               VerticalAlignment="Center"
-                              Command="{Binding $parent[controls:JDataGridGroupPanel].RemoveGroupCommand}"
+                              Command="{Binding $parent[controls:HDevDataGridGroupPanel].RemoveGroupCommand}"
                               CommandParameter="{Binding}">
                         <Path Width="8" Height="8"
                               Data="M0,0 L8,8 M8,0 L0,8"
@@ -754,8 +754,8 @@
     </Style>
   </ControlTheme>
 
-  <!-- ===== JDataGridGroupRow Theme ===== -->
-  <ControlTheme x:Key="{x:Type controls:JDataGridGroupRow}" TargetType="controls:JDataGridGroupRow">
+  <!-- ===== HDevDataGridGroupRow Theme ===== -->
+  <ControlTheme x:Key="{x:Type controls:HDevDataGridGroupRow}" TargetType="controls:HDevDataGridGroupRow">
     <Setter Property="Background" Value="{DynamicResource DataGridGroupBackgroundBrush}" />
     <Setter Property="Height" Value="{Binding RowHeight, RelativeSource={RelativeSource Self}}" />
     <Setter Property="Cursor" Value="Hand" />

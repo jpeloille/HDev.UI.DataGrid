@@ -1,7 +1,7 @@
 using System.Globalization;
 using Avalonia.Media;
 
-namespace Julien.Avalonia.DataGrid.Models;
+namespace HDev.UI.DataGrid.Models;
 
 /// <summary>
 /// The kind of aggregate computed by a <see cref="GridSummary"/>.

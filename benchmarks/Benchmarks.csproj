@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../src/Julien.Avalonia.DataGrid.csproj" />
+    <ProjectReference Include="../src/HDev.UI.DataGrid.csproj" />
   </ItemGroup>
 
 </Project>

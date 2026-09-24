@@ -2,15 +2,15 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Models;
 
-namespace Julien.Avalonia.DataGrid.Controls;
+namespace HDev.UI.DataGrid;
 
 /// <summary>
 /// A filter cell control for the filter row: text input + operator selector
 /// (the operator set depends on the column type).
 /// </summary>
-public class JDataGridFilterCell : TemplatedControl
+public class HDevDataGridFilterCell : TemplatedControl
 {
     private TextBox? _filterTextBox;
     private Button? _operatorButton;
@@ -19,20 +19,20 @@ public class JDataGridFilterCell : TemplatedControl
     #region Styled Properties
 
     public static readonly StyledProperty<GridColumn?> ColumnProperty =
-        AvaloniaProperty.Register<JDataGridFilterCell, GridColumn?>(nameof(Column));
+        AvaloniaProperty.Register<HDevDataGridFilterCell, GridColumn?>(nameof(Column));
 
     public static readonly StyledProperty<string> FilterTextProperty =
-        AvaloniaProperty.Register<JDataGridFilterCell, string>(nameof(FilterText), string.Empty);
+        AvaloniaProperty.Register<HDevDataGridFilterCell, string>(nameof(FilterText), string.Empty);
 
     public static readonly StyledProperty<FilterOperator> OperatorProperty =
-        AvaloniaProperty.Register<JDataGridFilterCell, FilterOperator>(nameof(Operator), FilterOperator.Contains);
+        AvaloniaProperty.Register<HDevDataGridFilterCell, FilterOperator>(nameof(Operator), FilterOperator.Contains);
 
     #endregion
 
     #region Routed Events
 
     public static readonly RoutedEvent<FilterChangedEventArgs> FilterChangedEvent =
-        RoutedEvent.Register<JDataGridFilterCell, FilterChangedEventArgs>(
+        RoutedEvent.Register<HDevDataGridFilterCell, FilterChangedEventArgs>(
             nameof(FilterChanged), RoutingStrategies.Bubble);
 
     public event EventHandler<FilterChangedEventArgs>? FilterChanged

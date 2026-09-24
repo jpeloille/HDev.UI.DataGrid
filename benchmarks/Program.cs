@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Julien.Avalonia.DataGrid.Models;
-using Julien.Avalonia.DataGrid.Helpers;
+using HDev.UI.DataGrid.Models;
+using HDev.UI.DataGrid.Helpers;
 
 // Micro-benchmark: sort + filter pass through GridDataSource over a large dataset.
 // Used to baseline the reflection-based access path and to verify the gain after

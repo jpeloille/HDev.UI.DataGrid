@@ -2,11 +2,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:DemoApp.ViewModels"
         xmlns:controls="using:DemoApp.Controls"
-        xmlns:jdg="using:Julien.Avalonia.DataGrid.Controls"
-        xmlns:models="using:Julien.Avalonia.DataGrid.Models"
+        xmlns:hgrid="using:HDev.UI.DataGrid"
+        xmlns:models="using:HDev.UI.DataGrid.Models"
         x:Class="DemoApp.Views.MainWindow"
         x:DataType="vm:MainViewModel"
-        Title="Rounded Skin Panels | JDataGrid"
+        Title="Rounded Skin Panels | HDevDataGrid"
         Width="1400" Height="900"
         WindowStartupLocation="CenterScreen"
         ExtendClientAreaToDecorationsHint="True"
@@ -48,7 +48,7 @@
         <Border Grid.Column="2"
                 Background="Transparent"
                 PointerPressed="TitleBar_PointerPressed">
-          <TextBlock Text="Rounded Skin Panels | JDataGrid"
+          <TextBlock Text="Rounded Skin Panels | HDevDataGrid"
                      Foreground="{DynamicResource TitleBarForegroundBrush}"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Center"
@@ -262,7 +262,7 @@
                             SearchText="{Binding SearchText, Mode=TwoWay}"
                             SearchWatermark="Search employees..."
                             ShowHeader="True">
-          <jdg:JDataGrid ItemsSource="{Binding Employees}"
+          <hgrid:HDevDataGrid ItemsSource="{Binding Employees}"
                          SelectedItem="{Binding SelectedEmployee}"
                          ShowFilterRow="{Binding ShowFilterRow}"
                          ShowGroupPanel="{Binding ShowGroupPanel}"
@@ -278,7 +278,7 @@
                          RowHeight="32"
                          HeaderHeight="36">
 
-            <jdg:JDataGrid.Columns>
+            <hgrid:HDevDataGrid.Columns>
               <models:GridColumn FieldName="Id"
                                  Header="ID"
                                  Width="60"
@@ -335,9 +335,9 @@
                                  Header="Country"
                                  Width="120"
                                  AllowGroup="True" />
-            </jdg:JDataGrid.Columns>
+            </hgrid:HDevDataGrid.Columns>
 
-          </jdg:JDataGrid>
+          </hgrid:HDevDataGrid>
         </controls:CardPanel>
       </Grid>
 
@@ -459,7 +459,7 @@
                    VerticalAlignment="Center"
                    Foreground="{DynamicResource TextPrimaryBrush}" />
         <TextBlock Grid.Column="1"
-                   Text="JDataGrid Demo v1.0"
+                   Text="HDevDataGrid Demo v1.0"
                    Foreground="{DynamicResource TextSecondaryBrush}"
                    VerticalAlignment="Center" />
       </Grid>

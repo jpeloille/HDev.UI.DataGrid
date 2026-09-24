@@ -3,16 +3,16 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Models;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace Julien.Avalonia.DataGrid.Controls;
+namespace HDev.UI.DataGrid;
 
 /// <summary>
 /// Represents a column header with sorting, resizing, and reordering support.
 /// </summary>
-public class JDataGridColumnHeader : TemplatedControl
+public class HDevDataGridColumnHeader : TemplatedControl
 {
     #region Private Fields
 
@@ -41,74 +41,74 @@ public class JDataGridColumnHeader : TemplatedControl
     #region Styled Properties
 
     public static readonly StyledProperty<GridColumn?> ColumnProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, GridColumn?>(nameof(Column));
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, GridColumn?>(nameof(Column));
 
     public static readonly StyledProperty<string> HeaderTextProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, string>(nameof(HeaderText), string.Empty);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, string>(nameof(HeaderText), string.Empty);
 
     public static readonly StyledProperty<ListSortDirection?> SortDirectionProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, ListSortDirection?>(nameof(SortDirection));
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, ListSortDirection?>(nameof(SortDirection));
 
     public static readonly StyledProperty<int> SortIndexProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, int>(nameof(SortIndex), -1);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, int>(nameof(SortIndex), -1);
 
     public static readonly StyledProperty<bool> AllowSortProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(AllowSort), true);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(AllowSort), true);
 
     public static readonly StyledProperty<bool> AllowResizeProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(AllowResize), true);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(AllowResize), true);
 
     public static readonly StyledProperty<bool> AllowReorderProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(AllowReorder), true);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(AllowReorder), true);
 
     public static readonly StyledProperty<bool> ShowFilterButtonProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(ShowFilterButton), false);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(ShowFilterButton), false);
 
     public static readonly StyledProperty<bool> IsFilteredProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsFiltered), false);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(IsFiltered), false);
 
     public static readonly StyledProperty<bool> IsDragOverLeftProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsDragOverLeft), false);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(IsDragOverLeft), false);
 
     public static readonly StyledProperty<bool> IsDragOverRightProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsDragOverRight), false);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(IsDragOverRight), false);
 
     public static readonly StyledProperty<bool> IsFrozenProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsFrozen), false);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(IsFrozen), false);
 
     public static readonly StyledProperty<bool> IsPositionLockedProperty =
-        AvaloniaProperty.Register<JDataGridColumnHeader, bool>(nameof(IsPositionLocked), false);
+        AvaloniaProperty.Register<HDevDataGridColumnHeader, bool>(nameof(IsPositionLocked), false);
 
     #endregion
 
     #region Routed Events
 
     public static readonly RoutedEvent<ColumnEventArgs> SortRequestedEvent =
-        RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
+        RoutedEvent.Register<HDevDataGridColumnHeader, ColumnEventArgs>(
             nameof(SortRequested), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<ColumnResizeEventArgs> ResizeCompletedEvent =
-        RoutedEvent.Register<JDataGridColumnHeader, ColumnResizeEventArgs>(
+        RoutedEvent.Register<HDevDataGridColumnHeader, ColumnResizeEventArgs>(
             nameof(ResizeCompleted), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<ColumnReorderEventArgs> ReorderCompletedEvent =
-        RoutedEvent.Register<JDataGridColumnHeader, ColumnReorderEventArgs>(
+        RoutedEvent.Register<HDevDataGridColumnHeader, ColumnReorderEventArgs>(
             nameof(ReorderCompleted), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<ColumnEventArgs> FilterRequestedEvent =
-        RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
+        RoutedEvent.Register<HDevDataGridColumnHeader, ColumnEventArgs>(
             nameof(FilterRequested), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<ColumnEventArgs> GroupRequestedEvent =
-        RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
+        RoutedEvent.Register<HDevDataGridColumnHeader, ColumnEventArgs>(
             nameof(GroupRequested), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<ColumnFreezeEventArgs> FreezeRequestedEvent =
-        RoutedEvent.Register<JDataGridColumnHeader, ColumnFreezeEventArgs>(
+        RoutedEvent.Register<HDevDataGridColumnHeader, ColumnFreezeEventArgs>(
             nameof(FreezeRequested), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<ColumnEventArgs> AutoFitRequestedEvent =
-        RoutedEvent.Register<JDataGridColumnHeader, ColumnEventArgs>(
+        RoutedEvent.Register<HDevDataGridColumnHeader, ColumnEventArgs>(
             nameof(AutoFitRequested), RoutingStrategies.Bubble);
 
     public event EventHandler<ColumnEventArgs>? AutoFitRequested
@@ -239,9 +239,9 @@ public class JDataGridColumnHeader : TemplatedControl
 
     #region Constructor
 
-    static JDataGridColumnHeader()
+    static HDevDataGridColumnHeader()
     {
-        ColumnProperty.Changed.AddClassHandler<JDataGridColumnHeader>((header, e) => header.OnColumnChanged(e));
+        ColumnProperty.Changed.AddClassHandler<HDevDataGridColumnHeader>((header, e) => header.OnColumnChanged(e));
     }
 
     #endregion

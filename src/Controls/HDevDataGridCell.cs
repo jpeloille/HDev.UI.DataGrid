@@ -7,14 +7,14 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.VisualTree;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Models;
 
-namespace Julien.Avalonia.DataGrid.Controls;
+namespace HDev.UI.DataGrid;
 
 /// <summary>
 /// Represents a single cell in the DataGrid.
 /// </summary>
-public class JDataGridCell : TemplatedControl
+public class HDevDataGridCell : TemplatedControl
 {
     #region Private Fields
 
@@ -28,51 +28,51 @@ public class JDataGridCell : TemplatedControl
     #region Styled Properties
 
     public static readonly StyledProperty<GridColumn?> ColumnProperty =
-        AvaloniaProperty.Register<JDataGridCell, GridColumn?>(nameof(Column));
+        AvaloniaProperty.Register<HDevDataGridCell, GridColumn?>(nameof(Column));
 
     public static readonly StyledProperty<object?> ValueProperty =
-        AvaloniaProperty.Register<JDataGridCell, object?>(nameof(Value));
+        AvaloniaProperty.Register<HDevDataGridCell, object?>(nameof(Value));
 
     public static readonly StyledProperty<object?> RowDataProperty =
-        AvaloniaProperty.Register<JDataGridCell, object?>(nameof(RowData));
+        AvaloniaProperty.Register<HDevDataGridCell, object?>(nameof(RowData));
 
     public static readonly StyledProperty<bool> IsSelectedProperty =
-        AvaloniaProperty.Register<JDataGridCell, bool>(nameof(IsSelected), false);
+        AvaloniaProperty.Register<HDevDataGridCell, bool>(nameof(IsSelected), false);
 
     public static readonly StyledProperty<bool> IsEditingProperty =
-        AvaloniaProperty.Register<JDataGridCell, bool>(nameof(IsEditing), false);
+        AvaloniaProperty.Register<HDevDataGridCell, bool>(nameof(IsEditing), false);
 
     public static readonly StyledProperty<bool> IsReadOnlyProperty =
-        AvaloniaProperty.Register<JDataGridCell, bool>(nameof(IsReadOnly), false);
+        AvaloniaProperty.Register<HDevDataGridCell, bool>(nameof(IsReadOnly), false);
 
     public static readonly StyledProperty<TextAlignment> TextAlignmentProperty =
-        AvaloniaProperty.Register<JDataGridCell, TextAlignment>(nameof(TextAlignment), TextAlignment.Left);
+        AvaloniaProperty.Register<HDevDataGridCell, TextAlignment>(nameof(TextAlignment), TextAlignment.Left);
 
     public static readonly StyledProperty<string?> DisplayTextProperty =
-        AvaloniaProperty.Register<JDataGridCell, string?>(nameof(DisplayText));
+        AvaloniaProperty.Register<HDevDataGridCell, string?>(nameof(DisplayText));
 
     #endregion
 
     #region Routed Events
 
     public static readonly RoutedEvent<CellEventArgs> CellClickEvent =
-        RoutedEvent.Register<JDataGridCell, CellEventArgs>(
+        RoutedEvent.Register<HDevDataGridCell, CellEventArgs>(
             nameof(CellClick), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<CellEventArgs> CellDoubleClickEvent =
-        RoutedEvent.Register<JDataGridCell, CellEventArgs>(
+        RoutedEvent.Register<HDevDataGridCell, CellEventArgs>(
             nameof(CellDoubleClick), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<CellEventArgs> BeginEditEvent =
-        RoutedEvent.Register<JDataGridCell, CellEventArgs>(
+        RoutedEvent.Register<HDevDataGridCell, CellEventArgs>(
             nameof(BeginEdit), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<CellValueChangedEventArgs> ValueChangedEvent =
-        RoutedEvent.Register<JDataGridCell, CellValueChangedEventArgs>(
+        RoutedEvent.Register<HDevDataGridCell, CellValueChangedEventArgs>(
             nameof(ValueChanged), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<CellEventArgs> EditEndedEvent =
-        RoutedEvent.Register<JDataGridCell, CellEventArgs>(
+        RoutedEvent.Register<HDevDataGridCell, CellEventArgs>(
             nameof(EditEnded), RoutingStrategies.Bubble);
 
     public event EventHandler<CellEventArgs>? CellClick
@@ -165,23 +165,23 @@ public class JDataGridCell : TemplatedControl
     private static readonly string PC_Editing = ":editing";
     private static readonly string PC_ReadOnly = ":readonly";
 
-    static JDataGridCell()
+    static HDevDataGridCell()
     {
-        IsSelectedProperty.Changed.AddClassHandler<JDataGridCell>((cell, e) =>
+        IsSelectedProperty.Changed.AddClassHandler<HDevDataGridCell>((cell, e) =>
             cell.PseudoClasses.Set(PC_Selected, (bool)e.NewValue!));
 
-        IsEditingProperty.Changed.AddClassHandler<JDataGridCell>((cell, e) =>
+        IsEditingProperty.Changed.AddClassHandler<HDevDataGridCell>((cell, e) =>
         {
             cell.PseudoClasses.Set(PC_Editing, (bool)e.NewValue!);
             cell.OnEditingChanged((bool)e.NewValue!);
         });
 
-        IsReadOnlyProperty.Changed.AddClassHandler<JDataGridCell>((cell, e) =>
+        IsReadOnlyProperty.Changed.AddClassHandler<HDevDataGridCell>((cell, e) =>
             cell.PseudoClasses.Set(PC_ReadOnly, (bool)e.NewValue!));
 
-        ColumnProperty.Changed.AddClassHandler<JDataGridCell>((cell, e) => cell.OnColumnChanged());
-        ValueProperty.Changed.AddClassHandler<JDataGridCell>((cell, e) => cell.UpdateDisplayText());
-        RowDataProperty.Changed.AddClassHandler<JDataGridCell>((cell, e) => cell.UpdateValue());
+        ColumnProperty.Changed.AddClassHandler<HDevDataGridCell>((cell, e) => cell.OnColumnChanged());
+        ValueProperty.Changed.AddClassHandler<HDevDataGridCell>((cell, e) => cell.UpdateDisplayText());
+        RowDataProperty.Changed.AddClassHandler<HDevDataGridCell>((cell, e) => cell.UpdateValue());
     }
 
     #endregion
@@ -284,7 +284,7 @@ public class JDataGridCell : TemplatedControl
         if (_contentPresenter == null) return;
 
         // Le recyclage détache la cellule ; son binding RowData (ancêtre
-        // JDataGridRow, cf. Themes/JDataGrid.axaml) perd alors sa cible, publie une
+        // HDevDataGridRow, cf. Themes/HDevDataGrid.axaml) perd alors sa cible, publie une
         // erreur et nous rappelle ICI, en plein détachement. Toucher au presenter à
         // cet instant réentre dans SetVisualParent sur un arbre à moitié démonté et
         // tue le process. Détaché, il n'y a rien à peindre : OnAttachedToVisualTree

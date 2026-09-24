@@ -6,10 +6,10 @@ using Avalonia.Media.Imaging;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Julien.Avalonia.DataGrid.Controls;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid;
+using HDev.UI.DataGrid.Models;
 
-// Renders the JDataGrid to PNG files using the headless Skia backend, so the
+// Renders the HDevDataGrid to PNG files using the headless Skia backend, so the
 // actual visual output (colors, spacing, alignment) can be inspected without a
 // display. Each scenario is saved to tests/RenderCapture/out/.
 
@@ -41,7 +41,7 @@ CaptureGroupPanel("04-group-panel-chip", panelGrid);
 
 Console.WriteLine($"Saved PNGs to {Path.GetFullPath(outDir)}");
 
-void CaptureGroupPanel(string name, JDataGrid grid)
+void CaptureGroupPanel(string name, HDevDataGrid grid)
 {
     var window = new Window { Width = 1100, Height = 200, Content = grid };
     window.Show();
@@ -55,7 +55,7 @@ void CaptureGroupPanel(string name, JDataGrid grid)
 
     // Simulate what a successful drop does: seed the panel's grouped columns and
     // group the data, then re-layout.
-    var panel = grid.GetVisualDescendants().OfType<JDataGridGroupPanel>().FirstOrDefault();
+    var panel = grid.GetVisualDescendants().OfType<HDevDataGridGroupPanel>().FirstOrDefault();
     var deptCol = grid.Columns.First(c => c.FieldName == nameof(Emp.Department));
     if (panel != null)
     {
@@ -77,7 +77,7 @@ void CaptureGroupPanel(string name, JDataGrid grid)
     window.Close();
 }
 
-void Capture(string name, JDataGrid grid)
+void Capture(string name, HDevDataGrid grid)
 {
     var window = new Window
     {
@@ -103,9 +103,9 @@ void Capture(string name, JDataGrid grid)
     window.Close();
 }
 
-JDataGrid BuildGrid(List<Emp> rows, bool group, bool filter, bool summary)
+HDevDataGrid BuildGrid(List<Emp> rows, bool group, bool filter, bool summary)
 {
-    var grid = new JDataGrid
+    var grid = new HDevDataGrid
     {
         AutoGenerateColumns = false,
         ItemsSource = rows,
@@ -152,7 +152,7 @@ public class CaptureApp : Application
         Styles.Add(new FluentTheme());
         Styles.Add(new StyleInclude(new Uri("avares://RenderCapture"))
         {
-            Source = new Uri("avares://Julien.Avalonia.DataGrid/Themes/Index.axaml")
+            Source = new Uri("avares://HDev.UI.DataGrid/Themes/Index.axaml")
         });
     }
 }

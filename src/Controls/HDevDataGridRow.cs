@@ -4,14 +4,14 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Models;
 
-namespace Julien.Avalonia.DataGrid.Controls;
+namespace HDev.UI.DataGrid;
 
 /// <summary>
 /// Represents a data row in the DataGrid.
 /// </summary>
-public class JDataGridRow : TemplatedControl
+public class HDevDataGridRow : TemplatedControl
 {
     #region Private Fields
 
@@ -26,51 +26,51 @@ public class JDataGridRow : TemplatedControl
     #region Styled Properties
 
     public static readonly StyledProperty<int> RowIndexProperty =
-        AvaloniaProperty.Register<JDataGridRow, int>(nameof(RowIndex), -1);
+        AvaloniaProperty.Register<HDevDataGridRow, int>(nameof(RowIndex), -1);
 
     public static readonly StyledProperty<bool> IsSelectedProperty =
-        AvaloniaProperty.Register<JDataGridRow, bool>(nameof(IsSelected), false);
+        AvaloniaProperty.Register<HDevDataGridRow, bool>(nameof(IsSelected), false);
 
     public static readonly StyledProperty<bool> IsCurrentProperty =
-        AvaloniaProperty.Register<JDataGridRow, bool>(nameof(IsCurrent), false);
+        AvaloniaProperty.Register<HDevDataGridRow, bool>(nameof(IsCurrent), false);
 
     public static readonly StyledProperty<bool> IsAlternateProperty =
-        AvaloniaProperty.Register<JDataGridRow, bool>(nameof(IsAlternate), false);
+        AvaloniaProperty.Register<HDevDataGridRow, bool>(nameof(IsAlternate), false);
 
     public static readonly StyledProperty<bool> IsEditingProperty =
-        AvaloniaProperty.Register<JDataGridRow, bool>(nameof(IsEditing), false);
+        AvaloniaProperty.Register<HDevDataGridRow, bool>(nameof(IsEditing), false);
 
     public static readonly StyledProperty<double> RowHeightProperty =
-        AvaloniaProperty.Register<JDataGridRow, double>(nameof(RowHeight), 36);
+        AvaloniaProperty.Register<HDevDataGridRow, double>(nameof(RowHeight), 36);
 
     public static readonly StyledProperty<bool> ShowRowNumberProperty =
-        AvaloniaProperty.Register<JDataGridRow, bool>(nameof(ShowRowNumber), false);
+        AvaloniaProperty.Register<HDevDataGridRow, bool>(nameof(ShowRowNumber), false);
 
     public static readonly StyledProperty<bool> ShowRowIndicatorProperty =
-        AvaloniaProperty.Register<JDataGridRow, bool>(nameof(ShowRowIndicator), true);
+        AvaloniaProperty.Register<HDevDataGridRow, bool>(nameof(ShowRowIndicator), true);
 
     public static readonly StyledProperty<GridColumnCollection?> ColumnsProperty =
-        AvaloniaProperty.Register<JDataGridRow, GridColumnCollection?>(nameof(Columns));
+        AvaloniaProperty.Register<HDevDataGridRow, GridColumnCollection?>(nameof(Columns));
 
     public static readonly StyledProperty<IBrush?> SelectedBackgroundProperty =
-        AvaloniaProperty.Register<JDataGridRow, IBrush?>(nameof(SelectedBackground));
+        AvaloniaProperty.Register<HDevDataGridRow, IBrush?>(nameof(SelectedBackground));
 
     public static readonly StyledProperty<IBrush?> AlternateBackgroundProperty =
-        AvaloniaProperty.Register<JDataGridRow, IBrush?>(nameof(AlternateBackground));
+        AvaloniaProperty.Register<HDevDataGridRow, IBrush?>(nameof(AlternateBackground));
 
     public static readonly StyledProperty<IBrush?> HoverBackgroundProperty =
-        AvaloniaProperty.Register<JDataGridRow, IBrush?>(nameof(HoverBackground));
+        AvaloniaProperty.Register<HDevDataGridRow, IBrush?>(nameof(HoverBackground));
 
     #endregion
 
     #region Routed Events
 
     public static readonly RoutedEvent<RowEventArgs> RowClickEvent =
-        RoutedEvent.Register<JDataGridRow, RowEventArgs>(
+        RoutedEvent.Register<HDevDataGridRow, RowEventArgs>(
             nameof(RowClick), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<RowEventArgs> RowDoubleClickEvent =
-        RoutedEvent.Register<JDataGridRow, RowEventArgs>(
+        RoutedEvent.Register<HDevDataGridRow, RowEventArgs>(
             nameof(RowDoubleClick), RoutingStrategies.Bubble);
 
     public event EventHandler<RowEventArgs>? RowClick
@@ -171,18 +171,18 @@ public class JDataGridRow : TemplatedControl
     private static readonly string PC_Editing = ":editing";
     private static readonly string PC_PointerOver = ":pointerover";
 
-    static JDataGridRow()
+    static HDevDataGridRow()
     {
-        IsSelectedProperty.Changed.AddClassHandler<JDataGridRow>((row, e) =>
+        IsSelectedProperty.Changed.AddClassHandler<HDevDataGridRow>((row, e) =>
             row.PseudoClasses.Set(PC_Selected, (bool)e.NewValue!));
 
-        IsCurrentProperty.Changed.AddClassHandler<JDataGridRow>((row, e) =>
+        IsCurrentProperty.Changed.AddClassHandler<HDevDataGridRow>((row, e) =>
             row.PseudoClasses.Set(PC_Current, (bool)e.NewValue!));
 
-        IsAlternateProperty.Changed.AddClassHandler<JDataGridRow>((row, e) =>
+        IsAlternateProperty.Changed.AddClassHandler<HDevDataGridRow>((row, e) =>
             row.PseudoClasses.Set(PC_Alternate, (bool)e.NewValue!));
 
-        IsEditingProperty.Changed.AddClassHandler<JDataGridRow>((row, e) =>
+        IsEditingProperty.Changed.AddClassHandler<HDevDataGridRow>((row, e) =>
             row.PseudoClasses.Set(PC_Editing, (bool)e.NewValue!));
     }
 

@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
-namespace Julien.Avalonia.DataGrid.Models;
+namespace HDev.UI.DataGrid.Models;
 
 /// <summary>
 /// Represents a filter condition for a column.

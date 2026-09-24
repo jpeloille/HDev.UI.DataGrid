@@ -1,8 +1,8 @@
-using Julien.Avalonia.DataGrid.Helpers;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Helpers;
+using HDev.UI.DataGrid.Models;
 using Xunit;
 
-namespace Julien.Avalonia.DataGrid.Tests;
+namespace HDev.UI.DataGrid.Tests;
 
 public class PropertyAccessorTests
 {

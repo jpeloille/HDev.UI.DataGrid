@@ -9,21 +9,21 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Reactive;
 using Avalonia.VisualTree;
-using Julien.Avalonia.DataGrid.Models;
-using Models = Julien.Avalonia.DataGrid.Models;
-using SelectionMode = Julien.Avalonia.DataGrid.Models.SelectionMode;
+using HDev.UI.DataGrid.Models;
+using Models = HDev.UI.DataGrid.Models;
+using SelectionMode = HDev.UI.DataGrid.Models.SelectionMode;
 using System.Collections;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows.Input;
 
-namespace Julien.Avalonia.DataGrid.Controls;
+namespace HDev.UI.DataGrid;
 
 /// <summary>
 /// A high-performance, feature-rich DataGrid control for Avalonia.
 /// Supports sorting, filtering, grouping, editing, virtualization, and more.
 /// </summary>
-public class JDataGrid : TemplatedControl
+public class HDevDataGrid : TemplatedControl
 {
     #region Private Fields
 
@@ -41,12 +41,12 @@ public class JDataGrid : TemplatedControl
     private ItemsControl? _summaryPresenter;
     private ItemsControl? _frozenSummaryPresenter;
     private Border? _frozenSummarySeparator;
-    private JDataGridGroupPanel? _groupPanel;
+    private HDevDataGridGroupPanel? _groupPanel;
     private Border? _frozenHeaderSeparator;
     private Border? _frozenFilterSeparator;
     private object? _editingItem;
     private GridColumn? _editingColumn;
-    private JDataGridCell? _editingCell;
+    private HDevDataGridCell? _editingCell;
     private IDisposable? _widthSubscription;
 
     #endregion
@@ -54,127 +54,127 @@ public class JDataGrid : TemplatedControl
     #region Styled Properties
 
     public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty =
-        AvaloniaProperty.Register<JDataGrid, IEnumerable?>(nameof(ItemsSource));
+        AvaloniaProperty.Register<HDevDataGrid, IEnumerable?>(nameof(ItemsSource));
 
     public static readonly StyledProperty<GridColumnCollection> ColumnsProperty =
-        AvaloniaProperty.Register<JDataGrid, GridColumnCollection>(nameof(Columns));
+        AvaloniaProperty.Register<HDevDataGrid, GridColumnCollection>(nameof(Columns));
 
     public static readonly StyledProperty<object?> SelectedItemProperty =
-        AvaloniaProperty.Register<JDataGrid, object?>(nameof(SelectedItem),
+        AvaloniaProperty.Register<HDevDataGrid, object?>(nameof(SelectedItem),
             defaultBindingMode: BindingMode.TwoWay);
 
     public static readonly StyledProperty<IList?> SelectedItemsProperty =
-        AvaloniaProperty.Register<JDataGrid, IList?>(nameof(SelectedItems));
+        AvaloniaProperty.Register<HDevDataGrid, IList?>(nameof(SelectedItems));
 
     public static readonly StyledProperty<SelectionMode> SelectionModeProperty =
-        AvaloniaProperty.Register<JDataGrid, SelectionMode>(nameof(SelectionMode), SelectionMode.Single);
+        AvaloniaProperty.Register<HDevDataGrid, SelectionMode>(nameof(SelectionMode), SelectionMode.Single);
 
     public static readonly StyledProperty<double> RowHeightProperty =
-        AvaloniaProperty.Register<JDataGrid, double>(nameof(RowHeight), 36);
+        AvaloniaProperty.Register<HDevDataGrid, double>(nameof(RowHeight), 36);
 
     public static readonly StyledProperty<double> HeaderHeightProperty =
-        AvaloniaProperty.Register<JDataGrid, double>(nameof(HeaderHeight), 40);
+        AvaloniaProperty.Register<HDevDataGrid, double>(nameof(HeaderHeight), 40);
 
     public static readonly StyledProperty<bool> ShowHeaderProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(ShowHeader), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(ShowHeader), true);
 
     public static readonly StyledProperty<bool> ShowFilterRowProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(ShowFilterRow), false);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(ShowFilterRow), false);
 
     public static readonly StyledProperty<bool> ShowGroupPanelProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(ShowGroupPanel), false);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(ShowGroupPanel), false);
 
     public static readonly StyledProperty<bool> ShowSummaryFooterProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(ShowSummaryFooter), false);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(ShowSummaryFooter), false);
 
     public static readonly StyledProperty<bool> AllowSortingProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(AllowSorting), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(AllowSorting), true);
 
     public static readonly StyledProperty<bool> AllowFilteringProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(AllowFiltering), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(AllowFiltering), true);
 
     public static readonly StyledProperty<bool> AllowGroupingProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(AllowGrouping), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(AllowGrouping), true);
 
     public static readonly StyledProperty<bool> AllowEditingProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(AllowEditing), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(AllowEditing), true);
 
     public static readonly StyledProperty<bool> AllowColumnResizingProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(AllowColumnResizing), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(AllowColumnResizing), true);
 
     public static readonly StyledProperty<bool> AllowColumnReorderingProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(AllowColumnReordering), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(AllowColumnReordering), true);
 
     public static readonly StyledProperty<bool> AutoGenerateColumnsProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(AutoGenerateColumns), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(AutoGenerateColumns), true);
 
     public static readonly StyledProperty<bool> IsVirtualizingProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(IsVirtualizing), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(IsVirtualizing), true);
 
     public static readonly StyledProperty<bool> ShowRowNumbersProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(ShowRowNumbers), false);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(ShowRowNumbers), false);
 
     public static readonly StyledProperty<bool> ShowRowIndicatorProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(ShowRowIndicator), true);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(ShowRowIndicator), true);
 
     public static readonly StyledProperty<IBrush?> AlternateRowBackgroundProperty =
-        AvaloniaProperty.Register<JDataGrid, IBrush?>(nameof(AlternateRowBackground));
+        AvaloniaProperty.Register<HDevDataGrid, IBrush?>(nameof(AlternateRowBackground));
 
     public static readonly StyledProperty<IBrush?> SelectedRowBackgroundProperty =
-        AvaloniaProperty.Register<JDataGrid, IBrush?>(nameof(SelectedRowBackground));
+        AvaloniaProperty.Register<HDevDataGrid, IBrush?>(nameof(SelectedRowBackground));
 
     public static readonly StyledProperty<IBrush?> HoverRowBackgroundProperty =
-        AvaloniaProperty.Register<JDataGrid, IBrush?>(nameof(HoverRowBackground));
+        AvaloniaProperty.Register<HDevDataGrid, IBrush?>(nameof(HoverRowBackground));
 
     public static readonly StyledProperty<IBrush?> GridLinesColorProperty =
-        AvaloniaProperty.Register<JDataGrid, IBrush?>(nameof(GridLinesColor));
+        AvaloniaProperty.Register<HDevDataGrid, IBrush?>(nameof(GridLinesColor));
 
     public static readonly StyledProperty<GridLinesVisibility> GridLinesVisibilityProperty =
-        AvaloniaProperty.Register<JDataGrid, GridLinesVisibility>(nameof(GridLinesVisibility), GridLinesVisibility.Horizontal);
+        AvaloniaProperty.Register<HDevDataGrid, GridLinesVisibility>(nameof(GridLinesVisibility), GridLinesVisibility.Horizontal);
 
     public static readonly StyledProperty<int> FrozenColumnCountProperty =
-        AvaloniaProperty.Register<JDataGrid, int>(nameof(FrozenColumnCount), 0);
+        AvaloniaProperty.Register<HDevDataGrid, int>(nameof(FrozenColumnCount), 0);
 
     public static readonly StyledProperty<string?> EmptyContentProperty =
-        AvaloniaProperty.Register<JDataGrid, string?>(nameof(EmptyContent), "No data to display");
+        AvaloniaProperty.Register<HDevDataGrid, string?>(nameof(EmptyContent), "No data to display");
 
     public static readonly StyledProperty<bool> IsLoadingProperty =
-        AvaloniaProperty.Register<JDataGrid, bool>(nameof(IsLoading), false);
+        AvaloniaProperty.Register<HDevDataGrid, bool>(nameof(IsLoading), false);
 
     public static readonly StyledProperty<string?> LoadingTextProperty =
-        AvaloniaProperty.Register<JDataGrid, string?>(nameof(LoadingText), "Loading...");
+        AvaloniaProperty.Register<HDevDataGrid, string?>(nameof(LoadingText), "Loading...");
 
     #endregion
 
     #region Command Properties
 
     public static readonly StyledProperty<ICommand?> RowDoubleClickCommandProperty =
-        AvaloniaProperty.Register<JDataGrid, ICommand?>(nameof(RowDoubleClickCommand));
+        AvaloniaProperty.Register<HDevDataGrid, ICommand?>(nameof(RowDoubleClickCommand));
 
     public static readonly StyledProperty<ICommand?> SelectionChangedCommandProperty =
-        AvaloniaProperty.Register<JDataGrid, ICommand?>(nameof(SelectionChangedCommand));
+        AvaloniaProperty.Register<HDevDataGrid, ICommand?>(nameof(SelectionChangedCommand));
 
     public static readonly StyledProperty<ICommand?> CellEditEndingCommandProperty =
-        AvaloniaProperty.Register<JDataGrid, ICommand?>(nameof(CellEditEndingCommand));
+        AvaloniaProperty.Register<HDevDataGrid, ICommand?>(nameof(CellEditEndingCommand));
 
     #endregion
 
     #region Routed Events
 
     public static readonly RoutedEvent<global::Avalonia.Controls.SelectionChangedEventArgs> SelectionChangedEvent =
-        RoutedEvent.Register<JDataGrid, global::Avalonia.Controls.SelectionChangedEventArgs>(
+        RoutedEvent.Register<HDevDataGrid, global::Avalonia.Controls.SelectionChangedEventArgs>(
             nameof(SelectionChanged), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<CellEditEventArgs> CellEditStartingEvent =
-        RoutedEvent.Register<JDataGrid, CellEditEventArgs>(
+        RoutedEvent.Register<HDevDataGrid, CellEditEventArgs>(
             nameof(CellEditStarting), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<CellEditEventArgs> CellEditEndingEvent =
-        RoutedEvent.Register<JDataGrid, CellEditEventArgs>(
+        RoutedEvent.Register<HDevDataGrid, CellEditEventArgs>(
             nameof(CellEditEnding), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<ColumnEventArgs> ColumnSortedEvent =
-        RoutedEvent.Register<JDataGrid, ColumnEventArgs>(
+        RoutedEvent.Register<HDevDataGrid, ColumnEventArgs>(
             nameof(ColumnSorted), RoutingStrategies.Bubble);
 
     public event EventHandler<global::Avalonia.Controls.SelectionChangedEventArgs>? SelectionChanged
@@ -443,7 +443,7 @@ public class JDataGrid : TemplatedControl
 
     #region Constructor
 
-    public JDataGrid()
+    public HDevDataGrid()
     {
         Columns = new GridColumnCollection();
         _selection.SelectionChanged += OnSelectionManagerChanged;
@@ -452,12 +452,12 @@ public class JDataGrid : TemplatedControl
         GroupSummaries.CollectionChanged += (_, _) => { ComputeGroupSummaries(); _dataSource.RebuildVisualRows(); };
     }
 
-    static JDataGrid()
+    static HDevDataGrid()
     {
-        ItemsSourceProperty.Changed.AddClassHandler<JDataGrid>((grid, e) => grid.OnItemsSourceChanged(e));
-        SelectionModeProperty.Changed.AddClassHandler<JDataGrid>((grid, e) => grid.OnSelectionModeChanged(e));
-        SelectedItemProperty.Changed.AddClassHandler<JDataGrid>((grid, e) => grid.OnSelectedItemChanged(e));
-        ShowSummaryFooterProperty.Changed.AddClassHandler<JDataGrid>((grid, _) => grid.UpdateSummaryFooter());
+        ItemsSourceProperty.Changed.AddClassHandler<HDevDataGrid>((grid, e) => grid.OnItemsSourceChanged(e));
+        SelectionModeProperty.Changed.AddClassHandler<HDevDataGrid>((grid, e) => grid.OnSelectionModeChanged(e));
+        SelectedItemProperty.Changed.AddClassHandler<HDevDataGrid>((grid, e) => grid.OnSelectedItemChanged(e));
+        ShowSummaryFooterProperty.Changed.AddClassHandler<HDevDataGrid>((grid, _) => grid.UpdateSummaryFooter());
     }
 
     #endregion
@@ -480,7 +480,7 @@ public class JDataGrid : TemplatedControl
         _summaryPresenter = e.NameScope.Find<ItemsControl>("PART_SummaryPresenter");
         _frozenSummaryPresenter = e.NameScope.Find<ItemsControl>("PART_FrozenSummaryPresenter");
         _frozenSummarySeparator = e.NameScope.Find<Border>("PART_FrozenSummarySeparator");
-        _groupPanel = e.NameScope.Find<JDataGridGroupPanel>("PART_GroupPanel");
+        _groupPanel = e.NameScope.Find<HDevDataGridGroupPanel>("PART_GroupPanel");
         _frozenHeaderSeparator = e.NameScope.Find<Border>("PART_FrozenHeaderSeparator");
         _frozenFilterSeparator = e.NameScope.Find<Border>("PART_FrozenFilterSeparator");
 
@@ -501,30 +501,30 @@ public class JDataGrid : TemplatedControl
                 }));
         }
 
-        // Listen to column header events (bubbled from JDataGridColumnHeader)
-        AddHandler(JDataGridColumnHeader.SortRequestedEvent, OnColumnSortRequested);
-        AddHandler(JDataGridColumnHeader.ResizeCompletedEvent, OnColumnResizeCompleted);
-        AddHandler(JDataGridColumnHeader.ReorderCompletedEvent, OnColumnReorderCompleted);
-        AddHandler(JDataGridColumnHeader.FreezeRequestedEvent, OnColumnFreezeRequested);
-        AddHandler(JDataGridColumnHeader.AutoFitRequestedEvent, OnColumnAutoFitRequested);
+        // Listen to column header events (bubbled from HDevDataGridColumnHeader)
+        AddHandler(HDevDataGridColumnHeader.SortRequestedEvent, OnColumnSortRequested);
+        AddHandler(HDevDataGridColumnHeader.ResizeCompletedEvent, OnColumnResizeCompleted);
+        AddHandler(HDevDataGridColumnHeader.ReorderCompletedEvent, OnColumnReorderCompleted);
+        AddHandler(HDevDataGridColumnHeader.FreezeRequestedEvent, OnColumnFreezeRequested);
+        AddHandler(HDevDataGridColumnHeader.AutoFitRequestedEvent, OnColumnAutoFitRequested);
 
-        // Listen to filter cell events (bubbled from JDataGridFilterCell)
-        AddHandler(JDataGridFilterCell.FilterChangedEvent, OnFilterChanged);
+        // Listen to filter cell events (bubbled from HDevDataGridFilterCell)
+        AddHandler(HDevDataGridFilterCell.FilterChangedEvent, OnFilterChanged);
 
-        // Listen to cell edit events (bubbled from JDataGridCell)
-        AddHandler(JDataGridCell.BeginEditEvent, OnCellBeginEditRequested);
-        AddHandler(JDataGridCell.EditEndedEvent, OnCellEditEnded);
+        // Listen to cell edit events (bubbled from HDevDataGridCell)
+        AddHandler(HDevDataGridCell.BeginEditEvent, OnCellBeginEditRequested);
+        AddHandler(HDevDataGridCell.EditEndedEvent, OnCellEditEnded);
 
         // Mouse selection (bubbled from rows/cells)
-        AddHandler(JDataGridRow.RowClickEvent, OnRowClicked);
-        AddHandler(JDataGridCell.CellClickEvent, OnCellClicked);
+        AddHandler(HDevDataGridRow.RowClickEvent, OnRowClicked);
+        AddHandler(HDevDataGridCell.CellClickEvent, OnCellClicked);
 
         // Listen to group panel events
-        AddHandler(JDataGridGroupPanel.ColumnGroupedEvent, OnColumnGrouped);
-        AddHandler(JDataGridGroupPanel.ColumnUngroupedEvent, OnColumnUngrouped);
+        AddHandler(HDevDataGridGroupPanel.ColumnGroupedEvent, OnColumnGrouped);
+        AddHandler(HDevDataGridGroupPanel.ColumnUngroupedEvent, OnColumnUngrouped);
 
         // Rebuild the visual rows when a group header is expanded/collapsed.
-        AddHandler(JDataGridGroupRow.ExpandChangedEvent, OnGroupExpandChanged);
+        AddHandler(HDevDataGridGroupRow.ExpandChangedEvent, OnGroupExpandChanged);
 
         RefreshView();
     }
@@ -647,7 +647,7 @@ public class JDataGrid : TemplatedControl
         }
     }
 
-    private void BeginEdit(JDataGridCell cell)
+    private void BeginEdit(HDevDataGridCell cell)
     {
         if (!AllowEditing || cell.Column == null || cell.RowData == null || cell.IsReadOnly)
             return;
@@ -686,7 +686,7 @@ public class JDataGrid : TemplatedControl
 
     private void OnCellBeginEditRequested(object? sender, CellEventArgs e)
     {
-        if (e.Source is JDataGridCell cell)
+        if (e.Source is HDevDataGridCell cell)
         {
             BeginEdit(cell);
             e.Handled = true;
@@ -708,12 +708,12 @@ public class JDataGrid : TemplatedControl
         e.Handled = true;
     }
 
-    private JDataGridCell? FindCell(object item, GridColumn column)
+    private HDevDataGridCell? FindCell(object item, GridColumn column)
     {
         if (_rowsPresenter == null) return null;
 
         return _rowsPresenter.GetVisualDescendants()
-            .OfType<JDataGridCell>()
+            .OfType<HDevDataGridCell>()
             .FirstOrDefault(c => Equals(c.RowData, item) && c.Column == column);
     }
 
@@ -937,7 +937,7 @@ public class JDataGrid : TemplatedControl
     {
         if (_rowsPresenter == null) return;
 
-        foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<JDataGridRow>())
+        foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<HDevDataGridRow>())
         {
             var item = row.DataContext;
             var rowIndex = item != null ? _dataSource.IndexOf(item) : -1;
@@ -946,7 +946,7 @@ public class JDataGrid : TemplatedControl
             row.IsSelected = false;
             row.IsCurrent = item != null && ReferenceEquals(item, _selection.CurrentItem);
 
-            foreach (var cell in row.GetVisualDescendants().OfType<JDataGridCell>())
+            foreach (var cell in row.GetVisualDescendants().OfType<HDevDataGridCell>())
             {
                 cell.IsSelected = rowIndex >= 0 && cell.Column != null &&
                     _selection.IsCellSelected(rowIndex, cell.Column);
@@ -1008,7 +1008,7 @@ public class JDataGrid : TemplatedControl
     {
         if (_rowsPresenter == null) return;
 
-        foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<JDataGridRow>())
+        foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<HDevDataGridRow>())
         {
             var item = row.DataContext;
             row.IsSelected = item != null && _selection.IsSelected(item);
@@ -1227,7 +1227,7 @@ public class JDataGrid : TemplatedControl
     {
         if (!AllowFiltering || e.Column == null) return;
 
-        var valueless = JDataGridFilterCell.IsValueless(e.Operator);
+        var valueless = HDevDataGridFilterCell.IsValueless(e.Operator);
 
         if (string.IsNullOrWhiteSpace(e.FilterText) && !valueless)
         {
@@ -1312,7 +1312,7 @@ public class JDataGrid : TemplatedControl
             // Rows no longer rebuild their cells on recycle (cells rebind instead),
             // so push column-structure changes (reorder/freeze/visibility) to any
             // already realized rows here.
-            foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<JDataGridRow>())
+            foreach (var row in _rowsPresenter.GetVisualDescendants().OfType<HDevDataGridRow>())
             {
                 row.RefreshCells();
             }

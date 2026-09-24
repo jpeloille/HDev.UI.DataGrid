@@ -5,7 +5,7 @@ using Avalonia.Data;
 using Avalonia.Media;
 using System.ComponentModel;
 
-namespace Julien.Avalonia.DataGrid.Models;
+namespace HDev.UI.DataGrid.Models;
 
 /// <summary>
 /// Defines a column in the DataGrid with full support for sorting, filtering,

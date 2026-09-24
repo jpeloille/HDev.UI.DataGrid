@@ -4,16 +4,16 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Julien.Avalonia.DataGrid.Models;
+using HDev.UI.DataGrid.Models;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace Julien.Avalonia.DataGrid.Controls;
+namespace HDev.UI.DataGrid;
 
 /// <summary>
 /// Panel for drag-and-drop column grouping.
 /// </summary>
-public class JDataGridGroupPanel : TemplatedControl
+public class HDevDataGridGroupPanel : TemplatedControl
 {
     private Border? _dropZone;
     private ItemsControl? _groupedColumnsPresenter;
@@ -21,29 +21,29 @@ public class JDataGridGroupPanel : TemplatedControl
     #region Styled Properties
 
     public static readonly StyledProperty<ObservableCollection<GridColumn>> GroupedColumnsProperty =
-        AvaloniaProperty.Register<JDataGridGroupPanel, ObservableCollection<GridColumn>>(
+        AvaloniaProperty.Register<HDevDataGridGroupPanel, ObservableCollection<GridColumn>>(
             nameof(GroupedColumns), new ObservableCollection<GridColumn>());
 
     public static readonly StyledProperty<string> PlaceholderTextProperty =
-        AvaloniaProperty.Register<JDataGridGroupPanel, string>(
+        AvaloniaProperty.Register<HDevDataGridGroupPanel, string>(
             nameof(PlaceholderText), "Drag a column header here to group by that column");
 
     public static readonly StyledProperty<bool> IsDragOverProperty =
-        AvaloniaProperty.Register<JDataGridGroupPanel, bool>(nameof(IsDragOver), false);
+        AvaloniaProperty.Register<HDevDataGridGroupPanel, bool>(nameof(IsDragOver), false);
 
     public static readonly StyledProperty<bool> HasGroupsProperty =
-        AvaloniaProperty.Register<JDataGridGroupPanel, bool>(nameof(HasGroups), false);
+        AvaloniaProperty.Register<HDevDataGridGroupPanel, bool>(nameof(HasGroups), false);
 
     #endregion
 
     #region Routed Events
 
     public static readonly RoutedEvent<GroupColumnEventArgs> ColumnGroupedEvent =
-        RoutedEvent.Register<JDataGridGroupPanel, GroupColumnEventArgs>(
+        RoutedEvent.Register<HDevDataGridGroupPanel, GroupColumnEventArgs>(
             nameof(ColumnGrouped), RoutingStrategies.Bubble);
 
     public static readonly RoutedEvent<GroupColumnEventArgs> ColumnUngroupedEvent =
-        RoutedEvent.Register<JDataGridGroupPanel, GroupColumnEventArgs>(
+        RoutedEvent.Register<HDevDataGridGroupPanel, GroupColumnEventArgs>(
             nameof(ColumnUngrouped), RoutingStrategies.Bubble);
 
     public event EventHandler<GroupColumnEventArgs>? ColumnGrouped
@@ -95,15 +95,15 @@ public class JDataGridGroupPanel : TemplatedControl
 
     #region Constructor
 
-    public JDataGridGroupPanel()
+    public HDevDataGridGroupPanel()
     {
         RemoveGroupCommand = new RemoveGroupRelayCommand(this);
         GroupedColumns = new ObservableCollection<GridColumn>();
     }
 
-    static JDataGridGroupPanel()
+    static HDevDataGridGroupPanel()
     {
-        GroupedColumnsProperty.Changed.AddClassHandler<JDataGridGroupPanel>((panel, e) =>
+        GroupedColumnsProperty.Changed.AddClassHandler<HDevDataGridGroupPanel>((panel, e) =>
         {
             if (e.OldValue is ObservableCollection<GridColumn> oldCol)
                 oldCol.CollectionChanged -= panel.OnGroupedColumnsChanged;
@@ -130,9 +130,9 @@ public class JDataGridGroupPanel : TemplatedControl
 
     private sealed class RemoveGroupRelayCommand : ICommand
     {
-        private readonly JDataGridGroupPanel _owner;
+        private readonly HDevDataGridGroupPanel _owner;
 
-        public RemoveGroupRelayCommand(JDataGridGroupPanel owner) => _owner = owner;
+        public RemoveGroupRelayCommand(HDevDataGridGroupPanel owner) => _owner = owner;
 
         // CanExecute is a pure function of the parameter, so it never changes for
         // a given chip; no need to raise this. Empty accessors satisfy ICommand
@@ -174,7 +174,7 @@ public class JDataGridGroupPanel : TemplatedControl
 
     private void OnDragEnter(object? sender, DragEventArgs e)
     {
-        if (e.DataTransfer.Contains(JDataGridColumnHeader.ColumnDragFormat))
+        if (e.DataTransfer.Contains(HDevDataGridColumnHeader.ColumnDragFormat))
         {
             IsDragOver = true;
             e.DragEffects = DragDropEffects.Move;
@@ -187,7 +187,7 @@ public class JDataGridGroupPanel : TemplatedControl
     // XDND/platform layer reports "won't accept" and Drop never fires.
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        if (e.DataTransfer.Contains(JDataGridColumnHeader.ColumnDragFormat))
+        if (e.DataTransfer.Contains(HDevDataGridColumnHeader.ColumnDragFormat))
         {
             IsDragOver = true;
             e.DragEffects = DragDropEffects.Move;
@@ -209,7 +209,7 @@ public class JDataGridGroupPanel : TemplatedControl
     {
         IsDragOver = false;
 
-        if (e.DataTransfer.TryGetValue(JDataGridColumnHeader.ColumnDragFormat) is GridColumn column)
+        if (e.DataTransfer.TryGetValue(HDevDataGridColumnHeader.ColumnDragFormat) is GridColumn column)
         {
             // Check if column is already grouped
             if (!GroupedColumns.Contains(column) && column.AllowGroup)

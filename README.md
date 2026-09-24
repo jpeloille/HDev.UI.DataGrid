@@ -1,4 +1,4 @@
-# Julien.Avalonia.DataGrid
+# HDev.UI.DataGrid
 
 A high-performance, feature-rich DataGrid control library for Avalonia UI, inspired by DevExpress controls.
 
@@ -41,10 +41,10 @@ A high-performance, feature-rich DataGrid control library for Avalonia UI, inspi
 
 ```bash
 # Via NuGet (when published)
-dotnet add package Julien.Avalonia.DataGrid
+dotnet add package HDev.UI.DataGrid
 
 # Or add project reference
-dotnet add reference path/to/Julien.Avalonia.DataGrid.csproj
+dotnet add reference path/to/HDev.UI.DataGrid.csproj
 ```
 
 ## Quick Start
@@ -55,7 +55,7 @@ dotnet add reference path/to/Julien.Avalonia.DataGrid.csproj
 <Application xmlns="https://github.com/avaloniaui">
   <Application.Styles>
     <FluentTheme />
-    <ResourceInclude Source="avares://Julien.Avalonia.DataGrid/Themes/Index.axaml" />
+    <ResourceInclude Source="avares://HDev.UI.DataGrid/Themes/Index.axaml" />
   </Application.Styles>
 </Application>
 ```
@@ -63,17 +63,17 @@ dotnet add reference path/to/Julien.Avalonia.DataGrid.csproj
 ### 2. Use the DataGrid
 
 ```xml
-<Window xmlns:jdg="using:Julien.Avalonia.DataGrid.Controls"
-        xmlns:models="using:Julien.Avalonia.DataGrid.Models">
+<Window xmlns:hgrid="using:HDev.UI.DataGrid"
+        xmlns:models="using:HDev.UI.DataGrid.Models">
   
-  <jdg:JDataGrid ItemsSource="{Binding Employees}"
+  <hgrid:HDevDataGrid ItemsSource="{Binding Employees}"
                  SelectedItem="{Binding SelectedEmployee}"
                  AllowSorting="True"
                  AllowFiltering="True"
                  AllowGrouping="True"
                  AllowEditing="True">
     
-    <jdg:JDataGrid.Columns>
+    <hgrid:HDevDataGrid.Columns>
       <models:GridColumn FieldName="Id" Header="ID" Width="60" IsReadOnly="True" />
       <models:GridColumn FieldName="Name" Header="Name" Width="150" />
       <models:GridColumn FieldName="Salary" Header="Salary" Width="100" 
@@ -82,16 +82,16 @@ dotnet add reference path/to/Julien.Avalonia.DataGrid.csproj
                          ColumnType="DateTime" FormatString="d" />
       <models:GridColumn FieldName="IsActive" Header="Active" Width="60" 
                          ColumnType="Boolean" />
-    </jdg:JDataGrid.Columns>
+    </hgrid:HDevDataGrid.Columns>
     
-  </jdg:JDataGrid>
+  </hgrid:HDevDataGrid>
 </Window>
 ```
 
 ### 3. Auto-generated columns
 
 ```xml
-<jdg:JDataGrid ItemsSource="{Binding Employees}"
+<hgrid:HDevDataGrid ItemsSource="{Binding Employees}"
                AutoGenerateColumns="True" />
 ```
 
@@ -225,13 +225,13 @@ plus the raw colors `DataGridFrozenColumnSeparator`, `DataGridGridLines`,
 ## Architecture
 
 ```
-Julien.Avalonia.DataGrid/
+HDev.UI.DataGrid/
 ├── Controls/
-│   ├── JDataGrid.cs           # Main control
-│   ├── JDataGridColumnHeader.cs
-│   ├── JDataGridRow.cs
-│   ├── JDataGridCell.cs
-│   └── JDataGridGroupRow.cs
+│   ├── HDevDataGrid.cs           # Main control
+│   ├── HDevDataGridColumnHeader.cs
+│   ├── HDevDataGridRow.cs
+│   ├── HDevDataGridCell.cs
+│   └── HDevDataGridGroupRow.cs
 ├── Models/
 │   ├── GridColumn.cs          # Column definition
 │   ├── GridColumnCollection.cs
@@ -244,7 +244,7 @@ Julien.Avalonia.DataGrid/
 ├── Converters/
 │   └── DataGridConverters.cs
 └── Themes/
-    ├── JDataGrid.axaml        # Visual themes
+    ├── HDevDataGrid.axaml        # Visual themes
     └── Index.axaml
 ```
 

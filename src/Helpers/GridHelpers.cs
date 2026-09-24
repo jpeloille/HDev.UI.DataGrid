@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 
-namespace Julien.Avalonia.DataGrid.Helpers;
+namespace HDev.UI.DataGrid.Helpers;
 
 /// <summary>
 /// Helper class for virtualization calculations.
