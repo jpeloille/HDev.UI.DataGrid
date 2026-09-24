@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Input;
+using Avalonia.Input.Raw;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
@@ -191,18 +192,42 @@ double wAfter = grid.Columns.First(c => c.FieldName == nameof(Emp.Salary)).Actua
 Check($"resize: dragging the grip widens the column ({wBefore:F0} -> {wAfter:F0})", wAfter > wBefore + 20);
 Save("int-04-resized");
 
-// === 8. Column reorder (INFO only) ===
-// Reorder uses DragDrop.DoDragDrop (OS-level drag/drop), which the headless
-// simulated mouse moves cannot initiate. Not a product verdict — needs the real
-// app or a DnD-aware harness. Reported as info, not counted as a failure.
+// === 8. Column reorder: drop side ===
+// Starting the drag (DoDragDropAsync) is OS-level and can't be driven headless,
+// but the drop side can: the headless DragDrop helper replays DragEnter/Over/Drop
+// with the same in-process DataTransfer the header builds.
 var nameH = Header(nameof(Emp.Name));
 var deptH = Header(nameof(Emp.Department));
-var fromPt = nameH.TranslatePoint(new Point(nameH.Bounds.Width / 2, nameH.Bounds.Height / 2), window) ?? new Point();
-var toPt = deptH.TranslatePoint(new Point(deptH.Bounds.Width / 2, deptH.Bounds.Height / 2), window) ?? new Point();
-int idxBefore = grid.Columns.First(c => c.FieldName == nameof(Emp.Name)).VisibleIndex;
-Drag(fromPt, toPt);
-int idxAfter = grid.Columns.First(c => c.FieldName == nameof(Emp.Name)).VisibleIndex;
-Console.WriteLine($"  [INFO] reorder via simulated DnD not exercised (OS drag/drop); Name index {idxBefore} -> {idxAfter} — verify in the real app");
+var toPt = deptH.TranslatePoint(new Point(deptH.Bounds.Width * 0.75, deptH.Bounds.Height / 2), window) ?? new Point();
+var nameCol = grid.Columns.First(c => c.FieldName == nameof(Emp.Name));
+int idxBefore = nameCol.VisibleIndex;
+var columnDrag = new DataTransfer();
+columnDrag.Add(DataTransferItem.Create(HDevDataGridColumnHeader.ColumnDragFormat, nameCol));
+window.DragDrop(toPt, RawDragEventType.DragEnter, columnDrag, DragDropEffects.Move, RawInputModifiers.None);
+window.DragDrop(toPt, RawDragEventType.DragOver, columnDrag, DragDropEffects.Move, RawInputModifiers.None);
+bool indicatorShown = deptH.IsDragOverLeft || deptH.IsDragOverRight;
+window.DragDrop(toPt, RawDragEventType.Drop, columnDrag, DragDropEffects.Move, RawInputModifiers.None);
+Pump();
+int idxAfter = nameCol.VisibleIndex;
+Check("reorder: header recognizes the column drag format (drop indicator shown)", indicatorShown);
+Check($"reorder: dropping Name on Department moves it ({idxBefore} -> {idxAfter})", idxAfter != idxBefore);
+Save("int-05-reordered");
+
+// === 9. Group panel: drop side ===
+grid.ShowGroupPanel = true;
+Pump();
+var groupPanel = grid.GetVisualDescendants().OfType<HDevDataGridGroupPanel>().First();
+var panelPt = groupPanel.TranslatePoint(new Point(groupPanel.Bounds.Width / 2, groupPanel.Bounds.Height / 2), window) ?? new Point();
+var deptCol = grid.Columns.First(c => c.FieldName == nameof(Emp.Department));
+var groupDrag = new DataTransfer();
+groupDrag.Add(DataTransferItem.Create(HDevDataGridColumnHeader.ColumnDragFormat, deptCol));
+window.DragDrop(panelPt, RawDragEventType.DragEnter, groupDrag, DragDropEffects.Move, RawInputModifiers.None);
+window.DragDrop(panelPt, RawDragEventType.DragOver, groupDrag, DragDropEffects.Move, RawInputModifiers.None);
+window.DragDrop(panelPt, RawDragEventType.Drop, groupDrag, DragDropEffects.Move, RawInputModifiers.None);
+Pump();
+Check($"group panel: dropping Department groups by it (groups={groupPanel.GroupedColumns.Count})",
+    groupPanel.GroupedColumns.Contains(deptCol));
+Save("int-06-grouped-by-drop");
 
 Console.WriteLine(failed == 0 ? "Interaction: ALL PASS" : $"Interaction: {failed} FAILED");
 Environment.ExitCode = failed == 0 ? 0 : 1;

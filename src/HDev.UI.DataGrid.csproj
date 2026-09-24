@@ -20,6 +20,10 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Interaction" />
+  </ItemGroup>
+
   <!-- Include all AXAML files as Avalonia resources -->
   <ItemGroup>
     <AvaloniaResource Include="**/*.axaml" />
